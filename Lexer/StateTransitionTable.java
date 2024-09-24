@@ -1,8 +1,8 @@
 package Lexer;
 
 public class StateTransitionTable {
-    int rows = 72;
-    int columns = 51;
+    public int rows = 72;
+    public int columns = 51;
 
     public StateTransitionTable() { // TODO determine how to index using the characters
         int[][] table = {
