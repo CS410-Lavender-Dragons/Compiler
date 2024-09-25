@@ -1,5 +1,6 @@
 package Lexer;
 
+//Token name with corresponding final state
 public enum TokenName {
     IN_KW(2), //in keyword 
     IF_KW(3), //if keyword
