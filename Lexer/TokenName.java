@@ -14,7 +14,7 @@ public enum TokenName {
     NUMERIC(34), //numeric
     DECIMAL(50), //decimal
     RANGE_OP(51), //range operator 
-    INCLUSIVERANGE_OP(52), //fixed missing comma
+    INCLUSIVERANGE_OP(52), //Inclusive range operator
     OPEN_BRACKET(49), //open bracket
     CLOSE_BRACKET(48), //close bracket
     OPEN_PAREN(47), //open parenthesis
@@ -39,7 +39,7 @@ public enum TokenName {
     BIT_16_FLOAT_OP(64),
     BIT_32_FLOAT_OP(68),
     BIT_64_FLOAT_OP(70),
-    BIT_128_FLOAT_OP(66); //fixed missing comma and added semicolon at the end
+    BIT_128_FLOAT_OP(66); 
 
 
     private final int token;
