@@ -39,7 +39,8 @@ public enum TokenName {
     BIT_16_FLOAT_OP(64),
     BIT_32_FLOAT_OP(68),
     BIT_64_FLOAT_OP(70),
-    BIT_128_FLOAT_OP(66); 
+    BIT_128_FLOAT_OP(66),
+    IDENTIFIER(71);
 
 
     private final int token;
