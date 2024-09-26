@@ -24,7 +24,7 @@ public class Lexer {
 
             //Character is not valid
             if (table.columnIndex(inputChar) == -1){
-                createToken(TokenName.INVALID_INPUT);
+                tokens.add(createToken(TokenName.INVALID_INPUT));
                 return tokens;
             }
 
@@ -38,10 +38,10 @@ public class Lexer {
 
                 //Need IDENTIFIER to also encompass states 1, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 17, 18, 20, 21, 23, 24, 25, 27, 28, 30, 31
                 if(curr_state == TokenName.IDENTIFIER || curr_state == TokenName.NUMERIC){ //Tokens which have a value (Identifier, Numeric)
-                    createToken(curr_state, value);
+                    tokens.add(createToken(curr_state, value));
                 }
                 else if (curr_state != 0){ //Tokens that don't have an associated value, excluding all whitespace
-                    createToken(curr_state);
+                    tokens.add(createToken(curr_state));
                 }
 
                 //Reset to start state, clear value String
@@ -49,5 +49,16 @@ public class Lexer {
                 value = "";
             }
         }
+
+        tokens.add(TokenName.EOI);
+        return tokens;
+    }
+
+    private Token createToken(TokenName name, String value){
+        
+    }
+
+    private Token createToken(TokenName name){
+        return new Token(name);
     }
 }
