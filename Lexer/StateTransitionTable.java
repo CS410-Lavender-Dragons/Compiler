@@ -144,10 +144,7 @@ public class StateTransitionTable {
     }
 
     public int columnIndex(char character) {
-        //TODO handle null?
-        int index = this.columnMap.get(character);
-        System.out.println(index);
-        return index;
+        return this.columnMap.getOrDefault(character, -1);
     }
 
 
