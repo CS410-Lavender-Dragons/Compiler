@@ -1,5 +1,6 @@
     package Lexer;
 
+    
     import java.util.Arrays;
     import java.util.LinkedList;
     import java.util.Queue;
@@ -7,6 +8,7 @@
     import Lexer.TokenName;
 
 
+    @SuppressWarnings("unused")
     public class Lexer {
         public static void main(String[] args) {
             StateTransitionTable table = new StateTransitionTable();
@@ -19,6 +21,7 @@
         public Queue<Token> tokenize(String input) {
             Queue<Token> tokens = new LinkedList<Token>();
             char inputChar;
+            @SuppressWarnings("unused")
             int inputIndexMapping;
             String value = "";
             int curr_state = 0;
@@ -27,13 +30,13 @@
                 inputChar = input.charAt(i);
 
                 //Character is not valid
-                if (table.columnIndex(inputChar) == -1){
+                if (table.columnIndex("" + inputChar) == -1){
                     tokens.add(createToken(TokenName.INVALID_INPUT));
                     return tokens;
                 }
 
-                //Update current state
-                curr_state = table.getNextState(curr_state, inputChar);
+                //update state; ooh ooh aah aah 
+                curr_state = table.getNextState(curr_state, "" + inputChar);
 
                 //Add input character to value String
                 value += inputChar;
