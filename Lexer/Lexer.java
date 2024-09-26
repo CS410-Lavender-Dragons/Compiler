@@ -44,7 +44,7 @@
                 if(accepting(curr_state)){
                     LinkedList<Integer> idList = new LinkedList<>(Arrays.asList(1, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 17, 18, 20, 21, 23, 24, 25, 27, 28, 30, 31));
 
-                    if(idList.contains(curr_state) || curr_state == TokenName.NUMERIC.getValue()){ //Tokens which have a value (Identifier, String)
+                    if(idList.contains(curr_state) || curr_state == TokenName.IDENTIFIER.getValue()){ //Tokens which have a value (Identifier, String)
                         tokens.add(createToken(TokenName.valToToken(curr_state), value));
                     }
                     else if (curr_state == TokenName.NUMERIC.getValue()){ //Token with a value (Numeric, Integer)
