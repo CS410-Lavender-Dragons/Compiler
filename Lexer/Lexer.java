@@ -37,8 +37,11 @@ public class Lexer {
             if(accepting(curr_state)){
 
                 //Need IDENTIFIER to also encompass states 1, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 17, 18, 20, 21, 23, 24, 25, 27, 28, 30, 31
-                if(curr_state == TokenName.IDENTIFIER || curr_state == TokenName.NUMERIC){ //Tokens which have a value (Identifier, Numeric)
+                if(curr_state == TokenName.IDENTIFIER){ //Token with a value (string identifier)
                     tokens.add(createToken(curr_state, value));
+                }
+                else if (curr_state == TokenName.NUMERIC.getValue()){ //Token with a value (Integer numeric)
+                    tokens.add(createToken(curr_state, Integer.valueOf(value)));
                 }
                 else if (curr_state != 0){ //Tokens that don't have an associated value, excluding all whitespace
                     tokens.add(createToken(curr_state));
@@ -55,7 +58,7 @@ public class Lexer {
     }
 
     private Token createToken(TokenName name, String value){
-        
+        return new Token(name, value);
     }
 
     private Token createToken(TokenName name){
