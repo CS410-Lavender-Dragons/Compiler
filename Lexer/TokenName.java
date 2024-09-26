@@ -1,44 +1,57 @@
 package Lexer;
 
-//Valeu will be ITS FINAL STATE
+//Token name with corresponding final state
 public enum TokenName {
-    IN_KW, //in keyword 
-    IF_KW, //if keyword
-    LOOP_KW, //loop keyword
-    LET_KW, //let keyword
-    ELSE_KW, //else keyword
-    FOR_KW, //for keyword
-    MUT_KW, //mut keyword
-    BREAK_KW,
-    CONTINUE_KW,
-    NUMERIC,
-    DECIMAL,
-    RANGE_OP,
-    INCRANGE_OP, //NAME IS TRASH ILL THINK OF A BETTER ONE LATER
-    OPEN_BRACKET_KW,
-    CLOSE_BRACKET_KW,
-    OPEN_PARENTHESIS_KW,
-    CLOSE_PARENTHESIS_KW,
-    PLUS_OP,
-    MINUS_OP,
-    MULTIPLY_OP,
-    DIVIDE_OP,
-    GT_OP,
-    GE_OP,
-    LT_OP,
-    LE_OP,
-    ASSIGNMENT_OP,
-    EQUALITY_COMPARISON_OP,
-    STATEMENT_TERMINATOR,
-    SIGNED8BIT_INT, //128-bit signed integer point data type
-    SIGNED16BIT_INT, //128-bit signed integer point data type
-    SIGNED32BIT_INT, //128-bit signed integer point data type
-    SIGNED64BIT_INT, //128-bit signed integer point data type
-    SIGNED128BIT_INT, //128-bit signed integer data type
-    SIGNED8BIT_FLOAT, //8-bit signed floating point data type
-    SIGNED16BIT_FLOAT, //16-bit signed floating point data type
-    SIGNED32BIT_FLOAT, //32-bit signed floating point data type
-    SIGNED64BIT_FLOAT, //64-bit signed floating point data type
-    SIGNED128BIT_FLOAT, // 128-bit signed floating point data type
+    IN_KW(2), //in keyword 
+    IF_KW(3), //if keyword
+    LOOP_KW(32), //loop keyword
+    LET_KW(29), //let keyword
+    ELSE_KW(26), //else keyword
+    FOR_KW(22), //for keyword
+    MUT_KW(19), //mut keyword
+    BREAK_KW(16), //break keyword
+    CONTINUE_KW(11), //continue keyword
+    NUMERIC(34), //numeric
+    DECIMAL(50), //decimal
+    RANGE_OP(51), //range operator 
+    INCLUSIVERANGE_OP(52), //Inclusive range operator
+    OPEN_BRACKET(49), //open bracket
+    CLOSE_BRACKET(48), //close bracket
+    OPEN_PAREN(47), //open parenthesis
+    CLOSE_PAREN(46), //close parenthesis
+    ADD_OP(45), //addition operator
+    SUB_OP(44), //subtraction operator 
+    MULT_OP(43), //multiplication operator
+    DIV_OP(42), //division operator
+    GREATER_OP(40), //greater than operator
+    GREATER_EQ_OP(41), //greater than or equal operator
+    LESS_OP(38), //less than operator
+    LESS_EQ_OP(39), //less than or equal operator 
+    ASSIGN_OP(36), //assignment operator
+    EQ_OP(37), //equality comparison operator
+    SEMICOLON(35), //statement terminator
+    BIT_8_INT_OP(53), 
+    BIT_16_INT_OP(55), 
+    BIT_32_INT_OP(59), 
+    BIT_64_INT_OP(61), 
+    BIT_128_INT_OP(57), 
+    BIT_8_FLOAT_OP(62), 
+    BIT_16_FLOAT_OP(64),
+    BIT_32_FLOAT_OP(68),
+    BIT_64_FLOAT_OP(70),
+    BIT_128_FLOAT_OP(66),
+    IDENTIFIER(71);
 
+
+    private final int token;
+
+    //Token Constructor
+    TokenName(int token) {
+        this.token = token;
+    }
+
+    //Token Getter
+    public int getValue() {
+        return token;
+    }
 }
