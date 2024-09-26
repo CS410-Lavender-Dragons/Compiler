@@ -57,4 +57,14 @@ public enum TokenName {
     public int getValue() {
         return token;
     }
+
+    //convert value back to token (to get rid of mad vscode squiggles)
+    public static TokenName valToToken(int value){
+        //seek & destroy
+        for(TokenName currentToken:TokenName.values()){
+            if(currentToken.token == value)
+                return currentToken;
+        }
+        return INVALID_INPUT;
+    }
 }

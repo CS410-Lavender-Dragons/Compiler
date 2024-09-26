@@ -1,7 +1,11 @@
 package Lexer;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
+import Lexer.Token;
+import Lexer.TokenName;
+
 
 public class Lexer {
     public static void main(String[] args) {
@@ -35,10 +39,11 @@ public class Lexer {
             value += inputChar;
 
             if(accepting(curr_state)){
+                LinkedList<Integer> idList = new LinkedList<>(Arrays.asList(1, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 17, 18, 20, 21, 23, 24, 25, 27, 28, 30, 31));
 
-                //Need IDENTIFIER to also encompass states 1, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 17, 18, 20, 21, 23, 24, 25, 27, 28, 30, 31
-                if(curr_state == TokenName.IDENTIFIER){ //Token with a value (string identifier)
-                    tokens.add(createToken(curr_state, value));
+                //if(idList.)
+                if(idList.contains(curr_state) || curr_state == TokenName.NUMERIC.getValue()){ //Tokens which have a value (Identifier, Numeric)
+                    tokens.add(createToken(valToToken(curr_state), value));
                 }
                 else if (curr_state == TokenName.NUMERIC.getValue()){ //Token with a value (Integer numeric)
                     tokens.add(createToken(curr_state, Integer.valueOf(value)));
@@ -57,6 +62,11 @@ public class Lexer {
         return tokens;
     }
 
+    //determination if it's all done
+    private boolean accepting(int curr_state){
+        return true;
+    }
+
     private Token createToken(TokenName name, String value){
         return new Token(name, value);
     }
@@ -64,4 +74,5 @@ public class Lexer {
     private Token createToken(TokenName name){
         return new Token(name);
     }
+
 }

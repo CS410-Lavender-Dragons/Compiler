@@ -150,6 +150,7 @@ public class StateTransitionTable {
         return index;
     }
 
+
     public int getNextState(int currentState, String characterInput) {
         return this.table[currentState][columnIndex(characterInput)];
     }
