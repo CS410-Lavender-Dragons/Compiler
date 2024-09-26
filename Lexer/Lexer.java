@@ -43,13 +43,13 @@
 
                     //if(idList.)
                     if(idList.contains(curr_state) || curr_state == TokenName.NUMERIC.getValue()){ //Tokens which have a value (Identifier, Numeric)
-                        tokens.add(createToken(valToToken(curr_state), value));
+                        tokens.add(createToken(TokenName.valToToken(curr_state), value));
                     }
                     else if (curr_state == TokenName.NUMERIC.getValue()){ //Token with a value (Integer numeric)
-                        tokens.add(createToken(curr_state, Integer.valueOf(value)));
+                        tokens.add(createToken(TokenName.valToToken(curr_state), Integer.valueOf(value).toString()));
                     }
                     else if (curr_state != 0){ //Tokens that don't have an associated value, excluding all whitespace
-                        tokens.add(createToken(curr_state));
+                        tokens.add(createToken(TokenName.valToToken(curr_state)));
                     }
 
                     //Reset to start state, clear value String
@@ -58,7 +58,8 @@
                 }
             }
 
-            tokens.add(TokenName.EOI);
+            //https://tinyurl.com/ycyya2pm 
+            tokens.add(createToken(TokenName.EOI));
             return tokens;
         }
 
