@@ -7,7 +7,7 @@ public class StateTransitionTable {
     public int rows;
     public int columns;
     public int[][] table;
-    public Map<String, Integer> columnMap;
+    public Map<Character, Integer> columnMap;
 
     public StateTransitionTable() {
         this.rows = 72;
@@ -88,62 +88,62 @@ public class StateTransitionTable {
                 {71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0} //71
         };
 
-        this.columnMap = new HashMap<String, Integer>();
-        this.columnMap.put("a", 0);
-        this.columnMap.put("b", 1);
-        this.columnMap.put("c", 2);
-        this.columnMap.put("d", 3);
-        this.columnMap.put("e", 4);
-        this.columnMap.put("f", 5);
-        this.columnMap.put("g", 6);
-        this.columnMap.put("h", 7);
-        this.columnMap.put("i", 8);
-        this.columnMap.put("j", 9);
-        this.columnMap.put("k", 10);
-        this.columnMap.put("l", 11);
-        this.columnMap.put("m", 12);
-        this.columnMap.put("n", 13);
-        this.columnMap.put("o", 14);
-        this.columnMap.put("p", 15);
-        this.columnMap.put("q", 16);
-        this.columnMap.put("r", 17);
-        this.columnMap.put("s", 18);
-        this.columnMap.put("t", 19);
-        this.columnMap.put("u", 20);
-        this.columnMap.put("v", 21);
-        this.columnMap.put("w", 22);
-        this.columnMap.put("x", 23);
-        this.columnMap.put("y", 24);
-        this.columnMap.put("z", 25);
-        this.columnMap.put("0", 26);
-        this.columnMap.put("1", 27);
-        this.columnMap.put("2", 28);
-        this.columnMap.put("3", 29);
-        this.columnMap.put("4", 30);
-        this.columnMap.put("5", 31);
-        this.columnMap.put("6", 32);
-        this.columnMap.put("7", 33);
-        this.columnMap.put("8", 34);
-        this.columnMap.put("9", 35);
-        this.columnMap.put("_", 36);
-        this.columnMap.put(".", 37);
-        this.columnMap.put("=", 37);
-        this.columnMap.put("{", 39);
-        this.columnMap.put("}", 40);
-        this.columnMap.put("(", 41);
-        this.columnMap.put(")", 42);
-        this.columnMap.put("+", 43);
-        this.columnMap.put("-", 44);
-        this.columnMap.put("*", 45);
-        this.columnMap.put("/", 46);
-        this.columnMap.put(">", 47);
-        this.columnMap.put("<", 48);
-        this.columnMap.put(":", 49);
-        this.columnMap.put(";", 50);
-        this.columnMap.put(" ", 51);
+        this.columnMap = new HashMap<Character, Integer>();
+        this.columnMap.put('a', 0);
+        this.columnMap.put('b', 1);
+        this.columnMap.put('c', 2);
+        this.columnMap.put('d', 3);
+        this.columnMap.put('e', 4);
+        this.columnMap.put('f', 5);
+        this.columnMap.put('g', 6);
+        this.columnMap.put('h', 7);
+        this.columnMap.put('i', 8);
+        this.columnMap.put('j', 9);
+        this.columnMap.put('k', 10);
+        this.columnMap.put('l', 11);
+        this.columnMap.put('m', 12);
+        this.columnMap.put('n', 13);
+        this.columnMap.put('o', 14);
+        this.columnMap.put('p', 15);
+        this.columnMap.put('q', 16);
+        this.columnMap.put('r', 17);
+        this.columnMap.put('s', 18);
+        this.columnMap.put('t', 19);
+        this.columnMap.put('u', 20);
+        this.columnMap.put('v', 21);
+        this.columnMap.put('w', 22);
+        this.columnMap.put('x', 23);
+        this.columnMap.put('y', 24);
+        this.columnMap.put('z', 25);
+        this.columnMap.put('0', 26);
+        this.columnMap.put('1', 27);
+        this.columnMap.put('2', 28);
+        this.columnMap.put('3', 29);
+        this.columnMap.put('4', 30);
+        this.columnMap.put('5', 31);
+        this.columnMap.put('6', 32);
+        this.columnMap.put('7', 33);
+        this.columnMap.put('8', 34);
+        this.columnMap.put('9', 35);
+        this.columnMap.put('_', 36);
+        this.columnMap.put('.', 37);
+        this.columnMap.put('=', 38);
+        this.columnMap.put('{', 39);
+        this.columnMap.put('}', 40);
+        this.columnMap.put('(', 41);
+        this.columnMap.put(')', 42);
+        this.columnMap.put('+', 43);
+        this.columnMap.put('-', 44);
+        this.columnMap.put('*', 45);
+        this.columnMap.put('/', 46);
+        this.columnMap.put('>', 47);
+        this.columnMap.put('<', 48);
+        this.columnMap.put(':', 49);
+        this.columnMap.put(';', 50);
+        this.columnMap.put(' ', 51);
     }
 
-    public int columnIndex(String character) {
+    public int columnIndex(char character) {
         //TODO handle null?
         int index = this.columnMap.get(character);
         System.out.println(index);
@@ -151,7 +151,7 @@ public class StateTransitionTable {
     }
 
 
-    public int getNextState(int currentState, String characterInput) {
+    public int getNextState(int currentState, char characterInput) {
         return this.table[currentState][columnIndex(characterInput)];
     }
 }
