@@ -22,6 +22,11 @@
             while (!tokens2.isEmpty()) {
                 System.out.println(tokens2.remove().toString());
             }
+            System.out.println("\n");
+            var tokens3 = lex.tokenize("for n in 1..100{x=x+y-100*20/20 }");
+            while (!tokens3.isEmpty()) {
+            	System.out.println(tokens3.remove().toString());
+            }
         }
 
         private final StateTransitionTable table = new StateTransitionTable();
