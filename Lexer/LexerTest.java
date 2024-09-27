@@ -33,7 +33,7 @@ public class LexerTest {
     		else if (tokenType == TokenName.NUMERIC.getValue())
     			tokens.add(new Token(TokenName.NUMERIC, Integer.valueOf(RANDOM.nextInt(9999))));
     		else if (idList.contains(tokenType))
-    			tokens.add(new Token(TokenName.IDENTIFIER, getRandomIdentifier()));
+    			tokens.add(new Token(TokenName.IDENTIFIER, getTransitionalTokenValue(tokenType)));
     		else
     			tokens.add(new Token(TokenName.valToToken(tokenType)));
     	}
@@ -49,7 +49,6 @@ public class LexerTest {
         for (Token token : tokens) {
             TokenName tokenName = token.getName();
             Object tokenValue = token.getValue();
-            int tokenNum = 0;
             switch (tokenName) {
                 case IN_KW:
                     sb.append("in ");
@@ -176,107 +175,114 @@ public class LexerTest {
                     }
                     break;
                 default:
-                    switch(tokenNum) {
-                    	case 1:
-                    		sb.append("i").append(" ");
-                    		break;
-                    	case 4:
-                    		sb.append("c").append(" ");
-                    		break;
-                    	case 5:
-                    		sb.append("co").append(" ");
-                    		break;
-                    	case 6:
-                    		sb.append("con").append(" ");
-                    		break;
-                    	case 7:
-                    		sb.append("cont").append(" ");
-                    		break;
-                    	case 8:
-                    		sb.append("conti").append(" ");
-                    		break;
-                    	case 9:
-                    		sb.append("contin").append(" ");
-                    		break;
-                    	case 10:
-                    		sb.append("continu").append(" ");
-                    		break;
-                    	case 12:
-                    		sb.append("b").append(" ");
-                    		break;
-                    	case 13:
-                    		sb.append("br").append(" ");
-                    		break;
-                    	case 14:
-                    		sb.append("bre").append(" ");
-                    		break;
-                    	case 15:
-                    		sb.append("brea").append(" ");
-                    		break;
-                    	case 17:
-                    		sb.append("m").append(" ");
-                    		break;
-                    	case 18:
-                    		sb.append("mu").append(" ");
-                    		break;
-                    	case 20:
-                    		sb.append("f").append(" ");
-                    		break;
-                    	case 21:
-                    		sb.append("fo").append(" ");
-                    		break;
-                    	case 23:
-                    		sb.append("e").append(" ");
-                    		break;
-                    	case 24:
-                    		sb.append("el").append(" ");
-                    		break;
-                    	case 25:
-                    		sb.append("els").append(" ");
-                    		break;
-                    	case 27:
-                    		sb.append("l").append(" ");
-                    		break;
-                    	case 28:
-                    		sb.append("le").append(" ");
-                    		break;
-                    	case 30:
-                    		sb.append("lo").append(" ");
-                    		break;
-                    	case 31:
-                    		sb.append("loo").append(" ");
-                    		break;
-                    	case 54:
-                    		sb.append("i1").append(" ");
-                    		break;
-                    	case 56:
-                    		sb.append("i12").append(" ");
-                    		break;
-                    	case 58:
-                    		sb.append("i3").append(" ");
-                    		break;
-                    	case 60:
-                    		sb.append("i6").append(" ");
-                    		break;
-                    	case 63:
-                    		sb.append("f1").append(" ");
-                    		break;
-                    	case 65:
-                    		sb.append("f12").append(" ");
-                    		break;
-                    	case 67:
-                    		sb.append("f3").append(" ");
-                    		break;
-                    	case 69:
-                    		sb.append("f6").append(" ");
-                    		break;
-                    		
-                    }
+                	
                     break;
             }
         }
         return sb.toString().trim();
     }
+	
+	private static String getTransitionalTokenValue(int state) {
+        StringBuilder sb = new StringBuilder();
+        
+        switch(state) {
+	    	case 1:
+	    		sb.append("i");
+	    		break;
+	    	case 4:
+	    		sb.append("c");
+	    		break;
+	    	case 5:
+	    		sb.append("co");
+	    		break;
+	    	case 6:
+	    		sb.append("con");
+	    		break;
+	    	case 7:
+	    		sb.append("cont");
+	    		break;
+	    	case 8:
+	    		sb.append("conti");
+	    		break;
+	    	case 9:
+	    		sb.append("contin");
+	    		break;
+	    	case 10:
+	    		sb.append("continu");
+	    		break;
+	    	case 12:
+	    		sb.append("b");
+	    		break;
+	    	case 13:
+	    		sb.append("br");
+	    		break;
+	    	case 14:
+	    		sb.append("bre");
+	    		break;
+	    	case 15:
+	    		sb.append("brea");
+	    		break;
+	    	case 17:
+	    		sb.append("m");
+	    		break;
+	    	case 18:
+	    		sb.append("mu");
+	    		break;
+	    	case 20:
+	    		sb.append("f");
+	    		break;
+	    	case 21:
+	    		sb.append("fo");
+	    		break;
+	    	case 23:
+	    		sb.append("e");
+	    		break;
+	    	case 24:
+	    		sb.append("el");
+	    		break;
+	    	case 25:
+	    		sb.append("els");
+	    		break;
+	    	case 27:
+	    		sb.append("l");
+	    		break;
+	    	case 28:
+	    		sb.append("le");
+	    		break;
+	    	case 30:
+	    		sb.append("lo");
+	    		break;
+	    	case 31:
+	    		sb.append("loo");
+	    		break;
+	    	case 54:
+	    		sb.append("i1");
+	    		break;
+	    	case 56:
+	    		sb.append("i12");
+	    		break;
+	    	case 58:
+	    		sb.append("i3");
+	    		break;
+	    	case 60:
+	    		sb.append("i6");
+	    		break;
+	    	case 63:
+	    		sb.append("f1");
+	    		break;
+	    	case 65:
+	    		sb.append("f12");
+	    		break;
+	    	case 67:
+	    		sb.append("f3");
+	    		break;
+	    	case 69:
+	    		sb.append("f6");
+	    		break;
+        }
+        
+        return sb.toString();
+	}
     
     private static String getRandomIdentifier() {
         final String STARTING_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
