@@ -44,7 +44,7 @@
                 // Character is not a valid character in the language
                 if (table.columnIndex(inputChar) == -1){
                     tokens.add(createToken(TokenName.INVALID_INPUT));
-                    //return tokens; //TODO should this be here?
+                    //return tokens; //TODO should this be here? -> yes we should stop processing input upon encountering a character that's not valid
                 }
 
                 if (table.getNextState(curr_state, inputChar) == -1) { // No further transitions
@@ -54,16 +54,16 @@
                             tokens.add(createToken(TokenName.IDENTIFIER, value));
                         }
                         else if (curr_state == TokenName.NUMERIC.getValue()){ //Token with a value (Numeric, Integer)
-                            tokens.add(createToken(TokenName.valToToken(curr_state), Integer.valueOf(value).toString()));
+                            tokens.add(createToken(TokenName.NUMERIC, Integer.valueOf(value).toString()));
                         }
                         else if (curr_state != 0){ //Tokens that don't have an associated value, excluding all whitespace
-                            tokens.add(createToken(TokenName.NUMERIC));
+                            tokens.add(createToken(TokenName.valToToken(curr_state)));
                         } //TODO might need a catch all
 
                         //Reset to start state, clear value String
                         curr_state = 0;
                         value = "";
-                    } else {
+                    } else { //I'm not sure about this
                         tokens.add(createToken(TokenName.INVALID_INPUT));
                     }
 
