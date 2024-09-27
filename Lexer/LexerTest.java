@@ -1,5 +1,5 @@
-// Authors: Hunter Oxley, Branden Purdum, Skyler Putney, Emma Kupec
-// Reviewers: William Valentine, Alyssa Mesinere
+// Authors: Skyler Putney
+// Reviewers: William Valentine, Alyssa Mesinere, Hunter Oxley, Branden Purdum, Emma Kupec
 
 package Lexer;
 
