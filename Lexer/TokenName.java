@@ -30,6 +30,7 @@ public enum TokenName {
     ASSIGN_OP(36), //assignment operator
     EQ_OP(37), //equality comparison operator
     SEMICOLON(35), //statement terminator
+    COLON(33),
     BIT_8_INT_OP(53), 
     BIT_16_INT_OP(55), 
     BIT_32_INT_OP(59), 
