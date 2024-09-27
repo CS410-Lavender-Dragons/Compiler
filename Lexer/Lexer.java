@@ -32,6 +32,11 @@
             while (!tokens4.isEmpty()) {
             	System.out.println(tokens4.remove().toString());
             }
+            System.out.println("\n");
+            var tokens5 = lex.tokenize("for i in 1..= 99 { x = ( 62.0 + 9.0) < > : ;}");
+            while (!tokens5.isEmpty()) {
+                System.out.println(tokens5.remove().toString());
+            }
         }
 
         private final StateTransitionTable table = new StateTransitionTable();
