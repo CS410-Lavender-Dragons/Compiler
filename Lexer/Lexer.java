@@ -48,7 +48,7 @@
                 // Character is not a valid character in the language
                 if (table.columnIndex(inputChar) == -1){
                     tokens.add(createToken(TokenName.INVALID_INPUT));
-                    //return tokens; //TODO should this be here? -> yes we should stop processing input upon encountering a character that's not valid
+                    return tokens;
                 }
                 
                 // Update state
@@ -58,7 +58,7 @@
                 value += inputChar;
 
                 if (i + 1 == input.length() || accepting(currState, input.charAt(i + 1)) || inputChar == ' ') { // In an accepting state
-                        // If the current state implies an Identifier Token
+                    // If the current state implies an Identifier Token
                 	if(idList.contains(currState) || currState == TokenName.IDENTIFIER.getValue()){ //Tokens which have a value (Identifier, String)
                         tokens.add(createToken(TokenName.IDENTIFIER, value));
                     }
@@ -67,20 +67,20 @@
                     }
                     else if (currState != 0){ //Tokens that don't have an associated value, excluding all whitespace
                         tokens.add(createToken(TokenName.valToToken(currState)));
-                    } //TODO might need a catch all
+                    }
 
                     //Reset to start state, clear value String
                     currState = 0;
                     value = "";
-                    }
                 }
+            }
 
             tokens.add(createToken(TokenName.EOI));
             return tokens;
         }
 
         // Determine if state is an accepting state
-        private boolean accepting(int currState, char nextChar) { //TODO implement
+        private boolean accepting(int currState, char nextChar) {
         	int nextState = table.getNextState(currState, nextChar);
             return nextState == -1 || nextState == 0;
         }
