@@ -1,6 +1,6 @@
-    //Authors: Emma Kupec, Skyler Putney
-    //Reviewers: Hunter Oxley, Branden Purdum, William Valentine
-    
+    // Authors: Hunter Oxley, Branden Purdum, Skyler Putney, Emma Kupec
+    // Reviewers: William Valentine, Alyssa Mesinere
+
     package Lexer;
 
     
@@ -21,7 +21,7 @@
                 System.out.println(tokens1.remove().toString());
             }
             System.out.println("\n");
-            var tokens2 = lex.tokenize("variable_name = 39");
+            var tokens2 = lex.tokenize("X = 89 + A");
             while (!tokens2.isEmpty()) {
                 System.out.println(tokens2.remove().toString());
             }
@@ -63,7 +63,7 @@
             	}
             	
             	//Grab character to process
-                inputChar = input.charAt(i);
+                inputChar = Character.toLowerCase(input.charAt(i));
 
                 // Character is not a valid character in the language
                 if (table.columnIndex(inputChar) == -1){
@@ -77,7 +77,7 @@
                 // Add input character to value String
                 value += inputChar;
 
-                if (i + 1 == input.length() || accepting(currState, input.charAt(i + 1))) { // In an accepting state
+                if (i + 1 == input.length() || accepting(currState, Character.toLowerCase(input.charAt(i + 1)))) { // In an accepting state
                     // If the current state implies an Identifier Token
                 	if(idList.contains(currState) || currState == TokenName.IDENTIFIER.getValue()){ //Tokens which have a value (Identifier, String)
                         tokens.add(createToken(TokenName.IDENTIFIER, value));
