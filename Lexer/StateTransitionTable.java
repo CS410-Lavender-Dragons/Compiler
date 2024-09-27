@@ -149,7 +149,7 @@ public class StateTransitionTable {
 
 
     public int getNextState(int currentState, char characterInput) {
-        if (currentState < 0 || currentState > 71) {
+        if (currentState < 0 || currentState > this.rows) {
             return -1;
         } else {
             return this.table[currentState][columnIndex(characterInput)];
