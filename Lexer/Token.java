@@ -1,3 +1,6 @@
+// Authors: Hunter Oxley, Branden Purdum, Skyler Putney, Emma Kupec
+// Reviewers: William Valentine, Alyssa Mesinere
+
 package Lexer;
 
 //Token class which identifies a token's name and corresponding value
