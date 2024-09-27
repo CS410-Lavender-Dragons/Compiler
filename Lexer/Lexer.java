@@ -11,62 +11,78 @@
     @SuppressWarnings("unused")
     public class Lexer {
         public static void main(String[] args) {
-            StateTransitionTable table = new StateTransitionTable();
-            int nextState = table.getNextState(0, "a");
-            System.out.println(nextState);
+            Lexer lex = new Lexer();
+
+//            var tokens1 = lex.tokenize("x = 89 + a");
+//            while (!tokens1.isEmpty()) {
+//                System.out.println(tokens1.remove().getName());
+//            }
+
+            var tokens2 = lex.tokenize("variable_name = 39");
+            while (!tokens2.isEmpty()) {
+                System.out.println(tokens2.remove().getName());
+            }
         }
 
         private final StateTransitionTable table = new StateTransitionTable();
 
+        // List of states that imply an Identifier Token
+        LinkedList<Integer> idList = new LinkedList<>(Arrays.asList(1, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 17, 18, 20, 21, 23, 24, 25, 27, 28, 30, 31));
+
         public Queue<Token> tokenize(String input) {
+            @SuppressWarnings("unused")
             Queue<Token> tokens = new LinkedList<Token>();
             char inputChar;
-            @SuppressWarnings("unused")
             int inputIndexMapping;
             String value = "";
             int curr_state = 0;
 
+            // Loop through the input
             for(int i = 0; i < input.length(); i++){
                 inputChar = input.charAt(i);
 
-                //Character is not valid
+                // Character is not a valid character in the language
                 if (table.columnIndex(inputChar) == -1){
                     tokens.add(createToken(TokenName.INVALID_INPUT));
-                    return tokens;
+                    //return tokens; //TODO should this be here?
                 }
 
-                //update state; ooh ooh aah aah 
-                curr_state = table.getNextState(curr_state, inputChar);
+                if (table.getNextState(curr_state, inputChar) == -1) { // No further transitions
+                    if (accepting(curr_state)) { // In an accepting state
+                        // If the current state implies an Identifier Token
+                        if(idList.contains(curr_state) || curr_state == TokenName.IDENTIFIER.getValue()){ //Tokens which have a value (Identifier, String)
+                            tokens.add(createToken(TokenName.valToToken(curr_state), value));
+                        }
+                        else if (curr_state == TokenName.NUMERIC.getValue()){ //Token with a value (Numeric, Integer)
+                            tokens.add(createToken(TokenName.valToToken(curr_state), Integer.valueOf(value).toString()));
+                        }
+                        else if (curr_state != 0){ //Tokens that don't have an associated value, excluding all whitespace
+                            tokens.add(createToken(TokenName.valToToken(curr_state)));
+                        } //TODO might need a catch all
 
-                //Add input character to value String
-                value += inputChar;
-
-                if(accepting(curr_state)){
-                    LinkedList<Integer> idList = new LinkedList<>(Arrays.asList(1, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 17, 18, 20, 21, 23, 24, 25, 27, 28, 30, 31));
-
-                    if(idList.contains(curr_state) || curr_state == TokenName.IDENTIFIER.getValue()){ //Tokens which have a value (Identifier, String)
-                        tokens.add(createToken(TokenName.IDENTIFIER, value));
+                        //Reset to start state, clear value String
+                        curr_state = 0;
+                        value = "";
+                    } else {
+                        tokens.add(createToken(TokenName.INVALID_INPUT));
                     }
-                    else if (curr_state == TokenName.NUMERIC.getValue()){ //Token with a value (Numeric, Integer)
-                        tokens.add(createToken(TokenName.NUMERIC, Integer.valueOf(value)));
-                    }
-                    else if (curr_state != 0){ //Tokens that don't have an associated value, excluding all whitespace
-                        tokens.add(createToken(TokenName.valToToken(curr_state)));
-                    }
 
-                    //Reset to start state, clear value String
                     curr_state = 0;
-                    value = "";
+                } else {
+                    // Update state
+                    curr_state = table.getNextState(curr_state, inputChar);
+
+                    // Add input character to value String
+                    value += inputChar;
                 }
             }
 
-            //https://tinyurl.com/ycyya2pm 
             tokens.add(createToken(TokenName.EOI));
             return tokens;
         }
 
-        //determination if it's all done
-        private boolean accepting(int curr_state){
+        // Determine if state is an accepting state
+        private boolean accepting(int curr_state) { //TODO implement
             return true;
         }
 

@@ -149,6 +149,7 @@ public class StateTransitionTable {
 
 
     public int getNextState(int currentState, char characterInput) {
+        //TODO add error checking
         return this.table[currentState][columnIndex(characterInput)];
     }
 }
