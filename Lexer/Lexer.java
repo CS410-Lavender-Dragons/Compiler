@@ -43,6 +43,13 @@
 
             // Loop through the input
             for(int i = 0; i < input.length(); i++){
+            	
+            	//Skip whitespace
+            	while(input.charAt(i) == ' ') {
+            		i++;
+            	}
+            	
+            	//Grab character to process
                 inputChar = input.charAt(i);
 
                 // Character is not a valid character in the language
@@ -57,7 +64,7 @@
                 // Add input character to value String
                 value += inputChar;
 
-                if (i + 1 == input.length() || accepting(currState, input.charAt(i + 1)) || inputChar == ' ') { // In an accepting state
+                if (i + 1 == input.length() || accepting(currState, input.charAt(i + 1))) { // In an accepting state
                     // If the current state implies an Identifier Token
                 	if(idList.contains(currState) || currState == TokenName.IDENTIFIER.getValue()){ //Tokens which have a value (Identifier, String)
                         tokens.add(createToken(TokenName.IDENTIFIER, value));
