@@ -24,4 +24,8 @@ public class Token {
     public Object getValue(){
         return value;
     }
+    
+    public String toString() {
+    	return name + " " + "{" + (value == null ? "" : value.toString()) + "}"; 
+    }
 }
