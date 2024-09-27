@@ -51,13 +51,13 @@
                     if (accepting(curr_state)) { // In an accepting state
                         // If the current state implies an Identifier Token
                         if(idList.contains(curr_state) || curr_state == TokenName.IDENTIFIER.getValue()){ //Tokens which have a value (Identifier, String)
-                            tokens.add(createToken(TokenName.valToToken(curr_state), value));
+                            tokens.add(createToken(TokenName.IDENTIFIER, value));
                         }
                         else if (curr_state == TokenName.NUMERIC.getValue()){ //Token with a value (Numeric, Integer)
                             tokens.add(createToken(TokenName.valToToken(curr_state), Integer.valueOf(value).toString()));
                         }
                         else if (curr_state != 0){ //Tokens that don't have an associated value, excluding all whitespace
-                            tokens.add(createToken(TokenName.valToToken(curr_state)));
+                            tokens.add(createToken(TokenName.NUMERIC));
                         } //TODO might need a catch all
 
                         //Reset to start state, clear value String
