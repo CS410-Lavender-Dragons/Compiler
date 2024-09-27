@@ -1,3 +1,6 @@
+// Authors: Emma Kupec, Skyler Putney
+// Reviewers: William Valentine, Alyssa Mesinere
+
 package Lexer;
 
 import java.util.HashMap;

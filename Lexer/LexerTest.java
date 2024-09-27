@@ -1,3 +1,6 @@
+// Authors: Hunter Oxley, Branden Purdum, Skyler Putney, Emma Kupec
+// Reviewers: William Valentine, Alyssa Mesinere
+
 package Lexer;
 
 import java.util.Arrays;
