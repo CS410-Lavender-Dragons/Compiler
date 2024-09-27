@@ -16,6 +16,22 @@ public class LexerTest {
 		System.out.println(generatedTokens);
 		System.out.println(lexedTokens);
 		System.out.println(compareTokens(generatedTokens, lexedTokens));
+		
+		for(int i = 0; i < 10000; i++)
+		{
+			generatedTokens = generateTokenStream();
+			toLex = generateInputFromTokens(generatedTokens);
+			lexedTokens = lex.tokenize(toLex);
+			if(!compareTokens(generatedTokens, lexedTokens)) {
+				System.out.println("ERROR: Test #" + i);
+				System.out.println(generatedTokens);
+				System.out.println(lexedTokens);
+				break;
+			}
+			if (i == 9999)
+				System.out.println("Tests successful.");
+			
+		}
 	}
 	
     private static LinkedList<Integer> idList = new LinkedList<>(Arrays.asList(1, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 17, 18, 20, 21, 23, 24, 25, 27, 28, 30, 31, 54, 56, 58, 60, 63, 65, 67, 69));
@@ -83,13 +99,13 @@ public class LexerTest {
                     }
                     break;
                 case DECIMAL:
-                    sb.append("."); // Example decimal value
+                    sb.append(". "); // Example decimal value
                     break;
                 case RANGE_OP:
-                    sb.append("..");
+                    sb.append(".. ");
                     break;
                 case INCLUSIVERANGE_OP:
-                    sb.append("..=");
+                    sb.append("..= ");
                     break;
                 case OPEN_BRACKET:
                     sb.append("{");
@@ -116,22 +132,22 @@ public class LexerTest {
                     sb.append("/");
                     break;
                 case GREATER_OP:
-                    sb.append(">");
+                    sb.append("> ");
                     break;
                 case GREATER_EQ_OP:
-                    sb.append(">=");
+                    sb.append(">= ");
                     break;
                 case LESS_OP:
-                    sb.append("<");
+                    sb.append("< ");
                     break;
                 case LESS_EQ_OP:
-                    sb.append("<=");
+                    sb.append("<= ");
                     break;
                 case ASSIGN_OP:
-                    sb.append("=");
+                    sb.append("= ");
                     break;
                 case EQ_OP:
-                    sb.append("==");
+                    sb.append("== ");
                     break;
                 case SEMICOLON:
                     sb.append(";");
