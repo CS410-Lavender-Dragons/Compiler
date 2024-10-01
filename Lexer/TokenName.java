@@ -1,3 +1,6 @@
+// Authors: Hunter Oxley, Branden Purdum, Skyler Putney, Emma Kupec
+// Reviewers: William Valentine, Alyssa Mesinere
+
 package Lexer;
 
 //Token name with corresponding final state
@@ -30,6 +33,7 @@ public enum TokenName {
     ASSIGN_OP(36), //assignment operator
     EQ_OP(37), //equality comparison operator
     SEMICOLON(35), //statement terminator
+    COLON(33),
     BIT_8_INT_OP(53), 
     BIT_16_INT_OP(55), 
     BIT_32_INT_OP(59), 
@@ -40,7 +44,10 @@ public enum TokenName {
     BIT_32_FLOAT_OP(68),
     BIT_64_FLOAT_OP(70),
     BIT_128_FLOAT_OP(66),
-    IDENTIFIER(71);
+    IDENTIFIER(71),
+
+    INVALID_INPUT(100),
+    EOI(101);
 
 
     private final int token;
@@ -54,4 +61,17 @@ public enum TokenName {
     public int getValue() {
         return token;
     }
+
+    //convert value back to token (to get rid of mad vscode squiggles)
+    public static TokenName valToToken(int value){
+        //seek & destroy
+        for(TokenName currentToken:TokenName.values()){
+            if(currentToken.token == value)
+                return currentToken;
+        }
+        return INVALID_INPUT;
+    }
+
+    //get name; more squiggles
+
 }

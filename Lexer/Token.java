@@ -1,3 +1,6 @@
+// Authors: Hunter Oxley, Branden Purdum, Skyler Putney, Emma Kupec
+// Reviewers: William Valentine, Alyssa Mesinere
+
 package Lexer;
 
 //Token class which identifies a token's name and corresponding value
@@ -23,5 +26,9 @@ public class Token {
 
     public Object getValue(){
         return value;
+    }
+    
+    public String toString() {
+    	return name + " " + "{" + (value == null ? "" : value.toString()) + "}"; 
     }
 }
