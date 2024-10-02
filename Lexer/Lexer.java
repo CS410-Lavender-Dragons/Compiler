@@ -9,12 +9,24 @@
     import java.util.Queue;
     import Lexer.Token;
     import Lexer.TokenName;
+    import java.io.File;
+    import java.io.InputStreamReader;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.io.IOException;
+
 
 
     @SuppressWarnings("unused")
     public class Lexer {
-        public static void main(String[] args) {
+        public static void main(String[] args) throws IOException{
             Lexer lex = new Lexer();
+
+           //WARNING: I CODED THIS PATH ON MY MAC, IF YOU ARE ON WINDOWS CHANGE THIS TO WORK FOR YOUR MACHINE 
+           Path sampleCodeFile = Path.of("/Users/zane/Desktop/Compiler/Lexer/SampleCode.txt");
+           String sampleCode = Files.readString(sampleCodeFile).replaceAll("\r", " ").replaceAll("\n", " ");           ;
+           
+
 
             var tokens1 = lex.tokenize("x = 89 + a");
             while (!tokens1.isEmpty()) {
@@ -31,7 +43,7 @@
             	System.out.println(tokens3.remove().toString());
             }
             System.out.println("\n");
-            var tokens4 = lex.tokenize("for x in 23..=  4912 { x - 99} & { y + 2} ");
+            var tokens4 = lex.tokenize("for x in 23..=  4912 { x - 99} & { y + 2}");
             while (!tokens4.isEmpty()) {
             	System.out.println(tokens4.remove().toString());
             }
@@ -39,6 +51,12 @@
             var tokens5 = lex.tokenize("for i in 1..= 99 { x = ( 62.0 + 9.0) < > : ;}");
             while (!tokens5.isEmpty()) {
                 System.out.println(tokens5.remove().toString());
+            }
+            //File reader for multiline and custom code
+            System.out.println('\n');
+            var tokens6 = lex.tokenize(sampleCode);
+            while(!tokens6.isEmpty()){
+                System.out.println(tokens6.remove().toString());
             }
         }
 
