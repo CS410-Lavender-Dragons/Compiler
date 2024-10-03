@@ -24,7 +24,7 @@
 
            //WARNING: I CODED THIS PATH ON MY MAC, IF YOU ARE ON WINDOWS CHANGE THIS TO WORK FOR YOUR MACHINE 
            Path sampleCodeFile = Path.of("/Users/zane/Desktop/Compiler/Lexer/SampleCode.txt");
-           String sampleCode = Files.readString(sampleCodeFile).replaceAll("\r", " ").replaceAll("\n", " ");           ;
+           String sampleCode = Files.readString(sampleCodeFile);          ;
            
 
 
@@ -76,7 +76,7 @@
             for(int i = 0; i < input.length(); i++){
             	
             	//Skip whitespace
-            	while(input.charAt(i) == ' ') {
+            	while(Character.isWhitespace(input.charAt(i))) {
             		i++;
             	}
             	

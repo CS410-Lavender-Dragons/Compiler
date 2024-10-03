@@ -144,6 +144,8 @@ public class StateTransitionTable {
         this.columnMap.put(':', 49);
         this.columnMap.put(';', 50);
         this.columnMap.put(' ', 51);
+        this.columnMap.put('\r', 51);
+        this.columnMap.put('\n', 51);
     }
 
     public int columnIndex(char character) {
