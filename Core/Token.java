@@ -1,7 +1,7 @@
 // Authors: Hunter Oxley, Branden Purdum, Skyler Putney, Emma Kupec
 // Reviewers: William Valentine, Alyssa Mesinere
 
-package Lexer;
+package Core;
 
 //Token class which identifies a token's name and corresponding value
 public class Token {
