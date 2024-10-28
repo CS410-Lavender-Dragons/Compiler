@@ -118,11 +118,8 @@ public class Parser {
     }
 
     void ARITHMETIC_EXPR(){
-        if (accept(TokenName.OPEN_PAREN)){
-            ARITHMETIC_EXPR();
-            expect(TokenName.CLOSE_PAREN);
-        }
-        else {
+
+ //       else {
             TERM();
             if (accept(TokenName.ADD_OP)){
                 ARITHMETIC_EXPR();
@@ -130,7 +127,7 @@ public class Parser {
             else if (accept(TokenName.SUB_OP)){
                 ARITHMETIC_EXPR();
             }
-        }
+   //     }
     }
 
     void TERM(){
@@ -144,7 +141,11 @@ public class Parser {
     }
 
     void VALUE(){
-        if (accept(TokenName.NUMERIC)){
+        if (accept(TokenName.OPEN_PAREN)){
+            ARITHMETIC_EXPR();
+            expect(TokenName.CLOSE_PAREN);
+        }
+        else if (accept(TokenName.NUMERIC)){
             if (accept(TokenName.DECIMAL))
                 expect(TokenName.NUMERIC);
         }
