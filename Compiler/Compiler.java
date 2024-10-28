@@ -1,0 +1,15 @@
+package Compiler;
+
+import Lexer.Lexer;
+import Parser.Parser;
+
+public class Compiler {
+    public static void main(String[] args){
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        var tokens1 = lexer.tokenize("x = 89 + a;");
+        parser.parse(tokens1);
+        var tokens2 = lexer.tokenize("for n in 1..100{x=x+y-100*20/20;}");
+        parser.parse(tokens2);
+    }
+}

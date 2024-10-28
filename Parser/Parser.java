@@ -7,6 +7,12 @@ import java.util.Queue;
 
 public class Parser {
     Queue<Token> tokenQueue;
+
+    public void parse(Queue<Token> tokenQueue){
+        this.tokenQueue = tokenQueue;
+        STATEMENTS();
+    }
+
     boolean accept(TokenName tokenName){
         if (tokenQueue.peek().getName() == tokenName){
             tokenQueue.remove();
@@ -23,7 +29,7 @@ public class Parser {
 
     void STATEMENTS(){
         STATEMENT();
-        if (!tokenQueue.isEmpty()) {
+        if (tokenQueue.peek().getName() != TokenName.EOI && tokenQueue.peek().getName() != TokenName.CLOSE_BRACKET) {
             STATEMENTS();
         }
     }
