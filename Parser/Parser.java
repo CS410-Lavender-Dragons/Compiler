@@ -6,8 +6,8 @@ import Core.TokenName;
 import java.util.Queue;
 
 public class Parser {
-    Queue<Token> tokenQueue;
-    boolean accept(TokenName tokenName){
+    static Queue<Token> tokenQueue;
+    static boolean accept(TokenName tokenName){
         if (tokenQueue.peek().getName() == tokenName){
             tokenQueue.remove();
             return true;
@@ -15,21 +15,54 @@ public class Parser {
         return false;
     }
 
-    void expect(TokenName tokenName){
+    static void expect(TokenName tokenName){
         if (tokenQueue.peek().getName() != tokenName)
             throw new RuntimeException("Expected: " + tokenName + ", but found: " + tokenQueue.peek().getName());
         tokenQueue.remove();
     }
 
     void STATEMENTS(){
-
+        STATEMENT();
+        if (!tokenQueue.isEmpty()) {
+            STATEMENTS();
+        }
     }
 
     void STATEMENT(){
-
+        if (accept(TokenName.IF_KW))
+            IF_EXPR();
+        else if (accept(TokenName.WHILE_KW))
+            WHILE_EXPR();
+        else if (accept(TokenName.FOR_KW))
+            FOR_EXPR();
+        else
+            ASSIGNMENT_EXPR();
     }
 
     void ASSIGNMENT_EXPR(){
+        if (accept(TokenName.IDENTIFIER)){
+            expect(TokenName.ASSIGN_OP);
+            ARITHMETIC_EXPR();
+            expect(TokenName.SEMICOLON);
+        }
+        else if (accept(TokenName.LET_KW)){
+            if (accept(TokenName.MUT_KW)){
+                expect(TokenName.IDENTIFIER);
+                if (accept(TokenName.COLON))
+                    TYPE();
+                expect(TokenName.ASSIGN_OP);
+                ARITHMETIC_EXPR();
+                expect(TokenName.SEMICOLON);
+            }
+            else {
+                expect(TokenName.IDENTIFIER);
+                if (accept(TokenName.COLON))
+                    TYPE();
+                expect(TokenName.ASSIGN_OP);
+                ARITHMETIC_EXPR();
+                expect(TokenName.SEMICOLON);
+            }
+        }
 
     }
 
@@ -38,39 +71,102 @@ public class Parser {
     }
 
     void IF_EXPR(){
-
+        COMPARISON_EXPR();
+        expect(TokenName.OPEN_BRACKET);
+        STATEMENTS();
+        expect(TokenName.CLOSE_BRACKET);
+        if (accept(TokenName.ELSE_KW)){
+            if (accept(TokenName.IF_KW)){
+                IF_EXPR();
+            }
+            else{
+                expect(TokenName.OPEN_BRACKET);
+                STATEMENTS();
+                expect(TokenName.CLOSE_BRACKET);
+            }
+        }
     }
 
     void WHILE_EXPR(){
-
+        COMPARISON_EXPR();
+        expect(TokenName.OPEN_BRACKET);
+        STATEMENTS();
+        expect(TokenName.CLOSE_BRACKET);
     }
 
     void FOR_EXPR(){
-
+        expect(TokenName.IDENTIFIER);
+        expect(TokenName.IN_KW);
+        RANGE();
+        expect(TokenName.OPEN_BRACKET);
+        STATEMENTS();
+        expect(TokenName.CLOSE_BRACKET);
     }
 
     void RANGE(){
-
+        ARITHMETIC_EXPR();
+        if (!accept(TokenName.RANGE_OP))
+            expect(TokenName.INCLUSIVERANGE_OP);
+        ARITHMETIC_EXPR();
     }
 
     void ARITHMETIC_EXPR(){
-
+        if (accept(TokenName.OPEN_PAREN)){
+            ARITHMETIC_EXPR();
+            expect(TokenName.CLOSE_PAREN);
+        }
+        else {
+            TERM();
+            if (accept(TokenName.ADD_OP)){
+                ARITHMETIC_EXPR();
+            }
+            else if (accept(TokenName.SUB_OP)){
+                ARITHMETIC_EXPR();
+            }
+        }
     }
 
     void TERM(){
-
+        VALUE();
+        if (accept(TokenName.MULT_OP)){
+            TERM();
+        }
+        else if (accept(TokenName.DIV_OP)){
+            TERM();
+        }
     }
 
     void VALUE(){
-
+        if (accept(TokenName.NUMERIC)){
+            if (accept(TokenName.DECIMAL))
+                expect(TokenName.NUMERIC);
+        }
+        else {
+            expect(TokenName.IDENTIFIER);
+        }
     }
 
     void COMPARISON_EXPR(){
-
+        ARITHMETIC_EXPR();
+        COMPARISON();
+        ARITHMETIC_EXPR();
     }
 
     //Returns int representing complement operation of comparison token
     int COMPARISON(){
-        return 0;
+        if (accept(TokenName.EQ_OP))
+            return 6;
+        else if (accept(TokenName.GREATER_EQ_OP))
+            return 2;
+        else if (accept(TokenName.LESS_EQ_OP))
+            return 3;
+        else if (accept(TokenName.GREATER_OP))
+            return 4;
+        else if (accept(TokenName.LESS_OP))
+            return 5;
+        else{
+            expect(TokenName.UNEQUAL_OP);
+            return 1;
+        }
     }
 }

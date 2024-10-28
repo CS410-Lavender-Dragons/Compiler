@@ -47,7 +47,9 @@ public enum TokenName {
     IDENTIFIER(71),
 
     INVALID_INPUT(100),
-    EOI(101);
+    EOI(101),
+    WHILE_KW(102), //temporary until Lexer modified
+    UNEQUAL_OP(103); //temporary until Lexer modified
 
 
     private final int token;
