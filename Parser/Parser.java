@@ -67,7 +67,8 @@ public class Parser {
     }
 
     void TYPE(){
-
+        if (!accept(TokenName.BIT_8_FLOAT_OP) || !accept(TokenName.BIT_8_INT_OP) || !accept(TokenName.BIT_16_FLOAT_OP) || !accept(TokenName.BIT_16_INT_OP) || !accept(TokenName.BIT_32_FLOAT_OP) || !accept(TokenName.BIT_32_INT_OP) || !accept(TokenName.BIT_64_FLOAT_OP) || !accept(TokenName.BIT_64_INT_OP) || !accept(TokenName.BIT_128_FLOAT_OP))
+            expect(TokenName.BIT_128_INT_OP);
     }
 
     void IF_EXPR(){
