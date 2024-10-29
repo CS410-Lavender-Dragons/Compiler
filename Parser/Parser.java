@@ -51,29 +51,36 @@ public class Parser {
             ARITHMETIC_EXPR();
             expect(TokenName.SEMICOLON);
         }
-        else if (accept(TokenName.LET_KW)){
-            if (accept(TokenName.MUT_KW)){
-                expect(TokenName.IDENTIFIER);
-                if (accept(TokenName.COLON))
-                    TYPE();
-                expect(TokenName.ASSIGN_OP);
-                ARITHMETIC_EXPR();
-                expect(TokenName.SEMICOLON);
-            }
-            else {
-                expect(TokenName.IDENTIFIER);
-                if (accept(TokenName.COLON))
-                    TYPE();
-                expect(TokenName.ASSIGN_OP);
-                ARITHMETIC_EXPR();
-                expect(TokenName.SEMICOLON);
-            }
+        else {
+            expect(TokenName.LET_KW);
+            LET_ASSIGN();
         }
+    }
 
+    void LET_ASSIGN(){
+        if (accept(TokenName.IDENTIFIER)){
+            TYPE_ASSIGN();
+            expect(TokenName.ASSIGN_OP);
+            ARITHMETIC_EXPR();
+            expect(TokenName.SEMICOLON);
+        }
+        else {
+            expect(TokenName.MUT_KW);
+            expect(TokenName.IDENTIFIER);
+            TYPE_ASSIGN();
+            expect(TokenName.ASSIGN_OP);
+            ARITHMETIC_EXPR();
+            expect(TokenName.SEMICOLON);
+        }
+    }
+
+    void TYPE_ASSIGN(){
+        if (accept(TokenName.COLON))
+            TYPE();
     }
 
     void TYPE(){
-        if (!accept(TokenName.BIT_8_FLOAT_OP) || !accept(TokenName.BIT_8_INT_OP) || !accept(TokenName.BIT_16_FLOAT_OP) || !accept(TokenName.BIT_16_INT_OP) || !accept(TokenName.BIT_32_FLOAT_OP) || !accept(TokenName.BIT_32_INT_OP) || !accept(TokenName.BIT_64_FLOAT_OP) || !accept(TokenName.BIT_64_INT_OP) || !accept(TokenName.BIT_128_FLOAT_OP))
+        if (!accept(TokenName.BIT_8_FLOAT_OP) && !accept(TokenName.BIT_8_INT_OP) && !accept(TokenName.BIT_16_FLOAT_OP) && !accept(TokenName.BIT_16_INT_OP) && !accept(TokenName.BIT_32_FLOAT_OP) && !accept(TokenName.BIT_32_INT_OP) && !accept(TokenName.BIT_64_FLOAT_OP) && !accept(TokenName.BIT_64_INT_OP) && !accept(TokenName.BIT_128_FLOAT_OP))
             expect(TokenName.BIT_128_INT_OP);
     }
 
@@ -82,15 +89,21 @@ public class Parser {
         expect(TokenName.OPEN_BRACKET);
         STATEMENTS();
         expect(TokenName.CLOSE_BRACKET);
-        if (accept(TokenName.ELSE_KW)){
-            if (accept(TokenName.IF_KW)){
-                IF_EXPR();
-            }
-            else{
-                expect(TokenName.OPEN_BRACKET);
-                STATEMENTS();
-                expect(TokenName.CLOSE_BRACKET);
-            }
+        ELSE_CLAUSE();
+    }
+
+    void ELSE_CLAUSE(){
+        if (accept(TokenName.ELSE_KW))
+            ELSE_CLAUSE2();
+    }
+
+    void ELSE_CLAUSE2(){
+        if (accept(TokenName.IF_KW))
+            IF_EXPR();
+        else {
+            expect(TokenName.OPEN_BRACKET);
+            STATEMENTS();
+            expect(TokenName.CLOSE_BRACKET);
         }
     }
 
@@ -146,12 +159,16 @@ public class Parser {
             expect(TokenName.CLOSE_PAREN);
         }
         else if (accept(TokenName.NUMERIC)){
-            if (accept(TokenName.DECIMAL))
-                expect(TokenName.NUMERIC);
+            VALUE2();
         }
         else {
             expect(TokenName.IDENTIFIER);
         }
+    }
+
+    void VALUE2(){
+        if (accept(TokenName.DECIMAL))
+            expect(TokenName.NUMERIC);
     }
 
     void COMPARISON_EXPR(){
