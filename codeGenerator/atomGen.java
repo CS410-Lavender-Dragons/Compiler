@@ -20,102 +20,52 @@ import java.util.Arrays;
 public class atomGen {    
 
     //..
-    Queue<atom> atomList = new LinkedList<>(); 
+    static Queue<atom> atomList = new LinkedList<>(); 
 
-    public void generateAtoms(Queue<Token> stream){
+    //TODO: what is the logic that'll tie everything together, pemdas? 
 
-        //t regs start at 1 
-        int tempRegCount = 1; 
-        //counter stuff. 0 is slot 0, 1 is slot 1, etc. 
-        ArrayList<Integer> tempRegs = new ArrayList<>(); 
-        
-        //to store identifiers to plug into things 
-        ArrayList<String> idList = new ArrayList<>();
-        String[] identifiers = new String[4];  
-        int curIdentifier = 0; 
+    static int tempCounter = 0; 
 
-        //other register stuff 
-        //int 
-            
-        //scan through stream
-        for(Token token : stream){
-            //dogwater code
-            
-            //if the first one is a var and not a kw, capture.
-            if(token.getName().equals(TokenName.IDENTIFIER)){
-                //TODO: double check to make sure getValue works 
-                identifiers[curIdentifier] = token.getValue().toString(); 
-                curIdentifier++; 
-            }
-            
-            //load in 
-            if(token.getName().equals(TokenName.ADD_OP)){
-                //increment temp reg count 
-                String result = "T" + tempRegCount; 
-                addAtom(idList.get(0), idList.get(1), result);
-                tempRegCount++; 
-            }
-            else if(token.getName().equals(TokenName.SUB_OP)){
-                String result = "T" + tempRegCount; 
-                subAtom(idList.get(0), idList.get(1), result);
-                tempRegCount++; 
-            }
-            else if(token.getName().equals(TokenName.MULT_OP)){
-                String result = "T" + tempRegCount; 
-                mulAtom(idList.get(0), idList.get(1), result);
-                tempRegCount++; 
-            }
-            else if(token.getName().equals(TokenName.DIV_OP)){
-                String result = "T" + tempRegCount; 
-                divAtom(idList.get(0), idList.get(1), result);
-                tempRegCount++; 
-            }
-            //do jump, lbl, test, and counter magic 
-            else if(token.getName().equals(TokenName.FOR_KW)){
-                
-            }
-            //add mov atom  
-            else if(token.getName().equals(TokenName.EQ_OP)){
-
-            }
-            
-        } 
-            
-
-        //determine which one it is? 
-        
-        //return finalized list of atoms 
-        //return atomList;
-    }
-
-    //for everything below, -1 means null
+    //for everything below, -1 means null. just helper stuff 
 
     // add add atom: (ADD, left, right, result)
-    public void addAtom(String left, String right, String result) {
+    public static void addAtom(String left, String right, String result) {
         atomList.add(new atom("ADD", left, right, result, -1, null));
     }
 
     // add sub atom: (SUB, left, right, result)
-    public void subAtom(String left, String right, String result) {
+    public static void subAtom(String left, String right, String result) {
         atomList.add(new atom("SUB", left, right, result, -1, null));
     }
 
     //add mul atom: (MUL, left, right, result)
-    public void mulAtom(String left, String right, String result){
+    public static void mulAtom(String left, String right, String result){
         atomList.add(new atom("SUB", left, right, result, -1, null));
     }
 
     //add mul atom: (MUL, left, right, result)
-    public void divAtom(String left, String right, String result){
+    public static void divAtom(String left, String right, String result){
         atomList.add(new atom("SUB", left, right, result, -1, null));
     }
 
-    public void jmpAtom(String dest){
+    public static void jmpAtom(String dest){
         atomList.add(new atom("JMP", null, null, null, -1, dest));
     }
 
-    public void negAtom(String dest){
-        /* atomList.add(new atom()) */
+    public static void negAtom(String dest){
+        atomList.add(new atom("NEG", null, null, null, -1, dest));
+    }
+
+    public static void lblAtom(String dest){
+        atomList.add(new atom("LBL", null, null, null, -1, dest));
+    }
+
+    public static void tstAtom(String left, String right, int cmp, String dest){
+        atomList.add(new atom("TST", left, right, null, cmp, dest));
+    }
+
+    public static void movAtom(String left, String dest){
+        atomList.add(new atom("MOV", left, null, null, -1, dest));
     }
 
     //problem of identifying stuff, counter as well

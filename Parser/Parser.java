@@ -4,9 +4,13 @@ import Core.Token;
 import Core.TokenName;
 
 import java.util.Queue;
+import codeGenerator.atomGen;
 
 public class Parser {
     Queue<Token> tokenQueue;
+
+    Object destroyed = null; 
+    int destroyedNum = 0; 
 
     //helper
     public Queue<Token> getQueue(){
@@ -20,7 +24,9 @@ public class Parser {
 
     boolean accept(TokenName tokenName){
         if (tokenQueue.peek().getName() == tokenName){
-            tokenQueue.remove();
+            
+            destroyed = tokenQueue.remove().getValue(); 
+
             return true;
         }
         return false;
@@ -29,7 +35,8 @@ public class Parser {
     void expect(TokenName tokenName){
         if (tokenQueue.peek().getName() != tokenName)
             throw new RuntimeException("Expected: " + tokenName + ", but found: " + tokenQueue.peek().getName());
-        tokenQueue.remove();
+        //save
+        destroyed = tokenQueue.remove().getValue();
     }
 
     void STATEMENTS(){
@@ -60,12 +67,16 @@ public class Parser {
         expect(TokenName.SEMICOLON);
     }
 
+    //baking in at this level for now 
     void LET_ASSIGN(){
         if (accept(TokenName.IDENTIFIER)){
+            var left = destroyed; 
             TYPE_ASSIGN();
             expect(TokenName.ASSIGN_OP);
             ARITHMETIC_EXPR();
+            //String right = destroyed; 
             expect(TokenName.SEMICOLON);
+            
         }
         else {
             expect(TokenName.MUT_KW);
@@ -75,6 +86,9 @@ public class Parser {
             ARITHMETIC_EXPR();
             expect(TokenName.SEMICOLON);
         }
+
+        
+
     }
 
     void TYPE_ASSIGN(){
@@ -135,6 +149,7 @@ public class Parser {
 
     void ARITHMETIC_EXPR(){
             TERM();
+
             ARITH_LIST();
     }
 
@@ -148,8 +163,10 @@ public class Parser {
         }
     }
 
+    //no
     void TERM(){
         VALUE();
+
         TERM_LIST();  
     }
 
@@ -163,26 +180,47 @@ public class Parser {
         }
     }
 
-    void VALUE(){
+    //in progress 
+    Object VALUE(){
+
+        //NOT worked in 
         if (accept(TokenName.OPEN_PAREN)){
             ARITHMETIC_EXPR();
             expect(TokenName.CLOSE_PAREN);
         }
+
+        //worked on
         else if (accept(TokenName.NUMERIC)){
-            FLOAT();
+            Integer num1 = (Integer) destroyed; 
+            Integer floatResult = FLOAT();
+
+            //math magic to calculate out decimal to return up the tree
+            return (Integer)(num1) + (floatResult / Math.pow(10, floatResult.toString().length()));//whatever the result of float is ; 
+            //return added 
         }
+
+        //NOT worked on
         else if(accept(TokenName.SUB_OP)){
             NEGATED_VALUE();
         }
         else {
+            //terminal 
             expect(TokenName.IDENTIFIER);
+            //return up the tree 
+            return destroyed; 
         }
+        //placeholder 
+        return ""; 
     }
-
-    void FLOAT(){
+    
+    //worked on, probably done 
+    Integer FLOAT(){
         if(accept(TokenName.DECIMAL)){
             expect(TokenName.NUMERIC);
+            //grab
+            return (Integer) destroyed;  
         }
+        return null; 
     }
 
     void NEGATED_VALUE(){
