@@ -88,6 +88,8 @@ public class atomGen {
         //return atomList;
     }
 
+    //for everything below, -1 means null
+
     // add add atom: (ADD, left, right, result)
     public void addAtom(String left, String right, String result) {
         atomList.add(new atom("ADD", left, right, result, -1, null));
@@ -101,6 +103,19 @@ public class atomGen {
     //add mul atom: (MUL, left, right, result)
     public void mulAtom(String left, String right, String result){
         atomList.add(new atom("SUB", left, right, result, -1, null));
+    }
+
+    //add mul atom: (MUL, left, right, result)
+    public void divAtom(String left, String right, String result){
+        atomList.add(new atom("SUB", left, right, result, -1, null));
+    }
+
+    public void jmpAtom(String dest){
+        atomList.add(new atom("JMP", null, null, null, -1, dest));
+    }
+
+    public void negAtom(String dest){
+        /* atomList.add(new atom()) */
     }
 
     //problem of identifying stuff, counter as well
