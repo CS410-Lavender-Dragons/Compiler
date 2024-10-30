@@ -8,6 +8,11 @@ import java.util.Queue;
 public class Parser {
     Queue<Token> tokenQueue;
 
+    //helper
+    public Queue<Token> getQueue(){
+        return this.tokenQueue;
+    }
+
     public void parse(Queue<Token> tokenQueue){
         this.tokenQueue = tokenQueue;
         STATEMENTS();
