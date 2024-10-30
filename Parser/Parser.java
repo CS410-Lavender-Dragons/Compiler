@@ -41,23 +41,18 @@ public class Parser {
             WHILE_EXPR();
         else if (accept(TokenName.FOR_KW))
             FOR_EXPR();
-        else if (accept(TokenName.LET_KW))
-            LET_ASSIGN();
-        else
+        else if (accept(TokenName.IDENTIFIER))
             ASSIGNMENT_EXPR();
+        else {
+            expect(TokenName.LET_KW);
+            LET_ASSIGN();
+        }
     }
 
     void ASSIGNMENT_EXPR(){
-        if (accept(TokenName.IDENTIFIER)){
-            expect(TokenName.ASSIGN_OP);
-            ARITHMETIC_EXPR();
-            expect(TokenName.SEMICOLON);
-        }
-        else {
-            //Looks like this was updated to part of STATEMENT() so I added it there, not sure if we want to keep the if/else statement
-            //expect(TokenName.LET_KW);
-            //LET_ASSIGN();
-        }
+        expect(TokenName.ASSIGN_OP);
+        ARITHMETIC_EXPR();
+        expect(TokenName.SEMICOLON);
     }
 
     void LET_ASSIGN(){
@@ -129,10 +124,8 @@ public class Parser {
     }
 
     void RANGE(){
-        ARITHMETIC_EXPR();
         if (!accept(TokenName.RANGE_OP))
             expect(TokenName.INCLUSIVERANGE_OP);
-        ARITHMETIC_EXPR();
     }
 
     void ARITHMETIC_EXPR(){
@@ -142,9 +135,13 @@ public class Parser {
 
     //I apologize if this isn't what we wanted
     void ARITH_LIST(){
-        if(!accept(TokenName.ADD_OP)){
-            expect(TokenName.SUB_OP);
+        if (accept(TokenName.ADD_OP)){
+            ARITHMETIC_EXPR();
         }
+        else if (accept(TokenName.SUB_OP)){
+            ARITHMETIC_EXPR();
+        }
+
     }
 
     void TERM(){
@@ -154,8 +151,11 @@ public class Parser {
 
     //Another apology here since this was done similarly to arith_list
     void TERM_LIST(){
-        if(!accept(TokenName.MULT_OP)){
-            expect(TokenName.DIV_OP);
+        if (accept(TokenName.MULT_OP)){
+            TERM();
+        }
+        else if (accept(TokenName.DIV_OP)){
+            TERM();
         }
     }
 
