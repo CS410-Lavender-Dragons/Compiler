@@ -12,6 +12,13 @@ public class Parser {
     Object destroyed = null; 
     int destroyedNum = 0; 
 
+    //helper: double can cast itself automatically into an obj (as with any primitive)
+    double floatCalculator(Integer left, Integer right){
+        //abracadabra
+        double answer =  (left) + (right / Math.pow(10, right.toString().length()));
+        return answer;
+    }
+
     //helper
     public Queue<Token> getQueue(){
         return this.tokenQueue;
@@ -194,15 +201,21 @@ public class Parser {
             Integer num1 = (Integer) destroyed; 
             Integer floatResult = FLOAT();
 
+            //return witchcraft
+            return floatCalculator(num1, floatResult); 
+            
             //math magic to calculate out decimal to return up the tree
-            return (Integer)(num1) + (floatResult / Math.pow(10, floatResult.toString().length()));//whatever the result of float is ; 
+            //return (Integer)(num1) + (floatResult / Math.pow(10, floatResult.toString().length()));//whatever the result of float is ; 
             //return added 
         }
 
         //NOT worked on
         else if(accept(TokenName.SUB_OP)){
             NEGATED_VALUE();
+            
         }
+
+        //worked on 
         else {
             //terminal 
             expect(TokenName.IDENTIFIER);
@@ -223,13 +236,19 @@ public class Parser {
         return null; 
     }
 
-    void NEGATED_VALUE(){
+    
+    //in progress 
+    Integer NEGATED_VALUE(){
+        //in progress
         if(accept(TokenName.NUMERIC)){
-            FLOAT();
+            return FLOAT(); 
         }
+        //not touched... yet
         else{
             expect(TokenName.IDENTIFIER);
         }
+        //placeholder
+        return null; 
     }
 
     void COMPARISON_EXPR(){
