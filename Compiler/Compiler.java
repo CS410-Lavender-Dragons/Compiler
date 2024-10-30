@@ -13,7 +13,7 @@ public class Compiler {
         parser.parse(tokens2);
         var tokens3 = lexer.tokenize("for x in 23..=  4912 { x = 99;}   y = (2 + 5) * 7;");
         parser.parse(tokens3);
-        var tokens4 = lexer.tokenize("let x = 10; let y =  (-x) + (8 * 7 - 5) + (z) / x + 0;");
+        var tokens4 = lexer.tokenize("let x : i32 = 10; let y =  (-x) + (8 * 7 - 5) + (z) / x + 0;");
         parser.parse(tokens4);
     }
 }
