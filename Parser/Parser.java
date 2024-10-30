@@ -41,6 +41,8 @@ public class Parser {
             WHILE_EXPR();
         else if (accept(TokenName.FOR_KW))
             FOR_EXPR();
+        else if (accept(TokenName.LET_KW))
+            LET_ASSIGN();
         else
             ASSIGNMENT_EXPR();
     }
@@ -52,8 +54,9 @@ public class Parser {
             expect(TokenName.SEMICOLON);
         }
         else {
-            expect(TokenName.LET_KW);
-            LET_ASSIGN();
+            //Looks like this was updated to part of STATEMENT() so I added it there, not sure if we want to keep the if/else statement
+            //expect(TokenName.LET_KW);
+            //LET_ASSIGN();
         }
     }
 
@@ -117,7 +120,9 @@ public class Parser {
     void FOR_EXPR(){
         expect(TokenName.IDENTIFIER);
         expect(TokenName.IN_KW);
+        ARITHMETIC_EXPR();
         RANGE();
+        ARITHMETIC_EXPR();
         expect(TokenName.OPEN_BRACKET);
         STATEMENTS();
         expect(TokenName.CLOSE_BRACKET);
@@ -131,25 +136,26 @@ public class Parser {
     }
 
     void ARITHMETIC_EXPR(){
-
- //       else {
             TERM();
-            if (accept(TokenName.ADD_OP)){
-                ARITHMETIC_EXPR();
-            }
-            else if (accept(TokenName.SUB_OP)){
-                ARITHMETIC_EXPR();
-            }
-   //     }
+            ARITH_LIST();
+    }
+
+    //I apologize if this isn't what we wanted
+    void ARITH_LIST(){
+        if(!accept(TokenName.ADD_OP)){
+            expect(TokenName.SUB_OP);
+        }
     }
 
     void TERM(){
         VALUE();
-        if (accept(TokenName.MULT_OP)){
-            TERM();
-        }
-        else if (accept(TokenName.DIV_OP)){
-            TERM();
+        TERM_LIST();  
+    }
+
+    //Another apology here since this was done similarly to arith_list
+    void TERM_LIST(){
+        if(!accept(TokenName.MULT_OP)){
+            expect(TokenName.DIV_OP);
         }
     }
 
@@ -159,16 +165,29 @@ public class Parser {
             expect(TokenName.CLOSE_PAREN);
         }
         else if (accept(TokenName.NUMERIC)){
-            VALUE2();
+            FLOAT();
+        }
+        else if(accept(TokenName.SUB_OP)){
+            NEGATED_VALUE();
         }
         else {
             expect(TokenName.IDENTIFIER);
         }
     }
 
-    void VALUE2(){
-        if (accept(TokenName.DECIMAL))
+    void FLOAT(){
+        if(accept(TokenName.DECIMAL)){
             expect(TokenName.NUMERIC);
+        }
+    }
+
+    void NEGATED_VALUE(){
+        if(accept(TokenName.NUMERIC)){
+            FLOAT();
+        }
+        else{
+            expect(TokenName.IDENTIFIER);
+        }
     }
 
     void COMPARISON_EXPR(){
