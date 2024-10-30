@@ -46,20 +46,18 @@ public class Parser {
             WHILE_EXPR();
         else if (accept(TokenName.FOR_KW))
             FOR_EXPR();
-        else
+        else if (accept(TokenName.IDENTIFIER))
             ASSIGNMENT_EXPR();
-    }
-
-    void ASSIGNMENT_EXPR(){
-        if (accept(TokenName.IDENTIFIER)){
-            expect(TokenName.ASSIGN_OP);
-            ARITHMETIC_EXPR();
-            expect(TokenName.SEMICOLON);
-        }
         else {
             expect(TokenName.LET_KW);
             LET_ASSIGN();
         }
+    }
+
+    void ASSIGNMENT_EXPR(){
+        expect(TokenName.ASSIGN_OP);
+        ARITHMETIC_EXPR();
+        expect(TokenName.SEMICOLON);
     }
 
     void LET_ASSIGN(){
@@ -80,8 +78,8 @@ public class Parser {
     }
 
     void TYPE_ASSIGN(){
-        if (accept(TokenName.COLON))
-            TYPE();
+        expect(TokenName.COLON);
+        TYPE();
     }
 
     void TYPE(){
@@ -122,34 +120,41 @@ public class Parser {
     void FOR_EXPR(){
         expect(TokenName.IDENTIFIER);
         expect(TokenName.IN_KW);
+        ARITHMETIC_EXPR();
         RANGE();
+        ARITHMETIC_EXPR();
         expect(TokenName.OPEN_BRACKET);
         STATEMENTS();
         expect(TokenName.CLOSE_BRACKET);
     }
 
     void RANGE(){
-        ARITHMETIC_EXPR();
         if (!accept(TokenName.RANGE_OP))
             expect(TokenName.INCLUSIVERANGE_OP);
-        ARITHMETIC_EXPR();
     }
 
     void ARITHMETIC_EXPR(){
-
- //       else {
             TERM();
-            if (accept(TokenName.ADD_OP)){
-                ARITHMETIC_EXPR();
-            }
-            else if (accept(TokenName.SUB_OP)){
-                ARITHMETIC_EXPR();
-            }
-   //     }
+            ARITH_LIST();
+    }
+
+    //I apologize if this isn't what we wanted
+    void ARITH_LIST(){
+        if (accept(TokenName.ADD_OP)){
+            ARITHMETIC_EXPR();
+        }
+        else if (accept(TokenName.SUB_OP)){
+            ARITHMETIC_EXPR();
+        }
     }
 
     void TERM(){
         VALUE();
+        TERM_LIST();  
+    }
+
+    //Another apology here since this was done similarly to arith_list
+    void TERM_LIST(){
         if (accept(TokenName.MULT_OP)){
             TERM();
         }
@@ -164,16 +169,29 @@ public class Parser {
             expect(TokenName.CLOSE_PAREN);
         }
         else if (accept(TokenName.NUMERIC)){
-            VALUE2();
+            FLOAT();
+        }
+        else if(accept(TokenName.SUB_OP)){
+            NEGATED_VALUE();
         }
         else {
             expect(TokenName.IDENTIFIER);
         }
     }
 
-    void VALUE2(){
-        if (accept(TokenName.DECIMAL))
+    void FLOAT(){
+        if(accept(TokenName.DECIMAL)){
             expect(TokenName.NUMERIC);
+        }
+    }
+
+    void NEGATED_VALUE(){
+        if(accept(TokenName.NUMERIC)){
+            FLOAT();
+        }
+        else{
+            expect(TokenName.IDENTIFIER);
+        }
     }
 
     void COMPARISON_EXPR(){
