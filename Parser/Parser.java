@@ -73,8 +73,8 @@ public class Parser {
     }
 
     void TYPE_ASSIGN(){
-        if (accept(TokenName.COLON))
-            TYPE();
+        expect(TokenName.COLON);
+        TYPE();
     }
 
     void TYPE(){
@@ -141,7 +141,6 @@ public class Parser {
         else if (accept(TokenName.SUB_OP)){
             ARITHMETIC_EXPR();
         }
-
     }
 
     void TERM(){
