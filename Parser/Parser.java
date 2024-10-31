@@ -118,10 +118,10 @@ public class Parser {
 
     void ELSE_CLAUSE(){
         if (accept(TokenName.ELSE_KW))
-            ELSE_CLAUSE2();
+            ELSE_NESTED();
     }
 
-    void ELSE_CLAUSE2(){
+    void ELSE_NESTED(){
         if (accept(TokenName.IF_KW))
             IF_EXPR();
         else {
@@ -202,8 +202,7 @@ public class Parser {
             Integer floatResult = FLOAT();
 
             //return witchcraft
-            if(floatResult != null)
-                return floatCalculator(num1, floatResult); 
+            return floatResult == null ? num1 : floatCalculator(num1, floatResult);
             
             //math magic to calculate out decimal to return up the tree
             //return (Integer)(num1) + (floatResult / Math.pow(10, floatResult.toString().length()));//whatever the result of float is ; 
