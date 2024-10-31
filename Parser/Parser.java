@@ -118,10 +118,10 @@ public class Parser {
 
     void ELSE_CLAUSE(){
         if (accept(TokenName.ELSE_KW))
-            ELSE_CLAUSE2();
+            ELSE_NESTED();
     }
 
-    void ELSE_CLAUSE2(){
+    void ELSE_NESTED(){
         if (accept(TokenName.IF_KW))
             IF_EXPR();
         else {
