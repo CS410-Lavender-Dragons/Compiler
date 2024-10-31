@@ -85,16 +85,16 @@ public class Parser {
             expect(TokenName.SEMICOLON);
             
         }
+        //worked on, day 2 
         else {
             expect(TokenName.MUT_KW);
             expect(TokenName.IDENTIFIER);
+            var left = destroyed; 
             TYPE_ASSIGN();
             expect(TokenName.ASSIGN_OP);
             ARITHMETIC_EXPR();
             expect(TokenName.SEMICOLON);
         }
-
-        
 
     }
 
@@ -202,7 +202,8 @@ public class Parser {
             Integer floatResult = FLOAT();
 
             //return witchcraft
-            return floatCalculator(num1, floatResult); 
+            if(floatResult != null)
+                return floatCalculator(num1, floatResult); 
             
             //math magic to calculate out decimal to return up the tree
             //return (Integer)(num1) + (floatResult / Math.pow(10, floatResult.toString().length()));//whatever the result of float is ; 
@@ -251,14 +252,20 @@ public class Parser {
         return null; 
     }
 
+    //this can return to while
     void COMPARISON_EXPR(){
+        //what can this be? can o worms
         ARITHMETIC_EXPR();
-        COMPARISON();
+        
+        Integer comparison = COMPARISON();
+        
+        //same issue, take care of atoms at lower level for arth expr 
         ARITHMETIC_EXPR();
     }
 
     //Returns int representing complement operation of comparison token
-    int COMPARISON(){
+    //where this returns to: comparison_expression 
+    Integer COMPARISON(){
         if (accept(TokenName.EQ_OP))
             return 6;
         else if (accept(TokenName.GREATER_EQ_OP))
