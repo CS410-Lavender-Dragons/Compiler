@@ -12,6 +12,9 @@ public class Parser {
     Object destroyed = null; 
     int destroyedNum = 0; 
 
+    String left; 
+    String right; 
+
     //helper: double can cast itself automatically into an obj (as with any primitive)
     double floatCalculator(Integer left, Integer right){
         //abracadabra
@@ -154,6 +157,7 @@ public class Parser {
             expect(TokenName.INCLUSIVERANGE_OP);
     }
 
+    //lower levels in progress
     void ARITHMETIC_EXPR(){
             TERM();
 
@@ -170,7 +174,7 @@ public class Parser {
         }
     }
 
-    //no
+    //no bueno
     void TERM(){
         VALUE();
 
@@ -190,8 +194,9 @@ public class Parser {
     //in progress 
     Object VALUE(){
 
-        //NOT worked in 
+        //NOT worked on, no return? 
         if (accept(TokenName.OPEN_PAREN)){
+            //String result = ARITHMETIC_EXPR(); no directly return arith expr
             ARITHMETIC_EXPR();
             expect(TokenName.CLOSE_PAREN);
         }
@@ -209,10 +214,9 @@ public class Parser {
             //return added 
         }
 
-        //NOT worked on
+        //in progress, returns data type of obj to cast to Integer (?)
         else if(accept(TokenName.SUB_OP)){
-            NEGATED_VALUE();
-            
+            return NEGATED_VALUE();
         }
 
         //worked on 
@@ -235,7 +239,6 @@ public class Parser {
         }
         return null; 
     }
-
     
     //in progress 
     Integer NEGATED_VALUE(){
@@ -251,9 +254,9 @@ public class Parser {
         return null; 
     }
 
-    //this can return to while
+    //not done; this can return to while or a number of other things 
     void COMPARISON_EXPR(){
-        //what can this be? can o worms
+        //what can this be? can o' worms
         ARITHMETIC_EXPR();
         
         Integer comparison = COMPARISON();
@@ -262,8 +265,8 @@ public class Parser {
         ARITHMETIC_EXPR();
     }
 
+    //99% sure done; where this returns to: comparison_expression 
     //Returns int representing complement operation of comparison token
-    //where this returns to: comparison_expression 
     Integer COMPARISON(){
         if (accept(TokenName.EQ_OP))
             return 6;
