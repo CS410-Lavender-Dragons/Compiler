@@ -202,7 +202,7 @@ public class Parser {
             Integer floatResult = FLOAT();
 
             //return witchcraft
-            return floatCalculator(num1, floatResult); 
+            return floatResult == null ? num1 : floatCalculator(num1, floatResult);
             
             //math magic to calculate out decimal to return up the tree
             //return (Integer)(num1) + (floatResult / Math.pow(10, floatResult.toString().length()));//whatever the result of float is ; 
