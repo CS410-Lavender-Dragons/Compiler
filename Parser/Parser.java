@@ -27,6 +27,7 @@ public class Parser {
     public void parse(Queue<Token> tokenQueue){
         this.tokenQueue = tokenQueue;
         STATEMENTS();
+        expect(TokenName.EOI);
     }
 
     boolean accept(TokenName tokenName){
