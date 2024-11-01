@@ -207,11 +207,15 @@ public class Parser {
     Object ARITHMETIC_EXPR(){
             //is this left or right? since it gets processed twice, it should be able to be both 
             Object left = TERM();
-            
-            //
 
             //operator and operator in progress 
             ARITH_LIST(left);
+
+            if(left != null){
+                return left; 
+            }
+
+            return null; 
 
     }
 
@@ -230,7 +234,7 @@ public class Parser {
         }
     }
 
-    //worked on, done?, no bueno
+    //worked on, done?
     Object TERM(){
         //left HAS to come out of here, for mul operator. can be x + y, or 1 + y
         Object left = VALUE();
@@ -243,18 +247,18 @@ public class Parser {
         return left;
     }
 
-    //done? Can generate: MUL, DIV atoms
+    //worked on, done? 
+    /** 
+     * Adds mul atom or div atom depending on operator. 
+     * 
+     */
     void TERM_LIST(Object left){
-        //left term is input
-
         if (accept(TokenName.MULT_OP)){
             Object right = TERM();
-            //create mult atom, logic will handle dest logic 
             atomList.mulAtom((String)left, (String)right, (String)result);
         }
         else if (accept(TokenName.DIV_OP)){
             Object right = TERM();
-            //create div atom 
             atomList.mulAtom((String)left, (String)right, (String)result);
         }
     }
@@ -275,12 +279,8 @@ public class Parser {
             Integer num1 = (Integer) destroyed; 
             Integer floatResult = FLOAT();
 
-            //return witchcraft
+            //witchcraft
             return floatResult == null ? num1 : floatCalculator(num1, floatResult);
-            
-            //math magic to calculate out decimal to return up the tree
-            //return (Integer)(num1) + (floatResult / Math.pow(10, floatResult.toString().length()));//whatever the result of float is ; 
-            //return added 
         }
 
         //in progress, returns data type of obj to cast to Integer (?)
@@ -326,6 +326,14 @@ public class Parser {
     //not done; this can return to while or a number of other things 
     //this can return to while
     //Can generate: TST atoms
+    /**
+     * Not done
+     * Can genrate TST atoms. 
+     * Can return to while (anything else?). 
+     * 
+     * @param
+     * @return 
+     */
     void COMPARISON_EXPR(){
         //what can this be? can o' worms
         ARITHMETIC_EXPR();
@@ -335,11 +343,15 @@ public class Parser {
         //same issue, take care of atoms at lower level for arth expr 
         ARITHMETIC_EXPR();
     }
-
-    //99% sure done; where this returns to: comparison_expression 
-    //Returns int representing complement operation of comparison token
-    //where this returns to: comparison_expression 
-    // //Can generate: NEG atoms
+    
+    /**
+     * 99% sure done; where this returns to: comparison_expression 
+     * Returns int representing complement operation of comparison token
+     * where this returns to: comparison_expression 
+     * Can generate: NEG atoms (?) 
+     * 
+     * @return a number
+     */
     Integer COMPARISON(){
         if (accept(TokenName.EQ_OP))
             return 6;
