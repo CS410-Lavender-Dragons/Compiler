@@ -145,20 +145,21 @@ public class Parser {
         COMPARISON_EXPR();
         expect(TokenName.OPEN_BRACKET);
         STATEMENTS();
-        //Ensure the identifier doesn’t exist in lookup table OR that is it mutable
         expect(TokenName.CLOSE_BRACKET);
+        //Generate LBL atom with label value from COMPARISON_EXPR
         ELSE_CLAUSE();
-        //Identify comparison operator and then use the complement
     }
 
     void ELSE_CLAUSE(){
         if (accept(TokenName.ELSE_KW))
+            //Generate a JMP atom to a temporary label, pass this label name to nested
             ELSE_NESTED();
     }
 
     void ELSE_NESTED(){
         if (accept(TokenName.IF_KW))
             IF_EXPR();
+            //Generate LBL atom with passed in parameter
         else {
             expect(TokenName.OPEN_BRACKET);
             STATEMENTS();
@@ -341,9 +342,10 @@ public class Parser {
         ARITHMETIC_EXPR();
         
         Integer comparison = COMPARISON();
-        
         //same issue, take care of atoms at lower level for arth expr 
         ARITHMETIC_EXPR();
+
+        //Generate TST atom using comparison variable value which jumps to a label
     }
 
     /**
