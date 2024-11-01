@@ -5,9 +5,15 @@ import Core.TokenName;
 
 import java.util.Queue;
 import codeGenerator.atomGen;
+import Core.Variable;
+
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 public class Parser {
     Queue<Token> tokenQueue;
+    Dictionary<String, Variable> lookupTable = new Hashtable<>();
 
     Object destroyed = null; 
     int destroyedNum = 0; 
@@ -24,6 +30,8 @@ public class Parser {
         return this.tokenQueue;
     }
 
+   
+
     public void parse(Queue<Token> tokenQueue){
         this.tokenQueue = tokenQueue;
         STATEMENTS();
@@ -32,8 +40,7 @@ public class Parser {
 
     boolean accept(TokenName tokenName){
         if (tokenQueue.peek().getName() == tokenName){
-            
-            destroyed = tokenQueue.remove().getValue(); 
+            destroyed = tokenQueue.remove().getValue();
 
             return true;
         }
@@ -69,24 +76,32 @@ public class Parser {
         }
     }
 
+    //Can generate: MOV atoms
     void ASSIGNMENT_EXPR(){
         expect(TokenName.ASSIGN_OP);
         ARITHMETIC_EXPR();
         expect(TokenName.SEMICOLON);
+
+        //Generate a new Variable with name, mutable, type - add to lookup table
+        //Generate a MOV Atom where we place the result from ARITHMETIC_EXPR into the identifier 
     }
 
-    //baking in at this level for now 
+    //Can generate: MOV atoms
     void LET_ASSIGN(){
         if (accept(TokenName.IDENTIFIER)){
             var left = destroyed; 
             TYPE_ASSIGN();
             expect(TokenName.ASSIGN_OP);
             ARITHMETIC_EXPR();
-            //String right = destroyed; 
+            String right = destroyed; 
             expect(TokenName.SEMICOLON);
+
+            Variable temp;
+            temp.setName(left);
+            temp.setMutable(false);
+            temp.setType();
             
         }
-        //worked on, day 2 
         else {
             expect(TokenName.MUT_KW);
             expect(TokenName.IDENTIFIER);
@@ -108,13 +123,16 @@ public class Parser {
         if (!accept(TokenName.BIT_8_FLOAT_OP) && !accept(TokenName.BIT_8_INT_OP) && !accept(TokenName.BIT_16_FLOAT_OP) && !accept(TokenName.BIT_16_INT_OP) && !accept(TokenName.BIT_32_FLOAT_OP) && !accept(TokenName.BIT_32_INT_OP) && !accept(TokenName.BIT_64_FLOAT_OP) && !accept(TokenName.BIT_64_INT_OP) && !accept(TokenName.BIT_128_FLOAT_OP))
             expect(TokenName.BIT_128_INT_OP);
     }
-
+    
+    //Can generate: JMP, LBL, MOV atoms
     void IF_EXPR(){
         COMPARISON_EXPR();
         expect(TokenName.OPEN_BRACKET);
         STATEMENTS();
+        //Ensure the identifier doesn’t exist in lookup table OR that is it mutable
         expect(TokenName.CLOSE_BRACKET);
         ELSE_CLAUSE();
+        //Identify comparison operator and then use the complement
     }
 
     void ELSE_CLAUSE(){
@@ -132,6 +150,7 @@ public class Parser {
         }
     }
 
+    //Can generate: JMP, LBL, MOV atoms
     void WHILE_EXPR(){
         COMPARISON_EXPR();
         expect(TokenName.OPEN_BRACKET);
@@ -139,15 +158,29 @@ public class Parser {
         expect(TokenName.CLOSE_BRACKET);
     }
 
+    //Can generate: JMP, LBL, MOV atoms
     void FOR_EXPR(){
         expect(TokenName.IDENTIFIER);
         expect(TokenName.IN_KW);
         ARITHMETIC_EXPR();
+        //Ensure Identifier being used is not already in Lookup table; if so, raise exception
+        //Generate new Variable with name, yes mutable, type - add to lookup table
+        //Generate MOV atom placing initial value of first ARITHMETIC_EXPR into identifier
+        //Generate LBL atom with String label1 = labelVar + labelNum++;
+        //Make temp variable with String labelAfterName = labelVar + labelNum++;
         RANGE();
+        //Generate TST atom using cmp of 5 for “..” and cmp of 3 for “..=” which jumps to labelAfterName
         ARITHMETIC_EXPR();
         expect(TokenName.OPEN_BRACKET);
+        //Go into STATEMENTS() - which generates those
         STATEMENTS();
+        //Generate ADD atom which adds 1 to identifier and stores result in identifier
+        //Generate JMP atom which goes to label1
+        //Generate LBL atom with labelAfterName
         expect(TokenName.CLOSE_BRACKET);
+
+        //At end of function, remove Variable from lookup table
+
     }
 
     void RANGE(){
@@ -161,7 +194,7 @@ public class Parser {
             ARITH_LIST();
     }
 
-    //I apologize if this isn't what we wanted
+    //Can generate: ADD, SUB atoms
     void ARITH_LIST(){
         if (accept(TokenName.ADD_OP)){
             ARITHMETIC_EXPR();
@@ -178,7 +211,7 @@ public class Parser {
         TERM_LIST();  
     }
 
-    //Another apology here since this was done similarly to arith_list
+    //Can generate: MUL, DIV atoms
     void TERM_LIST(){
         if (accept(TokenName.MULT_OP)){
             TERM();
@@ -189,6 +222,7 @@ public class Parser {
     }
 
     //in progress 
+    //Can generate: NEG atoms
     Object VALUE(){
 
         //NOT worked in 
@@ -253,6 +287,7 @@ public class Parser {
     }
 
     //this can return to while
+    //Can generate: TST atoms
     void COMPARISON_EXPR(){
         //what can this be? can o worms
         ARITHMETIC_EXPR();
@@ -265,6 +300,7 @@ public class Parser {
 
     //Returns int representing complement operation of comparison token
     //where this returns to: comparison_expression 
+    // //Can generate: NEG atoms
     Integer COMPARISON(){
         if (accept(TokenName.EQ_OP))
             return 6;
