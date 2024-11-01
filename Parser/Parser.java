@@ -98,12 +98,12 @@ public class Parser {
     //Can generate: MOV atoms
     void LET_ASSIGN(){
         if (accept(TokenName.IDENTIFIER)){
-            String left = (String)destroyed; 
+            String left =  String.valueOf(destroyed); 
             TYPE_ASSIGN();
             //Generate a new Variable with name, mutable false, type - add to lookup table
             expect(TokenName.ASSIGN_OP);
             ARITHMETIC_EXPR();
-            String right = (String)destroyed;
+            String right =  String.valueOf(destroyed);
             expect(TokenName.SEMICOLON);
             //Generate a MOV Atom where we place the result from ARITHMETIC_EXPR into the identifier
 
@@ -223,14 +223,15 @@ public class Parser {
     //Can generate: ADD, SUB atoms
     void ARITH_LIST(Object left){
         //buck stops here
+        String leftSide = String.valueOf(left); 
         if (accept(TokenName.ADD_OP)){
             //this is the right term
-            String right = (String)ARITHMETIC_EXPR();
-            atomList.addAtom((String)left, right, result);
+            String right = String.valueOf(ARITHMETIC_EXPR());
+            atomList.addAtom(leftSide, right, result);
         }
         else if (accept(TokenName.SUB_OP)){
-            String right = (String)ARITHMETIC_EXPR();
-            atomList.subAtom((String)left, right, result); 
+            String right = String.valueOf(ARITHMETIC_EXPR());
+            atomList.subAtom(leftSide, right, result); 
         }
     }
 
@@ -253,13 +254,14 @@ public class Parser {
      * 
      */
     void TERM_LIST(Object left){
+        var leftSide = String.valueOf(left); 
         if (accept(TokenName.MULT_OP)){
-            Object right = TERM();
-            atomList.mulAtom((String)left, (String)right, (String)result);
+            String right = String.valueOf(TERM());
+            atomList.mulAtom(leftSide, right, result);
         }
         else if (accept(TokenName.DIV_OP)){
-            Object right = TERM();
-            atomList.mulAtom((String)left, (String)right, (String)result);
+            String right = String.valueOf(TERM());
+            atomList.divAtom(leftSide, right, result); 
         }
     }
 
@@ -343,7 +345,7 @@ public class Parser {
         //same issue, take care of atoms at lower level for arth expr 
         ARITHMETIC_EXPR();
     }
-    
+
     /**
      * 99% sure done; where this returns to: comparison_expression 
      * Returns int representing complement operation of comparison token
