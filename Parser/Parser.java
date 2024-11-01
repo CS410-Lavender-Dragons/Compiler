@@ -88,11 +88,10 @@ public class Parser {
 
     //Can generate: MOV atoms
     void ASSIGNMENT_EXPR(){
+        //Ensure variable exists in lookup table AND is mutable
         expect(TokenName.ASSIGN_OP);
         ARITHMETIC_EXPR();
         expect(TokenName.SEMICOLON);
-
-        //Generate a new Variable with name, mutable, type - add to lookup table
         //Generate a MOV Atom where we place the result from ARITHMETIC_EXPR into the identifier 
     }
 
@@ -101,12 +100,12 @@ public class Parser {
         if (accept(TokenName.IDENTIFIER)){
             String left = (String)destroyed; 
             TYPE_ASSIGN();
+            //Generate a new Variable with name, mutable false, type - add to lookup table
             expect(TokenName.ASSIGN_OP);
             ARITHMETIC_EXPR();
-            
-            //
-            String right = (String)destroyed; 
+            String right = (String)destroyed;
             expect(TokenName.SEMICOLON);
+            //Generate a MOV Atom where we place the result from ARITHMETIC_EXPR into the identifier
 
             //should have everything in...
 
@@ -122,9 +121,11 @@ public class Parser {
             expect(TokenName.IDENTIFIER);
             var left = destroyed; 
             TYPE_ASSIGN();
+            //Generate a new Variable with name, mutable true, type - add to lookup table
             expect(TokenName.ASSIGN_OP);
             ARITHMETIC_EXPR();
             expect(TokenName.SEMICOLON);
+            //Generate a MOV Atom where we place the result from ARITHMETIC_EXPR into the identifier
         }
 
     }
@@ -176,24 +177,23 @@ public class Parser {
     //Can generate: JMP, LBL, MOV atoms
     void FOR_EXPR(){
         expect(TokenName.IDENTIFIER);
-        expect(TokenName.IN_KW);
-        ARITHMETIC_EXPR();
         //Ensure Identifier being used is not already in Lookup table; if so, raise exception
         //Generate new Variable with name, yes mutable, type - add to lookup table
+        expect(TokenName.IN_KW);
+        ARITHMETIC_EXPR();
         //Generate MOV atom placing initial value of first ARITHMETIC_EXPR into identifier
         //Generate LBL atom with String label1 = labelVar + labelNum++;
         //Make temp variable with String labelAfterName = labelVar + labelNum++;
         RANGE();
-        //Generate TST atom using cmp of 5 for “..” and cmp of 3 for “..=” which jumps to labelAfterName
         ARITHMETIC_EXPR();
+        //Generate TST atom using cmp of 5 for “..” and cmp of 3 for “..=” which jumps to labelAfterName (left value is identifier, right is second ARITHMETIC_EXPR return)
         expect(TokenName.OPEN_BRACKET);
-        //Go into STATEMENTS() - which generates those
+        //Go into STATEMENTS() - which generates those associated atoms
         STATEMENTS();
         //Generate ADD atom which adds 1 to identifier and stores result in identifier
         //Generate JMP atom which goes to label1
-        //Generate LBL atom with labelAfterName
         expect(TokenName.CLOSE_BRACKET);
-
+        //Generate LBL atom with labelAfterName
         //At end of function, remove Variable from lookup table
 
     }
