@@ -20,10 +20,14 @@ import java.util.Arrays;
 public class atomGen {    
 
     //dogwater code at its finest 
-    static Queue<atom> atomList = new LinkedList<>(); 
 
+    private Queue<atom> atomList; 
+    public atomGen(){
+        atomList = new LinkedList<>(); 
+    }
 
-    //TODO: what is the logic that'll tie everything together, pemdas? 
+    //TODO: what is the logic that'll tie everything together, pemdas? according to prof, recursion will, but there is the possiblity that this MAY not be the case
+    //depends on if previous step is correct   
 
     //reg trackers
     static int tempCounter = 0; 
@@ -35,56 +39,56 @@ public class atomGen {
     //for everything below, -1 means null. just helper stuff 
 
     //helper
-    public static String newTReg(){
+    public String newTReg(){
         return "T" + tempCounter++; 
     }
 
     // add add atom: (ADD, left, right, result)
-    public static void addAtom(String left, String right, String result) {
+    public  void addAtom(String left, String right, String result) {
         atomList.add(new atom("ADD", left, right, result, -1, null));
         tempCounter++; 
     }
 
     // add sub atom: (SUB, left, right, result)
-    public static void subAtom(String left, String right) {
+    public  void subAtom(String left, String right, String result) {
         atomList.add(new atom("SUB", left, right, newTReg(), -1, null));
     }
 
     //add mul atom: (MUL, left, right, result)
-    public static void mulAtom(String left, String right, String result){
-        atomList.add(new atom("SUB", left, right, newTReg(), -1, null));
+    public void mulAtom(String left, String right, String result){
+        atomList.add(new atom("MUL", left, right, newTReg(), -1, null));
     }
 
-    //add mul atom: (MUL, left, right, result)
-    public static void divAtom(String left, String right, String result){
-        atomList.add(new atom("SUB", left, right, newTReg(), -1, null));
+    //add div atom: (div, left, right, result)
+    public void divAtom(String left, String right, String result){
+        atomList.add(new atom("DIV", left, right, newTReg(), -1, null));
     }
 
-    public static void jmpAtom(String dest){
+    public void jmpAtom(String dest){
         atomList.add(new atom("JMP", null, null, null, -1, dest));
     }
 
-    public static void negAtom(String dest){
+    public void negAtom(String dest){
         atomList.add(new atom("NEG", null, null, null, -1, dest));
     }
 
-    public static void lblAtom(String dest){
+    public void lblAtom(String dest){
         atomList.add(new atom("LBL", null, null, null, -1, dest));
     }
 
-    public static void tstAtom(String left, String right, int cmp, String dest){
+    public void tstAtom(String left, String right, int cmp, String dest){
         atomList.add(new atom("TST", left, right, null, cmp, dest));
 
     }
 
-    public static void movAtom(String left, String dest){
+    public void movAtom(String left, String dest){
         atomList.add(new atom("MOV", left, null, null, -1, dest));
     }
 
     //problem of identifying stuff, counter as well
 
     //done
-    public static void end(){
+    public void end(){
         for(var atom : atomList){
             System.out.println(atom); 
         }

@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+//casting needs to be done right before use to avoid data types issues 
+
 public class Parser {
     Queue<Token> tokenQueue;
     Dictionary<String, Variable> lookupTable = new Hashtable<>();
@@ -18,8 +20,13 @@ public class Parser {
     Object destroyed = null; 
     int destroyedNum = 0; 
 
-    String left; 
-    String right; 
+    atomGen atomList = new atomGen();
+
+
+    //starting on null
+
+    //this will have to be tied into the logic of the new tReg stuff, method in atomGen
+    String result; 
 
     //helper: double can cast itself automatically into an obj (as with any primitive)
     double floatCalculator(Integer left, Integer right){
@@ -92,17 +99,22 @@ public class Parser {
     //Can generate: MOV atoms
     void LET_ASSIGN(){
         if (accept(TokenName.IDENTIFIER)){
-            var left = destroyed; 
+            String left = (String)destroyed; 
             TYPE_ASSIGN();
             expect(TokenName.ASSIGN_OP);
             ARITHMETIC_EXPR();
-            String right = destroyed; 
+            
+            //
+            String right = (String)destroyed; 
             expect(TokenName.SEMICOLON);
 
-            Variable temp;
+            //should have everything in...
+
+            //what is this 
+            /* Variable temp;
             temp.setName(left);
             temp.setMutable(false);
-            temp.setType();
+            temp.setType(); */
             
         }
         else {
@@ -191,48 +203,70 @@ public class Parser {
             expect(TokenName.INCLUSIVERANGE_OP);
     }
 
-    //lower levels in progress
-    void ARITHMETIC_EXPR(){
-            TERM();
+    //lower levels in progress, there may be something wrong with the line ordering in here 
+    Object ARITHMETIC_EXPR(){
+            //is this left or right? since it gets processed twice, it should be able to be both 
+            Object left = TERM();
+            
+            //
 
-            ARITH_LIST();
+            //operator and operator in progress 
+            ARITH_LIST(left);
+
     }
 
+    //worked on, done? 
     //Can generate: ADD, SUB atoms
-    void ARITH_LIST(){
+    void ARITH_LIST(Object left){
+        //buck stops here
         if (accept(TokenName.ADD_OP)){
-            ARITHMETIC_EXPR();
+            //this is the right term
+            String right = (String)ARITHMETIC_EXPR();
+            atomList.addAtom((String)left, right, result);
         }
         else if (accept(TokenName.SUB_OP)){
-            ARITHMETIC_EXPR();
+            String right = (String)ARITHMETIC_EXPR();
+            atomList.subAtom((String)left, right, result); 
         }
     }
 
-    //no bueno
-    void TERM(){
-        VALUE();
+    //worked on, done?, no bueno
+    Object TERM(){
+        //left HAS to come out of here, for mul operator. can be x + y, or 1 + y
+        Object left = VALUE();
 
-        TERM_LIST();  
+        //feed left into here, if not null 
+        if(left != null){
+            TERM_LIST(left); 
+        }  
+        //this returns the right one 
+        return left;
     }
 
-    //Can generate: MUL, DIV atoms
-    void TERM_LIST(){
+    //done? Can generate: MUL, DIV atoms
+    void TERM_LIST(Object left){
+        //left term is input
+
         if (accept(TokenName.MULT_OP)){
-            TERM();
+            Object right = TERM();
+            //create mult atom, logic will handle dest logic 
+            atomList.mulAtom((String)left, (String)right, (String)result);
         }
         else if (accept(TokenName.DIV_OP)){
-            TERM();
+            Object right = TERM();
+            //create div atom 
+            atomList.mulAtom((String)left, (String)right, (String)result);
         }
     }
 
     //in progress 
     //Can generate: NEG atoms
+    //MUST return a numeric or char value to punt up tree 
     Object VALUE(){
 
         //NOT worked on, no return? 
         if (accept(TokenName.OPEN_PAREN)){
-            //String result = ARITHMETIC_EXPR(); no directly return arith expr
-            ARITHMETIC_EXPR();
+            Object result = ARITHMETIC_EXPR();
             expect(TokenName.CLOSE_PAREN);
         }
 
