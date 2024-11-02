@@ -6,6 +6,7 @@ import Core.TokenName;
 import java.util.Queue;
 import codeGenerator.atomGen;
 import Core.Variable;
+import Core.Variable.Type;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -33,6 +34,14 @@ public class Parser {
         //abracadabra
         double answer =  (left) + (right / Math.pow(10, right.toString().length()));
         return answer;
+    }
+
+    //helper: Take instance of token and populate variable
+    public Variable TokVarConversion(Token token){
+        
+        
+        
+        return null;
     }
 
     //helper
@@ -89,9 +98,20 @@ public class Parser {
     //Can generate: MOV atoms
     void ASSIGNMENT_EXPR(){
         //Ensure variable exists in lookup table AND is mutable
-        expect(TokenName.ASSIGN_OP);
-        ARITHMETIC_EXPR();
-        expect(TokenName.SEMICOLON);
+        accept(TokenName.IDENTIFIER);
+        String left =  String.valueOf(destroyed);
+        if((lookupTable.get(left) != null) && (lookupTable.get(left).isMutable())){
+            expect(TokenName.ASSIGN_OP);
+            ARITHMETIC_EXPR();
+            expect(TokenName.SEMICOLON);
+        }
+        else if(lookupTable.get(left) == null) {
+            //variable has not been declared, throw error
+        }
+        else {
+            //variable does exist but isn't mutable, throw error 
+        }
+
         //Generate a MOV Atom where we place the result from ARITHMETIC_EXPR into the identifier 
     }
 
@@ -109,23 +129,47 @@ public class Parser {
 
             //should have everything in...
 
-            //what is this 
-            /* Variable temp;
-            temp.setName(left);
-            temp.setMutable(false);
-            temp.setType(); */
+            //Populating Variable for lookup table
+            Variable temp_var = new Variable(null, false, null);
+            temp_var.setName(left);
+            temp_var.setMutable(false);
+
+            if(right == "INT"){
+                temp_var.setType(Type.INT);
+            }
+            else if(right == "FLOAT"){
+                temp_var.setType(Type.FLOAT);
+            }
+             
+            lookupTable.put(temp_var.getName(), temp_var);
             
         }
         else {
             expect(TokenName.MUT_KW);
             expect(TokenName.IDENTIFIER);
-            var left = destroyed; 
+            String left =  String.valueOf(destroyed); 
             TYPE_ASSIGN();
             //Generate a new Variable with name, mutable true, type - add to lookup table
             expect(TokenName.ASSIGN_OP);
             ARITHMETIC_EXPR();
+            String right =  String.valueOf(destroyed);
             expect(TokenName.SEMICOLON);
             //Generate a MOV Atom where we place the result from ARITHMETIC_EXPR into the identifier
+
+
+            //Populating Variable for lookup table
+            Variable temp_var = new Variable(null, false, null);
+            temp_var.setName(left);
+            temp_var.setMutable(true);
+
+            if(right == "INT"){
+                temp_var.setType(Type.INT);
+            }
+            else if(right == "FLOAT"){
+                temp_var.setType(Type.FLOAT);
+            }
+             
+            lookupTable.put(temp_var.getName(), temp_var);
         }
 
     }
