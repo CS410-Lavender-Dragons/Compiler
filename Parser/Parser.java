@@ -23,12 +23,20 @@ public class Parser {
 
     atomGen atomList = new atomGen();
 
+    String destString; 
+
 
     //starting on null
 
     //this will have to be tied into the logic of the new tReg stuff, method in atomGen
     String result; 
 
+    
+    /** 
+     * @param left
+     * @param right
+     * @return double
+     */
     //helper: double can cast itself automatically into an obj (as with any primitive)
     double floatCalculator(Integer left, Integer right){
         //abracadabra
@@ -36,6 +44,11 @@ public class Parser {
         return answer;
     }
 
+    
+    /** 
+     * @param token
+     * @return Variable
+     */
     //helper: Take instance of token and populate variable
     public Variable TokVarConversion(Token token){
         
@@ -44,6 +57,10 @@ public class Parser {
         return null;
     }
 
+    
+    /** 
+     * @return Queue<Token>
+     */
     //helper
     public Queue<Token> getQueue(){
         return this.tokenQueue;
@@ -51,12 +68,21 @@ public class Parser {
 
    
 
+    
+    /** 
+     * @param tokenQueue
+     */
     public void parse(Queue<Token> tokenQueue){
         this.tokenQueue = tokenQueue;
         STATEMENTS();
         expect(TokenName.EOI);
     }
 
+    
+    /** 
+     * @param tokenName
+     * @return boolean
+     */
     boolean accept(TokenName tokenName){
         if (tokenQueue.peek().getName() == tokenName){
             destroyed = tokenQueue.remove().getValue();
@@ -66,6 +92,10 @@ public class Parser {
         return false;
     }
 
+    
+    /** 
+     * @param tokenName
+     */
     void expect(TokenName tokenName){
         if (tokenQueue.peek().getName() != tokenName)
             throw new RuntimeException("Expected: " + tokenName + ", but found: " + tokenQueue.peek().getName());
@@ -183,15 +213,25 @@ public class Parser {
         if (!accept(TokenName.BIT_8_FLOAT_OP) && !accept(TokenName.BIT_8_INT_OP) && !accept(TokenName.BIT_16_FLOAT_OP) && !accept(TokenName.BIT_16_INT_OP) && !accept(TokenName.BIT_32_FLOAT_OP) && !accept(TokenName.BIT_32_INT_OP) && !accept(TokenName.BIT_64_FLOAT_OP) && !accept(TokenName.BIT_64_INT_OP) && !accept(TokenName.BIT_128_FLOAT_OP))
             expect(TokenName.BIT_128_INT_OP);
     }
-    
+    /**
+     * 
+     * 
+     */
     //Can generate: JMP, LBL, MOV atoms
     void IF_EXPR(){
+        //atom already added 
         COMPARISON_EXPR();
+        
         expect(TokenName.OPEN_BRACKET);
+        
+        //added? should've been if everything else has been added 
         STATEMENTS();
+         
         expect(TokenName.CLOSE_BRACKET);
         //Generate LBL atom with label value from COMPARISON_EXPR
         ELSE_CLAUSE();
+
+        //run comparison 
     }
 
     void ELSE_CLAUSE(){
@@ -248,7 +288,13 @@ public class Parser {
             expect(TokenName.INCLUSIVERANGE_OP);
     }
 
-    //lower levels in progress, there may be something wrong with the line ordering in here 
+    
+    /** 
+     * @return Object
+     * 
+     * lower levels in progress, there may be something wrong with the line ordering in here 
+     */
+    
     Object ARITHMETIC_EXPR(){
             //is this left or right? since it gets processed twice, it should be able to be both 
             Object left = TERM();
@@ -264,8 +310,14 @@ public class Parser {
 
     }
 
-    //worked on, done? 
-    //Can generate: ADD, SUB atoms
+    
+    /** 
+     * @param left
+     * 
+     * add/sub atoms 
+     * worked on, done? 
+     */
+
     void ARITH_LIST(Object left){
         //buck stops here
         String leftSide = String.valueOf(left); 
@@ -280,7 +332,12 @@ public class Parser {
         }
     }
 
-    //worked on, done?
+    
+    /** 
+     * @return Object
+     * 
+     * worked on, done? 
+     */
     Object TERM(){
         //left HAS to come out of here, for mul operator. can be x + y, or 1 + y
         Object left = VALUE();
@@ -289,36 +346,52 @@ public class Parser {
         if(left != null){
             TERM_LIST(left); 
         }  
+
         //this returns the right one 
         return left;
     }
 
     //worked on, done? 
     /** 
-     * Adds mul atom or div atom depending on operator. 
+     * @param left item 
+     * @return 
      * 
+     * Adds mul atom or div atom depending on operator. 
+     * return result back to term()?
+     * 
+     * worked on, done? 
      */
-    void TERM_LIST(Object left){
+    String TERM_LIST(Object left){
         var leftSide = String.valueOf(left); 
         if (accept(TokenName.MULT_OP)){
             String right = String.valueOf(TERM());
             atomList.mulAtom(leftSide, right, result);
+            return result; 
         }
         else if (accept(TokenName.DIV_OP)){
             String right = String.valueOf(TERM());
             atomList.divAtom(leftSide, right, result); 
+            return result; 
         }
+        return ""; 
     }
 
-    //in progress 
-    //Can generate: NEG atoms
-    //MUST return a numeric or char value to punt up tree 
+    
+    /** 
+     * @return Object
+     * 
+     * worked on, done? 
+     * can generate: neg atoms
+     * must return numeric or char value to punt up tree
+     */
+
     Object VALUE(){
 
-        //NOT worked on, no return? 
+        //worked on, no return? 
         if (accept(TokenName.OPEN_PAREN)){
             Object result = ARITHMETIC_EXPR();
             expect(TokenName.CLOSE_PAREN);
+            return result; 
         }
 
         //worked on
@@ -342,11 +415,16 @@ public class Parser {
             //return up the tree 
             return destroyed; 
         }
-        //placeholder 
-        return ""; 
     }
     
-    //worked on, probably done 
+    
+    /** 
+     * @return Integer
+     * 
+     * @return extacted value
+     * 
+     * worked on, probably done
+     */
     Integer FLOAT(){
         if(accept(TokenName.DECIMAL)){
             expect(TokenName.NUMERIC);
@@ -356,7 +434,12 @@ public class Parser {
         return null; 
     }
     
-    //in progress 
+    
+    /** 
+     * @return Integer
+     * 
+     * returns negated value
+     */
     Integer NEGATED_VALUE(){
         //in progress
         if(accept(TokenName.NUMERIC)){
@@ -374,22 +457,25 @@ public class Parser {
     //this can return to while
     //Can generate: TST atoms
     /**
-     * Not done
+     * Not done. Needs lookup table logic built in 
      * Can genrate TST atoms. 
      * Can return to while (anything else?). 
+     * Pulls from arithmetic_expr and comparison (debugging)
      * 
      * @param
      * @return 
      */
+
     void COMPARISON_EXPR(){
         //what can this be? can o' worms
-        ARITHMETIC_EXPR();
+        Object left = ARITHMETIC_EXPR();
         
         Integer comparison = COMPARISON();
         //same issue, take care of atoms at lower level for arth expr 
-        ARITHMETIC_EXPR();
+        Object right = ARITHMETIC_EXPR();
 
         //Generate TST atom using comparison variable value which jumps to a label
+        atomList.tstAtom((String)left, (String)right, comparison, destString);
     }
 
     /**
