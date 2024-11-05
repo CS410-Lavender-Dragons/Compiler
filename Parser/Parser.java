@@ -29,7 +29,6 @@ public class Parser {
 
     // starting on null
 
-    // this will have to be tied into the logic of the new tReg stuff, method in
     // atomGen
     String result;
 
@@ -37,9 +36,10 @@ public class Parser {
      * @param left
      * @param right
      * @return double
+     *         helper: double can cast itself automatically into an obj (as with any
+     *         primitive)
      */
-    // helper: double can cast itself automatically into an obj (as with any
-    // primitive)
+
     double floatCalculator(Integer left, Integer right) {
         // abracadabra
         double answer = (left) + (right / Math.pow(10, right.toString().length()));
@@ -119,33 +119,53 @@ public class Parser {
             IF_EXPR();
         else if (accept(TokenName.WHILE_KW))
             WHILE_EXPR();
-        else if (accept(TokenName.FOR_KW))
-            FOR_EXPR();
-        else if (accept(TokenName.IDENTIFIER))
-            ASSIGNMENT_EXPR();
+        else if (accept(TokenName.FOR_KW)) {
+            try {
+                FOR_EXPR();
+            } catch (Exception e) {
+                System.exit(1);
+            }
+
+        } else if (accept(TokenName.IDENTIFIER))
+            try {
+                ASSIGNMENT_EXPR();
+            } catch (Exception e) {
+                System.exit(1);
+            }
+
         else {
             expect(TokenName.LET_KW);
             LET_ASSIGN();
         }
     }
 
+    /**
+     * @throws Exception
+     */
     // Can generate: MOV atoms
-    void ASSIGNMENT_EXPR() {
+    void ASSIGNMENT_EXPR() throws Exception {
         // Ensure variable exists in lookup table AND is mutable
         accept(TokenName.IDENTIFIER);
+        Object arithResult = null;
+        // destination
         String left = String.valueOf(destroyed);
         if ((lookupTable.get(left) != null) && (lookupTable.get(left).isMutable())) {
             expect(TokenName.ASSIGN_OP);
-            ARITHMETIC_EXPR();
+
+            // this is the droid we're looking for
+            arithResult = ARITHMETIC_EXPR();
             expect(TokenName.SEMICOLON);
         } else if (lookupTable.get(left) == null) {
             // variable has not been declared, throw error
-        } else {
+            throw new Exception("Variable has not yet been declared");
+        } else if (!lookupTable.get(left).isMutable()) {
             // variable does exist but isn't mutable, throw error
+            throw new Exception("Variable is not mutable");
         }
 
         // Generate a MOV Atom where we place the result from ARITHMETIC_EXPR into the
         // identifier
+        atomList.movAtom(arithResult.toString(), left);
     }
 
     // Can generate: MOV atoms
@@ -183,11 +203,9 @@ public class Parser {
             TYPE_ASSIGN();
             // Generate a new Variable with name, mutable true, type - add to lookup table
             expect(TokenName.ASSIGN_OP);
-            ARITHMETIC_EXPR();
+            Object arithResult = ARITHMETIC_EXPR();
             String right = String.valueOf(destroyed);
             expect(TokenName.SEMICOLON);
-            // Generate a MOV Atom where we place the result from ARITHMETIC_EXPR into the
-            // identifier
 
             // Populating Variable for lookup table
             Variable temp_var = new Variable(null, false, null);
@@ -201,6 +219,10 @@ public class Parser {
             }
 
             lookupTable.put(temp_var.getName(), temp_var);
+
+            // Generate a MOV Atom where we place the result from ARITHMETIC_EXPR into the
+            // identifier
+            atomList.movAtom(result, temp_var.getName());
         }
 
     }
@@ -219,31 +241,31 @@ public class Parser {
     }
 
     /**
-     * logic may be wrong 
+     * logic may be wrong
      * 
      * Can generate: JMP, LBL, MOV atoms
      */
     void IF_EXPR() {
         // atom already added.
         String label = COMPARISON_EXPR();
-        //add label, runs if true. jmps to end  
-        atomList.lblAtom(label); 
+        // add label, runs if true. jmps to end
+        atomList.lblAtom(label);
         expect(TokenName.OPEN_BRACKET);
         // added? should've been if everything else has been added
         STATEMENTS();
 
-        //prematurely add jmp to end label, pull back 
+        // prematurely add jmp to end label, pull back
         label = generateLabel();
         atomList.jmpAtom(label);
-        lblCounter--; 
+        lblCounter--;
 
         expect(TokenName.CLOSE_BRACKET);
-        //point of processing: if num > 5 { x = y;} (we are here)
+        // point of processing: if num > 5 { x = y;} (we are here)
 
         // Generate LBL atom with value from COMPARISON_EXPR. will increment + 1
         ELSE_CLAUSE();
 
-        //end label, has to jump to this
+        // end label, has to jump to this
         atomList.lblAtom(generateLabel());
     }
 
@@ -251,29 +273,30 @@ public class Parser {
      * process
      */
     void ELSE_CLAUSE() {
-        if (accept(TokenName.ELSE_KW)){
+        if (accept(TokenName.ELSE_KW)) {
             // Generate a JMP atom to a temporary label, pass this label name to nested
-            String label = generateLabel(); 
+            String label = generateLabel();
             ELSE_NESTED(label);
         }
-            
+
     }
 
-    
-    /** 
+    /**
      * @param label
      * 
-     * process else stuff
+     *              process else stuff
      */
     void ELSE_NESTED(String label) {
-        //nested
-        if (accept(TokenName.IF_KW)){
+        // nested
+        if (accept(TokenName.IF_KW)) {
             IF_EXPR();
-            /* // Generate LBL atom with passed in parameter
-            atomList.lblAtom(label); */
+            /*
+             * // Generate LBL atom with passed in parameter
+             * atomList.lblAtom(label);
+             */
         }
-        
-        //1 level 
+
+        // 1 level
         else {
             expect(TokenName.OPEN_BRACKET);
             atomList.lblAtom(label);
@@ -291,30 +314,81 @@ public class Parser {
     }
 
     // Can generate: JMP, LBL, MOV atoms
-    void FOR_EXPR() {
+    void FOR_EXPR() throws Exception {
         expect(TokenName.IDENTIFIER);
+        // right should be the identifier name, stow away for later
+        String right = String.valueOf(destroyed);
+
         // Ensure Identifier being used is not already in Lookup table; if so, raise
         // exception
+        // TODO: check is this really what's wanted?
+        if (lookupTable.get(destroyed.toString()) != null) {
+            throw new Exception("Variable is not already in use");
+        }
+
         // Generate new Variable with name, yes mutable, type - add to lookup table
         expect(TokenName.IN_KW);
+
+        // from above:
+        // Generate a new Variable with name, mutable true, type - add to
+        // lookup table
+        expect(TokenName.ASSIGN_OP);
+
+        // initial value of arith result
+        Object arithResult = ARITHMETIC_EXPR();
+        expect(TokenName.SEMICOLON);
+
+        // Populating Variable for lookup table
+        Variable temp_var = new Variable(null, false, null);
+        temp_var.setName(right);
+        temp_var.setMutable(true);
+
+        if (right == "INT") {
+            temp_var.setType(Type.INT);
+        } else if (right == "FLOAT") {
+            temp_var.setType(Type.FLOAT);
+        }
+
+        lookupTable.put(temp_var.getName(), temp_var);
+
         ARITHMETIC_EXPR();
         // Generate MOV atom placing initial value of first ARITHMETIC_EXPR into
         // identifier
+        atomList.movAtom(arithResult.toString(), right);
+
         // Generate LBL atom with String label1 = labelVar + labelNum++;
+        var label1 = generateLabel();
+        atomList.lblAtom(label1);
+
         // Make temp variable with String labelAfterName = labelVar + labelNum++;
+        var labelAfterName = generateLabel();
+
         RANGE();
         ARITHMETIC_EXPR();
         // Generate TST atom using cmp of 5 for “..” and cmp of 3 for “..=” which jumps
         // to labelAfterName (left value is identifier, right is second ARITHMETIC_EXPR
         // return)
+        expect(TokenName.RANGE_OP);
+        // determine comparison
+        int cmpNum = ((tokenQueue.peek().getName() == (TokenName.INCLUSIVERANGE_OP))) ? 3 : 5;
+        atomList.tstAtom(right, arithResult.toString(), cmpNum, labelAfterName);
         expect(TokenName.OPEN_BRACKET);
         // Go into STATEMENTS() - which generates those associated atoms
         STATEMENTS();
+
         // Generate ADD atom which adds 1 to identifier and stores result in identifier
+        atomList.addAtom("1", right, right);
+
         // Generate JMP atom which goes to label1
+        atomList.jmpAtom(label1);
         expect(TokenName.CLOSE_BRACKET);
+
         // Generate LBL atom with labelAfterName
-        // At end of function, remove Variable from lookup table
+        atomList.lblAtom("labelAfterName");
+
+        // At end of function, remove Variable from lookup table (is this the right way
+        // to do it?)
+        lookupTable.remove(temp_var);
 
     }
 
@@ -369,7 +443,7 @@ public class Parser {
     /**
      * @return Object
      * 
-     *         worked on, done?
+     *         worked on, done? this is highly questionable ----
      */
     Object TERM() {
         // left HAS to come out of here, for mul operator. can be x + y, or 1 + y
@@ -384,7 +458,6 @@ public class Parser {
         return left;
     }
 
-    // worked on, done?
     /**
      * @param left item
      * @return
