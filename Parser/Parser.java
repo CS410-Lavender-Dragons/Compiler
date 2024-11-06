@@ -101,7 +101,7 @@ public class Parser {
         }
         return false;
     }
-
+    
     /**
      * @param tokenName
      */
@@ -133,6 +133,7 @@ public class Parser {
 
         } else if (accept(TokenName.IDENTIFIER))
             try {
+            //1
                 ASSIGNMENT_EXPR();
             }
             // x = ..... (the first statement dies here, according to the debugger)
@@ -156,9 +157,10 @@ public class Parser {
         Object arithResult = null;
         // destination
         String left = String.valueOf(destroyed);
+        System.out.println(left); 
+        //something may be wrong with this condition causing higher level to hit try/catch block 
         if ((lookupTable.get(left) != null) && (lookupTable.get(left).isMutable())) {
             expect(TokenName.ASSIGN_OP);
-
             // this is the droid we're looking for
             arithResult = ARITHMETIC_EXPR();
             expect(TokenName.SEMICOLON);
@@ -342,13 +344,12 @@ public class Parser {
 
         expect(TokenName.IN_KW);
 
-        // initial value of arith result
-        Object arithResult = ARITHMETIC_EXPR();
+        // this is a temp reg
+        String arithResult = ARITHMETIC_EXPR();
 
-        ARITHMETIC_EXPR();
         // Generate MOV atom placing initial value of first ARITHMETIC_EXPR into
         // identifier
-        atomList.movAtom(arithResult.toString(), right);
+        atomList.movAtom(arithResult, right);
 
         // Generate LBL atom with String label1 = labelVar + labelNum++;
         var label1 = generateLabel();
@@ -358,37 +359,41 @@ public class Parser {
         var labelAfterName = generateLabel();
 
         RANGE();
-        ARITHMETIC_EXPR();
+        var rangeType = destroyed.toString(); 
+        String tReg2 = ARITHMETIC_EXPR();
+
         // Generate TST atom using cmp of 5 for “..” and cmp of 3 for “..=” which jumps
         // to labelAfterName (left value is identifier, right is second ARITHMETIC_EXPR
         // return)
-        expect(TokenName.RANGE_OP);
-        // determine comparison
-        int cmpNum = ((tokenQueue.peek().getName() == (TokenName.INCLUSIVERANGE_OP))) ? 3 : 5;
-        atomList.tstAtom(right, arithResult.toString(), cmpNum, labelAfterName);
+        int cmpNum = (rangeType.equals("..") ?  5:3); 
+        atomList.tstAtom(right, tReg2, cmpNum, tReg2);
+
         expect(TokenName.OPEN_BRACKET);
         // Go into STATEMENTS() - which generates those associated atoms
         STATEMENTS();
-
+        
         // Generate ADD atom which adds 1 to identifier and stores result in identifier
-        atomList.addAtom("1", right, right);
+        atomList.addAtom("1", right, right); 
 
         // Generate JMP atom which goes to label1
         atomList.jmpAtom(label1);
+
         expect(TokenName.CLOSE_BRACKET);
 
         // Generate LBL atom with labelAfterName
-        atomList.lblAtom("labelAfterName");
+        atomList.lblAtom(labelAfterName);
 
-        // At end of function, remove Variable from lookup table (is this the right way
-        // to do it?)
-        lookupTable.remove(temp_var);
+        // At end of function, remove Variable from lookup table
+        lookupTable.remove(temp_var); 
+
+     
 
     }
 
-    void RANGE() {
+    int RANGE() {
         if (!accept(TokenName.RANGE_OP))
             expect(TokenName.INCLUSIVERANGE_OP);
+            return 
     }
 
     /**
@@ -405,7 +410,7 @@ public class Parser {
         String tReg1 = TERM().toString();
 
         // operator and operator in progress
-        // this temp reg is the result... right? 
+        // this temp reg is the result... right?
         String tReg2 = ARITH_LIST(tReg1);
 
         if (tReg1 != null) {
@@ -437,7 +442,7 @@ public class Parser {
             atomList.subAtom(tReg, right, resultTReg);
         }
 
-        return resultTReg; 
+        return resultTReg;
     }
 
     /**
