@@ -17,20 +17,25 @@ import java.util.Hashtable;
 public class Parser {
     Queue<Token> tokenQueue;
     Dictionary<String, Variable> lookupTable = new Hashtable<>();
-
     Object destroyed = null;
     int destroyedNum = 0;
-
     atomGen atomList = new atomGen();
-
     String destString;
-
     int lblCounter = 0;
-
-    // starting on null
-
+    int tRegCount = 0;
     // atomGen
     String result;
+
+    // helper
+    public atomGen getAtoms() {
+        System.out.println("Here");
+        return this.atomList;
+    }
+
+    // helper, post-increment
+    public String newTReg() {
+        return "T" + tRegCount++;
+    }
 
     /**
      * @param left
@@ -129,8 +134,10 @@ public class Parser {
         } else if (accept(TokenName.IDENTIFIER))
             try {
                 ASSIGNMENT_EXPR();
-            } catch (Exception e) {
-                System.exit(1);
+            }
+            // x = ..... (the first statement dies here, according to the debugger)
+            catch (Exception e) {
+                System.out.println("Exception caught from assignment_expr");
             }
 
         else {
@@ -316,40 +323,27 @@ public class Parser {
     // Can generate: JMP, LBL, MOV atoms
     void FOR_EXPR() throws Exception {
         expect(TokenName.IDENTIFIER);
+
         // right should be the identifier name, stow away for later
         String right = String.valueOf(destroyed);
 
         // Ensure Identifier being used is not already in Lookup table; if so, raise
         // exception
-        // TODO: check is this really what's wanted?
         if (lookupTable.get(destroyed.toString()) != null) {
-            throw new Exception("Variable is not already in use");
+            throw new Exception("Variable is already in use");
         }
-
-        // Generate new Variable with name, yes mutable, type - add to lookup table
-        expect(TokenName.IN_KW);
-
-        // from above:
-        // Generate a new Variable with name, mutable true, type - add to
-        // lookup table
-        expect(TokenName.ASSIGN_OP);
-
-        // initial value of arith result
-        Object arithResult = ARITHMETIC_EXPR();
-        expect(TokenName.SEMICOLON);
 
         // Populating Variable for lookup table
         Variable temp_var = new Variable(null, false, null);
         temp_var.setName(right);
         temp_var.setMutable(true);
 
-        if (right == "INT") {
-            temp_var.setType(Type.INT);
-        } else if (right == "FLOAT") {
-            temp_var.setType(Type.FLOAT);
-        }
-
         lookupTable.put(temp_var.getName(), temp_var);
+
+        expect(TokenName.IN_KW);
+
+        // initial value of arith result
+        Object arithResult = ARITHMETIC_EXPR();
 
         ARITHMETIC_EXPR();
         // Generate MOV atom placing initial value of first ARITHMETIC_EXPR into
@@ -404,19 +398,21 @@ public class Parser {
      *         ordering in here
      */
 
-    Object ARITHMETIC_EXPR() {
+    String ARITHMETIC_EXPR() {
         // is this left or right? since it gets processed twice, it should be able to be
         // both
-        Object left = TERM();
+        // temp reg generation
+        String tReg1 = TERM().toString();
 
         // operator and operator in progress
-        ARITH_LIST(left);
+        // this temp reg is the result... right? 
+        String tReg2 = ARITH_LIST(tReg1);
 
-        if (left != null) {
-            return left;
+        if (tReg1 != null) {
+            return tReg1;
         }
 
-        return null;
+        return tReg2;
 
     }
 
@@ -425,37 +421,41 @@ public class Parser {
      * 
      *             add/sub atoms
      *             worked on, done?
+     * 
+     * 
      */
 
-    void ARITH_LIST(Object left) {
-        // buck stops here
-        String leftSide = String.valueOf(left);
+    String ARITH_LIST(String tReg) {
+
+        var resultTReg = newTReg();
         if (accept(TokenName.ADD_OP)) {
             // this is the right term
             String right = String.valueOf(ARITHMETIC_EXPR());
-            atomList.addAtom(leftSide, right, result);
+            atomList.addAtom(tReg, right, resultTReg);
         } else if (accept(TokenName.SUB_OP)) {
             String right = String.valueOf(ARITHMETIC_EXPR());
-            atomList.subAtom(leftSide, right, result);
+            atomList.subAtom(tReg, right, resultTReg);
         }
+
+        return resultTReg; 
     }
 
     /**
-     * @return Object
+     * @return String, tReg
      * 
      *         worked on, done? this is highly questionable ----
      */
-    Object TERM() {
+    String TERM() {
         // left HAS to come out of here, for mul operator. can be x + y, or 1 + y
-        Object left = VALUE();
+        String tReg = VALUE();
 
         // feed left into here, if not null
-        if (left != null) {
-            TERM_LIST(left);
+        if (tReg != null) {
+            TERM_LIST(tReg);
         }
 
         // this returns the right one
-        return left;
+        return tReg;
     }
 
     /**
@@ -489,13 +489,14 @@ public class Parser {
      *         must return numeric or char value to punt up tree
      */
 
-    Object VALUE() {
+    String VALUE() {
 
         // worked on, no return?
         if (accept(TokenName.OPEN_PAREN)) {
-            Object result = ARITHMETIC_EXPR();
+            String tReg = ARITHMETIC_EXPR();
             expect(TokenName.CLOSE_PAREN);
-            return result;
+            // return where the value is stored
+            return tReg;
         }
 
         // worked on
@@ -504,20 +505,20 @@ public class Parser {
             Integer floatResult = FLOAT();
 
             // witchcraft
-            return floatResult == null ? num1 : floatCalculator(num1, floatResult);
+            return String.valueOf(floatResult == null ? num1 : floatCalculator(num1, floatResult));
         }
 
         // in progress, returns data type of obj to cast to Integer (?)
         else if (accept(TokenName.SUB_OP)) {
-            return NEGATED_VALUE();
+            return String.valueOf(NEGATED_VALUE());
         }
 
-        // worked on
+        // TODO worked on, check
         else {
             // terminal
             expect(TokenName.IDENTIFIER);
             // return up the tree
-            return destroyed;
+            return destroyed.toString();
         }
     }
 
