@@ -139,29 +139,20 @@ public class Parser {
      */
     // Can generate: MOV atoms
     void ASSIGNMENT_EXPR() {
+        //destination identifier
+        String identifier = String.valueOf(destroyed);
         // Ensure variable exists in lookup table AND is mutable
-        accept(TokenName.IDENTIFIER);
-        Object arithResult = null;
-        // destination
-        String left = String.valueOf(destroyed);
-        System.out.println(left); 
-        //something may be wrong with this condition causing higher level to hit try/catch block 
-        if ((lookupTable.get(left) != null) && (lookupTable.get(left).isMutable())) {
-            expect(TokenName.ASSIGN_OP);
-            // this is the droid we're looking for
-            arithResult = ARITHMETIC_EXPR();
-            expect(TokenName.SEMICOLON);
-        } else if (lookupTable.get(left) == null) {
-            // variable has not been declared, throw error
-            throw new RuntimeException("Variable has not yet been declared");
-        } else if (!lookupTable.get(left).isMutable()) {
-            // variable does exist but isn't mutable, throw error
-            throw new RuntimeException("Variable is not mutable");
-        }
+        if (lookupTable.get(identifier) == null)
+            throw new RuntimeException(identifier + " identifier has not been initialized!");
+        if (!lookupTable.get(identifier).isMutable())
+            throw new RuntimeException(identifier + " is not mutable!");
 
-        // Generate a MOV Atom where we place the result from ARITHMETIC_EXPR into the
-        // identifier
-        atomList.movAtom(arithResult.toString(), left);
+        expect(TokenName.ASSIGN_OP);
+        String result = ARITHMETIC_EXPR();
+        //MOV result into identifier
+        atomList.movAtom(result, identifier);
+
+        expect(TokenName.SEMICOLON);
     }
 
     // Can generate: MOV atoms
