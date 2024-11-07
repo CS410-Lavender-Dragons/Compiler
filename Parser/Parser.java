@@ -330,9 +330,9 @@ public class Parser {
      *         ordering in here
      */
     String ARITHMETIC_EXPR() {
-        String leftResult = TERM();
-        String result = ARITH_LIST(leftResult);
-        return result;
+        String resultReg = TERM();
+        ARITH_LIST(resultReg);
+        return resultReg;
     }
 
     /**
@@ -343,19 +343,14 @@ public class Parser {
      * 
      * 
      */
-    String ARITH_LIST(String tReg) {
-
-        var resultTReg = newTReg();
+    void ARITH_LIST(String tReg) {
         if (accept(TokenName.ADD_OP)) {
-            // this is the right term
-            String right = String.valueOf(ARITHMETIC_EXPR());
-            atomList.addAtom(tReg, right, resultTReg);
+            String right = ARITHMETIC_EXPR();
+            atomList.addAtom(tReg, right, tReg);
         } else if (accept(TokenName.SUB_OP)) {
-            String right = String.valueOf(ARITHMETIC_EXPR());
-            atomList.subAtom(tReg, right, resultTReg);
+            String right = ARITHMETIC_EXPR();
+            atomList.subAtom(tReg, right, tReg);
         }
-
-        return resultTReg;
     }
 
     /**
