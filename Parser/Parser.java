@@ -87,6 +87,7 @@ public class Parser {
         this.tokenQueue = tokenQueue;
         STATEMENTS();
         expect(TokenName.EOI);
+        atomList.end();
     }
 
     /**
@@ -124,14 +125,9 @@ public class Parser {
             IF_EXPR();
         else if (accept(TokenName.WHILE_KW))
             WHILE_EXPR();
-        else if (accept(TokenName.FOR_KW)) {
-            try {
-                FOR_EXPR();
-            } catch (Exception e) {
-                System.exit(1);
-            }
-
-        } else if (accept(TokenName.IDENTIFIER))
+        else if (accept(TokenName.FOR_KW))
+            FOR_EXPR();
+        else if (accept(TokenName.IDENTIFIER))
             try {
             //1
                 ASSIGNMENT_EXPR();
@@ -323,57 +319,50 @@ public class Parser {
     }
 
     // Can generate: JMP, LBL, MOV atoms
-    void FOR_EXPR() throws Exception {
+    void FOR_EXPR() {
         expect(TokenName.IDENTIFIER);
-
         // right should be the identifier name, stow away for later
-        String right = String.valueOf(destroyed);
+        String loopIdent = String.valueOf(destroyed);
 
-        // Ensure Identifier being used is not already in Lookup table; if so, raise
-        // exception
-        if (lookupTable.get(destroyed.toString()) != null) {
-            throw new Exception("Variable is already in use");
+        // Ensure Identifier being used is not already in Lookup table; if so, raise exception
+        if (lookupTable.get(loopIdent) != null) {
+            throw new RuntimeException("For-loop variable already in use!");
         }
 
         // Populating Variable for lookup table
-        Variable temp_var = new Variable(null, false, null);
-        temp_var.setName(right);
-        temp_var.setMutable(true);
-
-        lookupTable.put(temp_var.getName(), temp_var);
+        Variable loopVar = new Variable(loopIdent, true, Type.INT);
+        lookupTable.put(loopIdent, loopVar);
 
         expect(TokenName.IN_KW);
 
-        // this is a temp reg
-        String arithResult = ARITHMETIC_EXPR();
+        //Temp register storing left value
+        String leftArithResult = ARITHMETIC_EXPR();
 
-        // Generate MOV atom placing initial value of first ARITHMETIC_EXPR into
-        // identifier
-        atomList.movAtom(arithResult, right);
+        // Generate MOV atom placing initial value of first ARITHMETIC_EXPR into identifier
+        atomList.movAtom(leftArithResult, loopIdent);
 
-        // Generate LBL atom with String label1 = labelVar + labelNum++;
+        // Generate LBL atom and store value
         var label1 = generateLabel();
         atomList.lblAtom(label1);
 
         // Make temp variable with String labelAfterName = labelVar + labelNum++;
         var labelAfterName = generateLabel();
 
-        RANGE();
-        var rangeType = destroyed.toString(); 
-        String tReg2 = ARITHMETIC_EXPR();
+        int cmp = RANGE();
+        
+        String upperLoopVal = ARITHMETIC_EXPR();
 
         // Generate TST atom using cmp of 5 for “..” and cmp of 3 for “..=” which jumps
         // to labelAfterName (left value is identifier, right is second ARITHMETIC_EXPR
         // return)
-        int cmpNum = (rangeType.equals("..") ?  5:3); 
-        atomList.tstAtom(right, tReg2, cmpNum, tReg2);
+        atomList.tstAtom(leftArithResult, upperLoopVal, cmp, labelAfterName);
 
         expect(TokenName.OPEN_BRACKET);
         // Go into STATEMENTS() - which generates those associated atoms
         STATEMENTS();
         
         // Generate ADD atom which adds 1 to identifier and stores result in identifier
-        atomList.addAtom("1", right, right); 
+        atomList.addAtom(loopIdent, "1", loopIdent);
 
         // Generate JMP atom which goes to label1
         atomList.jmpAtom(label1);
@@ -384,16 +373,18 @@ public class Parser {
         atomList.lblAtom(labelAfterName);
 
         // At end of function, remove Variable from lookup table
-        lookupTable.remove(temp_var); 
+        lookupTable.remove(loopIdent);
 
      
 
     }
 
     int RANGE() {
-        if (!accept(TokenName.RANGE_OP))
+        if (accept(TokenName.RANGE_OP))
+            return 5;
+        else
             expect(TokenName.INCLUSIVERANGE_OP);
-            return 
+        return 3;
     }
 
     /**
