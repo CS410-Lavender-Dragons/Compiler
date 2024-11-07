@@ -19,8 +19,8 @@ public class Parser {
     Dictionary<String, Variable> lookupTable;
     Object destroyed = null;
     atomGen atomList;
-    int lblCounter = 0;
-    int tRegCount = 0;
+    int lblCounter;
+    int tRegCount;
     // atomGen
     String result;
 
@@ -65,7 +65,7 @@ public class Parser {
      *         helper for generate labels
      */
     public String generateLabel() {
-        return "LBL " + lblCounter++;
+        return "L" + lblCounter++;
     }
 
     /**
@@ -84,6 +84,8 @@ public class Parser {
         this.tokenQueue = tokenQueue;
         this.lookupTable = new Hashtable<>();
         this.atomList = new atomGen();
+        lblCounter = 0;
+        tRegCount = 0;
         STATEMENTS();
         expect(TokenName.EOI);
         atomList.end();
@@ -280,9 +282,8 @@ public class Parser {
         // Generate MOV atom placing initial value of first ARITHMETIC_EXPR into identifier
         atomList.movAtom(leftArithResult, loopIdent);
 
-        // Generate LBL atom and store value
-        var label1 = generateLabel();
-        atomList.lblAtom(label1);
+        //Generate beforeLabel name
+        var beforeLabel = generateLabel();
 
         // Make temp variable with String labelAfterName = labelVar + labelNum++;
         var labelAfterName = generateLabel();
@@ -291,6 +292,8 @@ public class Parser {
         
         String upperLoopVal = ARITHMETIC_EXPR();
 
+        //Generate LBL for before loop atoms
+        atomList.lblAtom(beforeLabel);
         // Generate TST atom using cmp of 5 for “..” and cmp of 3 for “..=” which jumps
         // to labelAfterName (left value is identifier, right is second ARITHMETIC_EXPR
         // return)
@@ -304,7 +307,7 @@ public class Parser {
         atomList.addAtom(loopIdent, "1", loopIdent);
 
         // Generate JMP atom which goes to label1
-        atomList.jmpAtom(label1);
+        atomList.jmpAtom(beforeLabel);
 
         expect(TokenName.CLOSE_BRACKET);
 
