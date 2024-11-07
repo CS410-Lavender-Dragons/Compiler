@@ -242,27 +242,19 @@ public class Parser {
      * Can generate: JMP, LBL, MOV atoms
      */
     void IF_EXPR() {
-        // atom already added.
-        String label = COMPARISON_EXPR();
-        // add label, runs if true. jmps to end
-        atomList.lblAtom(label);
+        //Label to jump to if condition not true
+        String afterIfLabel = generateLabel();
+        COMPARISON_EXPR(afterIfLabel);
+
         expect(TokenName.OPEN_BRACKET);
-        // added? should've been if everything else has been added
         STATEMENTS();
-
-        // prematurely add jmp to end label, pull back
-        label = generateLabel();
-        atomList.jmpAtom(label);
-        lblCounter--;
-
         expect(TokenName.CLOSE_BRACKET);
-        // point of processing: if num > 5 { x = y;} (we are here)
+
+        //Add LBL Atom for afterIf
+        atomList.lblAtom(afterIfLabel);
 
         // Generate LBL atom with value from COMPARISON_EXPR. will increment + 1
         ELSE_CLAUSE();
-
-        // end label, has to jump to this
-        atomList.lblAtom(generateLabel());
     }
 
     /**
@@ -303,7 +295,8 @@ public class Parser {
 
     // Can generate: JMP, LBL, MOV atoms
     void WHILE_EXPR() {
-        COMPARISON_EXPR();
+        String afterWhileLabel = generateLabel();
+        COMPARISON_EXPR(afterWhileLabel);
         expect(TokenName.OPEN_BRACKET);
         STATEMENTS();
         expect(TokenName.CLOSE_BRACKET);
@@ -553,20 +546,14 @@ public class Parser {
      *         Pulls from arithmetic_expr and comparison (debugging)
      */
 
-    String COMPARISON_EXPR() {
-        // what can this be? can o' worms
-        Object left = ARITHMETIC_EXPR();
-
+    void COMPARISON_EXPR(String label) {
+        String left = ARITHMETIC_EXPR();
         Integer comparison = COMPARISON();
-        // same issue, take care of atoms at lower level for arth expr
-        Object right = ARITHMETIC_EXPR();
-
-        String label = generateLabel();
+        String right = ARITHMETIC_EXPR();
 
         // Generate TST atom using comparison variable value which jumps to a label
-        atomList.tstAtom((String) left, (String) right, comparison, label);
+        atomList.tstAtom(left, right, comparison.intValue(), label);
 
-        return label;
     }
 
     /**
