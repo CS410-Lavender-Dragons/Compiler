@@ -313,9 +313,6 @@ public class Parser {
 
         // At end of function, remove Variable from lookup table
         lookupTable.remove(loopIdent);
-
-     
-
     }
 
     int RANGE() {
@@ -332,23 +329,10 @@ public class Parser {
      *         lower levels in progress, there may be something wrong with the line
      *         ordering in here
      */
-
     String ARITHMETIC_EXPR() {
-        // is this left or right? since it gets processed twice, it should be able to be
-        // both
-        // temp reg generation
-        String tReg1 = TERM().toString();
-
-        // operator and operator in progress
-        // this temp reg is the result... right?
-        String tReg2 = ARITH_LIST(tReg1);
-
-        if (tReg1 != null) {
-            return tReg1;
-        }
-
-        return tReg2;
-
+        String leftResult = TERM();
+        String result = ARITH_LIST(leftResult);
+        return result;
     }
 
     /**
@@ -359,7 +343,6 @@ public class Parser {
      * 
      * 
      */
-
     String ARITH_LIST(String tReg) {
 
         var resultTReg = newTReg();
