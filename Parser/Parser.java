@@ -409,7 +409,10 @@ public class Parser {
         }
         else {
             expect(TokenName.IDENTIFIER);
-            return String.valueOf(destroyed);
+            String identifier = String.valueOf(destroyed);
+            if (lookupTable.get(identifier) == null)
+                throw new RuntimeException(identifier + " used before initialized!");
+            return identifier;
         }
     }
 
