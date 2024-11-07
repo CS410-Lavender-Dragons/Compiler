@@ -16,11 +16,9 @@ import java.util.Hashtable;
 
 public class Parser {
     Queue<Token> tokenQueue;
-    Dictionary<String, Variable> lookupTable = new Hashtable<>();
+    Dictionary<String, Variable> lookupTable;
     Object destroyed = null;
-    int destroyedNum = 0;
-    atomGen atomList = new atomGen();
-    String destString;
+    atomGen atomList;
     int lblCounter = 0;
     int tRegCount = 0;
     // atomGen
@@ -44,7 +42,6 @@ public class Parser {
      *         helper: double can cast itself automatically into an obj (as with any
      *         primitive)
      */
-
     double floatCalculator(Integer left, Integer right) {
         // abracadabra
         double answer = (left) + (right / Math.pow(10, right.toString().length()));
@@ -85,6 +82,8 @@ public class Parser {
      */
     public void parse(Queue<Token> tokenQueue) {
         this.tokenQueue = tokenQueue;
+        this.lookupTable = new Hashtable<>();
+        this.atomList = new atomGen();
         STATEMENTS();
         expect(TokenName.EOI);
         atomList.end();
@@ -128,15 +127,7 @@ public class Parser {
         else if (accept(TokenName.FOR_KW))
             FOR_EXPR();
         else if (accept(TokenName.IDENTIFIER))
-            try {
-            //1
                 ASSIGNMENT_EXPR();
-            }
-            // x = ..... (the first statement dies here, according to the debugger)
-            catch (Exception e) {
-                System.out.println("Exception caught from assignment_expr");
-            }
-
         else {
             expect(TokenName.LET_KW);
             LET_ASSIGN();
@@ -147,7 +138,7 @@ public class Parser {
      * @throws Exception
      */
     // Can generate: MOV atoms
-    void ASSIGNMENT_EXPR() throws Exception {
+    void ASSIGNMENT_EXPR() {
         // Ensure variable exists in lookup table AND is mutable
         accept(TokenName.IDENTIFIER);
         Object arithResult = null;
@@ -162,10 +153,10 @@ public class Parser {
             expect(TokenName.SEMICOLON);
         } else if (lookupTable.get(left) == null) {
             // variable has not been declared, throw error
-            throw new Exception("Variable has not yet been declared");
+            throw new RuntimeException("Variable has not yet been declared");
         } else if (!lookupTable.get(left).isMutable()) {
             // variable does exist but isn't mutable, throw error
-            throw new Exception("Variable is not mutable");
+            throw new RuntimeException("Variable is not mutable");
         }
 
         // Generate a MOV Atom where we place the result from ARITHMETIC_EXPR into the
