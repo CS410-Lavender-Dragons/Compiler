@@ -227,13 +227,13 @@ public class Parser {
      */
     void ELSE_NESTED(String afterIfLabel) {
         if (accept(TokenName.IF_KW)) {
-            //JMP to label after "if else" if "if" executes
-            String afterIfElseLabel = generateLabel();
-            atomList.jmpAtom(afterIfElseLabel);
+            //JMP to label after "else if" if "if" executes
+            String afterElseIfLabel = generateLabel();
+            atomList.jmpAtom(afterElseIfLabel);
             //LBL atom for afterIf
             atomList.lblAtom(afterIfLabel);
             IF_EXPR();
-            atomList.lblAtom(afterIfElseLabel);
+            atomList.lblAtom(afterElseIfLabel);
         }
         else {
             //Label for afterElse
