@@ -286,11 +286,15 @@ public class Parser {
 
     // Can generate: JMP, LBL, MOV atoms
     void WHILE_EXPR() {
+        String beforeWhileLabel = generateLabel();
         String afterWhileLabel = generateLabel();
+        atomList.lblAtom(beforeWhileLabel);
         COMPARISON_EXPR(afterWhileLabel);
         expect(TokenName.OPEN_BRACKET);
         STATEMENTS();
         expect(TokenName.CLOSE_BRACKET);
+        atomList.jmpAtom(beforeWhileLabel);
+        atomList.lblAtom(afterWhileLabel);
     }
 
     // Can generate: JMP, LBL, MOV atoms
