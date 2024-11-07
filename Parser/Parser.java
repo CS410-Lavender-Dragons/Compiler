@@ -333,8 +333,8 @@ public class Parser {
      *         ordering in here
      */
     String ARITHMETIC_EXPR() {
-        String resultReg = TERM();
-        ARITH_LIST(resultReg);
+        String left = TERM();
+        String resultReg = ARITH_LIST(left);
         return resultReg;
     }
 
@@ -346,14 +346,19 @@ public class Parser {
      * 
      * 
      */
-    void ARITH_LIST(String tReg) {
+    String ARITH_LIST(String tReg) {
         if (accept(TokenName.ADD_OP)) {
+            String resultReg = newTReg();
             String right = ARITHMETIC_EXPR();
-            atomList.addAtom(tReg, right, tReg);
+            atomList.addAtom(tReg, right, resultReg);
+            return resultReg;
         } else if (accept(TokenName.SUB_OP)) {
+            String resultReg = newTReg();
             String right = ARITHMETIC_EXPR();
-            atomList.subAtom(tReg, right, tReg);
+            atomList.subAtom(tReg, right, resultReg);
+            return resultReg;
         }
+        return tReg;
     }
 
     /**
@@ -362,8 +367,8 @@ public class Parser {
      *         worked on, done? this is highly questionable ----
      */
     String TERM() {
-        String resultReg = VALUE();
-        TERM_LIST(resultReg);
+        String left = VALUE();
+        String resultReg = TERM_LIST(left);
         return resultReg;
     }
 
@@ -376,14 +381,19 @@ public class Parser {
      * 
      *         worked on, done?
      */
-    void TERM_LIST(String tReg) {
+    String TERM_LIST(String tReg) {
         if (accept(TokenName.MULT_OP)) {
+            String resultReg = newTReg();
             String right = TERM();
-            atomList.mulAtom(tReg, right, tReg);
+            atomList.mulAtom(tReg, right, resultReg);
+            return resultReg;
         } else if (accept(TokenName.DIV_OP)) {
+            String resultReg = newTReg();
             String right = TERM();
-            atomList.divAtom(tReg, right, tReg);
+            atomList.divAtom(tReg, right, resultReg);
+            return resultReg;
         }
+        return tReg;
     }
 
     /**
