@@ -447,6 +447,8 @@ public class Parser {
         else {
             expect(TokenName.IDENTIFIER);
             value = String.valueOf(destroyed);
+            if (lookupTable.get(value) == null)
+                throw new RuntimeException("Cannot negate " + value + " before initialization!");
         }
         atomList.negAtom(value, result);
         return result;
