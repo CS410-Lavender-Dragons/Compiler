@@ -158,60 +158,28 @@ public class Parser {
     // Can generate: MOV atoms
     void LET_ASSIGN() {
         if (accept(TokenName.IDENTIFIER)) {
-            String left = String.valueOf(destroyed);
-            TYPE_ASSIGN();
-            // Generate a new Variable with name, mutable false, type - add to lookup table
+            String identifier = String.valueOf(destroyed);
+            if (lookupTable.get(identifier) != null)
+                throw new RuntimeException(identifier + " already exists!");
+            Type varType = TYPE_ASSIGN();
             expect(TokenName.ASSIGN_OP);
-            ARITHMETIC_EXPR();
-            String right = String.valueOf(destroyed);
+            String identValue = ARITHMETIC_EXPR();
+            lookupTable.put(identifier, new Variable(identifier, false, varType));
+            atomList.movAtom(identValue, identifier);
             expect(TokenName.SEMICOLON);
-            // Generate a MOV Atom where we place the result from ARITHMETIC_EXPR into the
-            // identifier
-
-            // should have everything in...
-
-            // Populating Variable for lookup table
-            Variable temp_var = new Variable(null, false, null);
-            temp_var.setName(left);
-            temp_var.setMutable(false);
-
-            if (right == "INT") {
-                temp_var.setType(Type.INT);
-            } else if (right == "FLOAT") {
-                temp_var.setType(Type.FLOAT);
-            }
-
-            lookupTable.put(temp_var.getName(), temp_var);
-
         } else {
             expect(TokenName.MUT_KW);
             expect(TokenName.IDENTIFIER);
-            String left = String.valueOf(destroyed);
-            TYPE_ASSIGN();
-            // Generate a new Variable with name, mutable true, type - add to lookup table
+            String identifier = String.valueOf(destroyed);
+            if (lookupTable.get(identifier) != null)
+                throw new RuntimeException(identifier + " already exists!");
+            Type varType = TYPE_ASSIGN();
             expect(TokenName.ASSIGN_OP);
-            Object arithResult = ARITHMETIC_EXPR();
-            String right = String.valueOf(destroyed);
+            String identValue = ARITHMETIC_EXPR();
+            lookupTable.put(identifier, new Variable(identifier, true, varType));
+            atomList.movAtom(identValue, identifier);
             expect(TokenName.SEMICOLON);
-
-            // Populating Variable for lookup table
-            Variable temp_var = new Variable(null, false, null);
-            temp_var.setName(left);
-            temp_var.setMutable(true);
-
-            if (right == "INT") {
-                temp_var.setType(Type.INT);
-            } else if (right == "FLOAT") {
-                temp_var.setType(Type.FLOAT);
-            }
-
-            lookupTable.put(temp_var.getName(), temp_var);
-
-            // Generate a MOV Atom where we place the result from ARITHMETIC_EXPR into the
-            // identifier
-            atomList.movAtom(result, temp_var.getName());
         }
-
     }
 
     Type TYPE_ASSIGN() {
