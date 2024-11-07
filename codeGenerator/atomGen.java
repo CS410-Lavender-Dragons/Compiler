@@ -26,27 +26,9 @@ public class atomGen {
         atomList = new LinkedList<>(); 
     }
 
-    //TODO: what is the logic that'll tie everything together, pemdas? according to prof, recursion will, but there is the possiblity that this MAY not be the case
-    //depends on if previous step is correct   
-
-    //reg trackers
-    static int tempCounter = 0; 
-    //static int lblCounter = 0; 
-
-    /* //logic & 2d arrays to track data....maybe needed? 
-    ArrayList<ArrayList<Character>> regArr = new ArrayList<>();   */
-
-    //for everything below, -1 means null. just helper stuff 
-
-    //helper
-    public String newTReg(){
-        return "T" + tempCounter++; 
-    }
-
     // add add atom: (ADD, left, right, result)
     public  void addAtom(String left, String right, String result) {
         atomList.add(new atom("ADD", left, right, result, -1, null));
-        tempCounter++; 
     }
 
     // add sub atom: (SUB, left, right, result)

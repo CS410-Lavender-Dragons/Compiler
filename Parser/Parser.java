@@ -21,65 +21,7 @@ public class Parser {
     atomGen atomList;
     int lblCounter;
     int tRegCount;
-    // atomGen
-    String result;
 
-    // helper
-    public atomGen getAtoms() {
-        System.out.println("Here");
-        return this.atomList;
-    }
-
-    // helper, post-increment
-    public String newTReg() {
-        return "T" + tRegCount++;
-    }
-
-    /**
-     * @param left
-     * @param right
-     * @return double
-     *         helper: double can cast itself automatically into an obj (as with any
-     *         primitive)
-     */
-    double floatCalculator(Integer left, Integer right) {
-        // abracadabra
-        double answer = (left) + (right / Math.pow(10, right.toString().length()));
-        return answer;
-    }
-
-    /**
-     * @param token
-     * @return Variable
-     * 
-     *         Helper: Take instance of token and populate variable
-     */
-    public Variable TokVarConversion(Token token) {
-
-        return null;
-    }
-
-    /**
-     * @return String
-     * 
-     *         helper for generate labels
-     */
-    public String generateLabel() {
-        return "L" + lblCounter++;
-    }
-
-    /**
-     * @return Queue<Token>
-     * 
-     *         helper
-     */
-    public Queue<Token> getQueue() {
-        return this.tokenQueue;
-    }
-
-    /**
-     * @param tokenQueue
-     */
     public void parse(Queue<Token> tokenQueue) {
         this.tokenQueue = tokenQueue;
         this.lookupTable = new Hashtable<>();
@@ -91,10 +33,6 @@ public class Parser {
         atomList.end();
     }
 
-    /**
-     * @param tokenName
-     * @return boolean
-     */
     boolean accept(TokenName tokenName) {
         if (tokenQueue.peek().getName() == tokenName) {
             destroyed = tokenQueue.remove().getValue();
@@ -103,10 +41,7 @@ public class Parser {
         }
         return false;
     }
-    
-    /**
-     * @param tokenName
-     */
+
     void expect(TokenName tokenName) {
         if (tokenQueue.peek().getName() != tokenName)
             throw new RuntimeException("Expected: " + tokenName + ", but found: " + tokenQueue.peek().getName());
@@ -136,10 +71,6 @@ public class Parser {
         }
     }
 
-    /**
-     * @throws Exception
-     */
-    // Can generate: MOV atoms
     void ASSIGNMENT_EXPR() {
         //destination identifier
         String identifier = String.valueOf(destroyed);
@@ -157,7 +88,6 @@ public class Parser {
         expect(TokenName.SEMICOLON);
     }
 
-    // Can generate: MOV atoms
     void LET_ASSIGN() {
         if (accept(TokenName.IDENTIFIER)) {
             String identifier = String.valueOf(destroyed);
@@ -198,11 +128,7 @@ public class Parser {
             expect(TokenName.BIT_128_INT_OP);
         return Type.INT;
     }
-    /**
-     * logic may be wrong
-     * 
-     * Can generate: JMP, LBL, MOV atoms
-     */
+
     void IF_EXPR() {
         //Label to jump to if condition not true
         String afterIfLabel = generateLabel();
@@ -220,11 +146,6 @@ public class Parser {
             ELSE_NESTED(afterIfLabel);
     }
 
-    /**
-     * @param label
-     * 
-     *              process else stuff
-     */
     void ELSE_NESTED(String afterIfLabel) {
         if (accept(TokenName.IF_KW)) {
             //JMP to label after "else if" if "if" executes
@@ -250,7 +171,6 @@ public class Parser {
         }
     }
 
-    // Can generate: JMP, LBL, MOV atoms
     void WHILE_EXPR() {
         String beforeWhileLabel = generateLabel();
         String afterWhileLabel = generateLabel();
@@ -263,7 +183,6 @@ public class Parser {
         atomList.lblAtom(afterWhileLabel);
     }
 
-    // Can generate: JMP, LBL, MOV atoms
     void FOR_EXPR() {
         expect(TokenName.IDENTIFIER);
         // right should be the identifier name, stow away for later
@@ -322,6 +241,7 @@ public class Parser {
         lookupTable.remove(loopIdent);
     }
 
+    //Returns complement of range operator for comparison
     int RANGE() {
         if (accept(TokenName.RANGE_OP))
             return 5;
@@ -330,26 +250,14 @@ public class Parser {
         return 3;
     }
 
-    /**
-     * @return Object
-     * 
-     *         lower levels in progress, there may be something wrong with the line
-     *         ordering in here
-     */
+    //Returns register holding result of expression
     String ARITHMETIC_EXPR() {
         String left = TERM();
         String resultReg = ARITH_LIST(left);
         return resultReg;
     }
 
-    /**
-     * @param left
-     * 
-     *             add/sub atoms
-     *             worked on, done?
-     * 
-     * 
-     */
+    //Adds add atom or sub atom depending on operator, returns register containing result
     String ARITH_LIST(String tReg) {
         if (accept(TokenName.ADD_OP)) {
             String resultReg = newTReg();
@@ -365,26 +273,14 @@ public class Parser {
         return tReg;
     }
 
-    /**
-     * @return String, tReg
-     * 
-     *         worked on, done? this is highly questionable ----
-     */
+    //Returns register holding result
     String TERM() {
         String left = VALUE();
         String resultReg = TERM_LIST(left);
         return resultReg;
     }
 
-    /**
-     * @param left item
-     * @return
-     * 
-     *         Adds mul atom or div atom depending on operator.
-     *         return result back to term()?
-     * 
-     *         worked on, done?
-     */
+    //Adds mul atom or div atom depending on operator, returns register containing result
     String TERM_LIST(String tReg) {
         if (accept(TokenName.MULT_OP)) {
             String resultReg = newTReg();
@@ -400,13 +296,7 @@ public class Parser {
         return tReg;
     }
 
-    /**
-     * @return Object
-     * 
-     *         worked on, done?
-     *         can generate: neg atoms
-     *         must return temp register
-     */
+    //Returns temp register/identifier holding value
     String VALUE() {
         if (accept(TokenName.OPEN_PAREN)) {
             String tReg = ARITHMETIC_EXPR();
@@ -433,13 +323,7 @@ public class Parser {
         }
     }
 
-    /**
-     * @return Integer
-     * 
-     * @return extacted value
-     * 
-     *         worked on, probably done
-     */
+    //Returns extracted value after decimal, null if DNE
     Integer FLOAT() {
         if (accept(TokenName.DECIMAL)) {
             expect(TokenName.NUMERIC);
@@ -448,11 +332,7 @@ public class Parser {
         return null;
     }
 
-    /**
-     * @return Integer
-     * 
-     *         returns negated value
-     */
+    //Returns Temp register holding negated value
     String NEGATED_VALUE() {
         String result = newTReg();
         String value;
@@ -471,16 +351,7 @@ public class Parser {
         return result;
     }
 
-    /**
-     * 
-     * @param
-     * @return target label
-     *         Not done. Needs lookup table logic built in
-     *         Can genrate TST atoms.
-     *         Can return to while (anything else?).
-     *         Pulls from arithmetic_expr and comparison (debugging)
-     */
-
+    //Generates TST atom using value from two arithmetic expressions and comparison (complement) from COMPARISON()
     void COMPARISON_EXPR(String label) {
         String left = ARITHMETIC_EXPR();
         Integer comparison = COMPARISON();
@@ -491,14 +362,8 @@ public class Parser {
 
     }
 
-    /**
-     * @return a number
-     *         99% sure done; where this returns to: comparison_expression
-     *         Returns int representing complement operation of comparison token
-     *         where this returns to: comparison_expression
-     *         Can generate: NEG atoms (?)
-     */
-    Integer COMPARISON() {
+     //Returns int representing complement operation of comparison token
+    int COMPARISON() {
         if (accept(TokenName.EQ_OP))
             return 6;
         else if (accept(TokenName.GREATER_EQ_OP))
@@ -513,5 +378,21 @@ public class Parser {
             expect(TokenName.UNEQUAL_OP);
             return 1;
         }
+    }
+
+    //get new temp register, increment count
+    public String newTReg() {
+        return "T" + tRegCount++;
+    }
+
+    //returns value of Double
+    double floatCalculator(Integer left, Integer right) {
+        double answer = (left) + (right / Math.pow(10, right.toString().length()));
+        return answer;
+    }
+
+   //get new label, increment count
+    public String generateLabel() {
+        return "L" + lblCounter++;
     }
 }
