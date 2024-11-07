@@ -264,8 +264,11 @@ public class Parser {
      *              process else stuff
      */
     void ELSE_NESTED(String afterIfLabel) {
-        if (accept(TokenName.IF_KW))
+        if (accept(TokenName.IF_KW)) {
+            //LBL atom for afterIf
+            atomList.lblAtom(afterIfLabel);
             IF_EXPR();
+        }
         else {
             //Label for afterElse
             String afterElseLabel = generateLabel();
@@ -274,9 +277,10 @@ public class Parser {
             //LBL atom for else
             atomList.lblAtom(afterIfLabel);
             expect(TokenName.OPEN_BRACKET);
-            atomList.lblAtom(label);
             STATEMENTS();
             expect(TokenName.CLOSE_BRACKET);
+            //LBL atom for afterElse
+            atomList.lblAtom(afterElseLabel);
         }
     }
 
