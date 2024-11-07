@@ -373,18 +373,14 @@ public class Parser {
      * 
      *         worked on, done?
      */
-    String TERM_LIST(Object left) {
-        var leftSide = String.valueOf(left);
+    void TERM_LIST(String tReg) {
         if (accept(TokenName.MULT_OP)) {
-            String right = String.valueOf(TERM());
-            atomList.mulAtom(leftSide, right, result);
-            return result;
+            String right = TERM();
+            atomList.mulAtom(tReg, right, tReg);
         } else if (accept(TokenName.DIV_OP)) {
-            String right = String.valueOf(TERM());
-            atomList.divAtom(leftSide, right, result);
-            return result;
+            String right = TERM();
+            atomList.divAtom(tReg, right, tReg);
         }
-        return "";
     }
 
     /**
