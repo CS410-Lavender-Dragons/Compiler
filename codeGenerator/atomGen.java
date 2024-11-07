@@ -68,8 +68,8 @@ public class atomGen {
         atomList.add(new atom("JMP", null, null, null, -1, dest));
     }
 
-    public void negAtom(String left, String dest){
-        atomList.add(new atom("NEG", left, null, null, -1, dest));
+    public void negAtom(String left, String result){
+        atomList.add(new atom("NEG", left, null, result, -1, null));
     }
 
     public void lblAtom(String dest){
