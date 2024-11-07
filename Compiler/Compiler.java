@@ -10,13 +10,13 @@ public class Compiler {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
         //atomGen generator = new atomGen();
-        var tokens1 = lexer.tokenize("let x : i32 = 89 + a;");
+        var tokens1 = lexer.tokenize("let x : i32 = 89 + 0;");
         parser.parse(tokens1);
         
-
-        /* var tokens2 = lexer.tokenize("for n in 1..100{x=x+y-100*20/20;}");
+        System.out.println("\n");
+        var tokens2 = lexer.tokenize("let mut x : i32 = 0; let y :i8 = 10; for n in 1..100{x=x+y-100*20/20;}");
         parser.parse(tokens2);
-        var tokens3 = lexer.tokenize("for x in 23..=  4912 { x = 99;}   y = (2 + 5) * 7;");
+        /* var tokens3 = lexer.tokenize("for x in 23..=  4912 { x = 99;}   y = (2 + 5) * 7;");
         parser.parse(tokens3);
         var tokens4 = lexer.tokenize("let x : i32 = 10; let y : f32 =  (-x) + (8.32 * 7 - 5) + (z) / x + 0.23;");
         parser.parse(tokens4); */

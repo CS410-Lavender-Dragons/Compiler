@@ -90,7 +90,7 @@ public class atomGen {
     //done
     public void end(){
         for(var atom : atomList){
-            System.out.println(atom); 
+            System.out.println(atom);
         }
     }
 
