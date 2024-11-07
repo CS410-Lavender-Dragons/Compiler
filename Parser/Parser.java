@@ -388,39 +388,28 @@ public class Parser {
      * 
      *         worked on, done?
      *         can generate: neg atoms
-     *         must return numeric or char value to punt up tree
+     *         must return temp register
      */
-
     String VALUE() {
-
-        // worked on, no return?
         if (accept(TokenName.OPEN_PAREN)) {
             String tReg = ARITHMETIC_EXPR();
             expect(TokenName.CLOSE_PAREN);
-            // return where the value is stored
             return tReg;
         }
-
-        // worked on
         else if (accept(TokenName.NUMERIC)) {
             Integer num1 = (Integer) destroyed;
             Integer floatResult = FLOAT();
-
-            // witchcraft
-            return String.valueOf(floatResult == null ? num1 : floatCalculator(num1, floatResult));
+            String value = String.valueOf(floatResult == null ? num1 : floatCalculator(num1, floatResult));
+            String result = newTReg();
+            atomList.movAtom(value, result);
+            return result;
         }
-
-        // in progress, returns data type of obj to cast to Integer (?)
         else if (accept(TokenName.SUB_OP)) {
-            return String.valueOf(NEGATED_VALUE());
+            return NEGATED_VALUE();
         }
-
-        // TODO worked on, check
         else {
-            // terminal
             expect(TokenName.IDENTIFIER);
-            // return up the tree
-            return destroyed.toString();
+            return String.valueOf(destroyed);
         }
     }
 
@@ -434,7 +423,6 @@ public class Parser {
     Integer FLOAT() {
         if (accept(TokenName.DECIMAL)) {
             expect(TokenName.NUMERIC);
-            // grab
             return (Integer) destroyed;
         }
         return null;
@@ -445,17 +433,20 @@ public class Parser {
      * 
      *         returns negated value
      */
-    Integer NEGATED_VALUE() {
-        // in progress
+    String NEGATED_VALUE() {
+        String result = newTReg();
+        String value;
         if (accept(TokenName.NUMERIC)) {
-            return FLOAT();
+            Integer num1 = (Integer) destroyed;
+            Integer floatResult = FLOAT();
+            value = String.valueOf(floatResult == null ? num1 : floatCalculator(num1, floatResult));
         }
-        // not touched... yet
         else {
             expect(TokenName.IDENTIFIER);
+            value = String.valueOf(destroyed);
         }
-        // placeholder
-        return null;
+        atomList.negAtom(value, result);
+        return result;
     }
 
     /**
