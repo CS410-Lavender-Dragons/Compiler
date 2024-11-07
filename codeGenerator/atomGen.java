@@ -51,17 +51,17 @@ public class atomGen {
 
     // add sub atom: (SUB, left, right, result)
     public  void subAtom(String left, String right, String result) {
-        atomList.add(new atom("SUB", left, right, newTReg(), -1, null));
+        atomList.add(new atom("SUB", left, right, result, -1, null));
     }
 
     //add mul atom: (MUL, left, right, result)
     public void mulAtom(String left, String right, String result){
-        atomList.add(new atom("MUL", left, right, newTReg(), -1, null));
+        atomList.add(new atom("MUL", left, right, result, -1, null));
     }
 
     //add div atom: (div, left, right, result)
     public void divAtom(String left, String right, String result){
-        atomList.add(new atom("DIV", left, right, newTReg(), -1, null));
+        atomList.add(new atom("DIV", left, right, result, -1, null));
     }
 
     public void jmpAtom(String dest){
