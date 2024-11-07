@@ -250,23 +250,12 @@ public class Parser {
         STATEMENTS();
         expect(TokenName.CLOSE_BRACKET);
 
-        //Add LBL Atom for afterIf
-        atomList.lblAtom(afterIfLabel);
-
-        // Generate LBL atom with value from COMPARISON_EXPR. will increment + 1
-        ELSE_CLAUSE();
+        ELSE_CLAUSE(afterIfLabel);
     }
 
-    /**
-     * process
-     */
-    void ELSE_CLAUSE() {
-        if (accept(TokenName.ELSE_KW)) {
-            // Generate a JMP atom to a temporary label, pass this label name to nested
-            String label = generateLabel();
-            ELSE_NESTED(label);
-        }
-
+    void ELSE_CLAUSE(String afterIfLabel) {
+        if (accept(TokenName.ELSE_KW))
+            ELSE_NESTED(afterIfLabel);
     }
 
     /**
@@ -274,18 +263,16 @@ public class Parser {
      * 
      *              process else stuff
      */
-    void ELSE_NESTED(String label) {
-        // nested
-        if (accept(TokenName.IF_KW)) {
+    void ELSE_NESTED(String afterIfLabel) {
+        if (accept(TokenName.IF_KW))
             IF_EXPR();
-            /*
-             * // Generate LBL atom with passed in parameter
-             * atomList.lblAtom(label);
-             */
-        }
-
-        // 1 level
         else {
+            //Label for afterElse
+            String afterElseLabel = generateLabel();
+            //JMP atom to afterElseLabel
+            atomList.jmpAtom(afterElseLabel);
+            //LBL atom for else
+            atomList.lblAtom(afterIfLabel);
             expect(TokenName.OPEN_BRACKET);
             atomList.lblAtom(label);
             STATEMENTS();
