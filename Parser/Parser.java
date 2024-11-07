@@ -359,16 +359,9 @@ public class Parser {
      *         worked on, done? this is highly questionable ----
      */
     String TERM() {
-        // left HAS to come out of here, for mul operator. can be x + y, or 1 + y
-        String tReg = VALUE();
-
-        // feed left into here, if not null
-        if (tReg != null) {
-            TERM_LIST(tReg);
-        }
-
-        // this returns the right one
-        return tReg;
+        String resultReg = VALUE();
+        TERM_LIST(resultReg);
+        return resultReg;
     }
 
     /**
