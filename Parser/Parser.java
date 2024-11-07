@@ -330,7 +330,7 @@ public class Parser {
         // Generate TST atom using cmp of 5 for “..” and cmp of 3 for “..=” which jumps
         // to labelAfterName (left value is identifier, right is second ARITHMETIC_EXPR
         // return)
-        atomList.tstAtom(leftArithResult, upperLoopVal, cmp, labelAfterName);
+        atomList.tstAtom(loopIdent, upperLoopVal, cmp, labelAfterName);
 
         expect(TokenName.OPEN_BRACKET);
         // Go into STATEMENTS() - which generates those associated atoms
