@@ -9,7 +9,18 @@ public class Compiler {
     public static void main(String[] args){
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
-        //atomGen generator = new atomGen();
+
+        //var tokens7 = lexer.tokenize("x = 5;");
+        //var tokens7 = lexer.tokenize("let x = 5;");
+        //var tokens7 = lexer.tokenize("let x : i32 = 6; x = 4;");
+        //var tokens7 = lexer.tokenize("for x in 1..20 { let mut y = 10;");
+        //var tokens7 = lexer.tokenize("for x in 1 { let mut y = 10; }");
+        //var tokens7 = lexer.tokenize("loop y {let mut x = 10; }");
+        //var tokens7 = lexer.tokenize("let y : i32 = 10; loop y < {let mut x = 10; }");
+        //var tokens7 = lexer.tokenize("let x : i2 = 10;");
+        //var tokens7 = lexer.tokenize("loop 1 7 { let mut x = 2;}");
+        //parser.parse(tokens7);
+
         var tokens1 = lexer.tokenize("let x : i32 = 89 + 0;");
         parser.parse(tokens1);
         
@@ -32,6 +43,7 @@ public class Compiler {
         System.out.println("\n");
         var tokens6 = lexer.tokenize("let x : i8 = 1; let mut y : f32 = 0; loop x < 10 { y = x * 3 + 2; }");
         parser.parse(tokens6);
+
     }
 }
     
