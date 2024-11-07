@@ -28,6 +28,10 @@ public class Compiler {
         System.out.println("\n");
         var tokens5 = lexer.tokenize("let x : i64 = 5; let mut y : f32 = 0; if x < 5 { y = 2; } else if x > 10 { y = 3; } else { y = 4; }");
         parser.parse(tokens5);
+
+        System.out.println("\n");
+        var tokens6 = lexer.tokenize("let x : i8 = 1; let mut y : f32 = 0; loop x < 10 { y = x * 3 + 2; }");
+        parser.parse(tokens6);
     }
 }
     

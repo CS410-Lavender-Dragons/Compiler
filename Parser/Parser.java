@@ -59,7 +59,7 @@ public class Parser {
     void STATEMENT() {
         if (accept(TokenName.IF_KW))
             IF_EXPR();
-        else if (accept(TokenName.WHILE_KW))
+        else if (accept(TokenName.LOOP_KW))//Temporary until Lexer corrected to lex "while"
             WHILE_EXPR();
         else if (accept(TokenName.FOR_KW))
             FOR_EXPR();
@@ -358,7 +358,7 @@ public class Parser {
         String right = ARITHMETIC_EXPR();
 
         // Generate TST atom using comparison variable value which jumps to a label
-        atomList.tstAtom(left, right, comparison.intValue(), label);
+        atomList.tstAtom(left, right, comparison, label);
 
     }
 
