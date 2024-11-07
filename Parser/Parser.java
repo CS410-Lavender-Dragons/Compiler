@@ -214,19 +214,20 @@ public class Parser {
 
     }
 
-    void TYPE_ASSIGN() {
+    Type TYPE_ASSIGN() {
         expect(TokenName.COLON);
-        TYPE();
+        return TYPE();
     }
 
-    void TYPE() {
-        if (!accept(TokenName.BIT_8_FLOAT_OP) && !accept(TokenName.BIT_8_INT_OP) && !accept(TokenName.BIT_16_FLOAT_OP)
-                && !accept(TokenName.BIT_16_INT_OP) && !accept(TokenName.BIT_32_FLOAT_OP)
-                && !accept(TokenName.BIT_32_INT_OP) && !accept(TokenName.BIT_64_FLOAT_OP)
-                && !accept(TokenName.BIT_64_INT_OP) && !accept(TokenName.BIT_128_FLOAT_OP))
+    Type TYPE() {
+        if (accept(TokenName.BIT_8_FLOAT_OP) || accept(TokenName.BIT_16_FLOAT_OP) || accept(TokenName.BIT_32_FLOAT_OP) || accept(TokenName.BIT_64_FLOAT_OP) || accept(TokenName.BIT_128_FLOAT_OP))
+            return Type.FLOAT;
+        else if (accept(TokenName.BIT_8_INT_OP) || accept(TokenName.BIT_16_INT_OP) || accept(TokenName.BIT_32_INT_OP) || accept(TokenName.BIT_64_INT_OP))
+            return Type.INT;
+        else
             expect(TokenName.BIT_128_INT_OP);
+        return Type.INT;
     }
-
     /**
      * logic may be wrong
      * 
