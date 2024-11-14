@@ -78,7 +78,7 @@ public class LexerTest {
                     sb.append("if ");
                     break;
                 case WHILE_KW:
-                    sb.append("loop ");
+                    sb.append("while ");
                     break;
                 case LET_KW:
                     sb.append("let ");
