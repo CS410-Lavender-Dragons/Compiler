@@ -1,9 +1,8 @@
 package Compiler;
 
-import Core.Token;
 import Lexer.Lexer;
 import Parser.Parser;
-import codeGenerator.atomGen;
+
 
 public class Compiler {
     public static void main(String[] args){

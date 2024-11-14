@@ -77,7 +77,7 @@ public class LexerTest {
                 case IF_KW:
                     sb.append("if ");
                     break;
-                case LOOP_KW:
+                case WHILE_KW:
                     sb.append("loop ");
                     break;
                 case LET_KW:
@@ -91,12 +91,6 @@ public class LexerTest {
                     break;
                 case MUT_KW:
                     sb.append("mut ");
-                    break;
-                case BREAK_KW:
-                    sb.append("break ");
-                    break;
-                case CONTINUE_KW:
-                    sb.append("continue ");
                     break;
                 case NUMERIC:
                     if (tokenValue instanceof Integer) {

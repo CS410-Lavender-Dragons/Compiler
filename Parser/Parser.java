@@ -8,7 +8,7 @@ import codeGenerator.atomGen;
 import Core.Variable;
 import Core.Variable.Type;
 
-import java.util.ArrayList;
+
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -59,7 +59,7 @@ public class Parser {
     void STATEMENT() {
         if (accept(TokenName.IF_KW))
             IF_EXPR();
-        else if (accept(TokenName.LOOP_KW))//Temporary until Lexer corrected to lex "while"
+        else if (accept(TokenName.WHILE_KW))//Temporary until Lexer corrected to lex "while"
             WHILE_EXPR();
         else if (accept(TokenName.FOR_KW))
             FOR_EXPR();
