@@ -3,9 +3,11 @@
 
 package Lexer;
 
+import Core.Token;
+import Core.TokenName;
+
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
@@ -75,8 +77,8 @@ public class LexerTest {
                 case IF_KW:
                     sb.append("if ");
                     break;
-                case LOOP_KW:
-                    sb.append("loop ");
+                case WHILE_KW:
+                    sb.append("while ");
                     break;
                 case LET_KW:
                     sb.append("let ");
@@ -89,12 +91,6 @@ public class LexerTest {
                     break;
                 case MUT_KW:
                     sb.append("mut ");
-                    break;
-                case BREAK_KW:
-                    sb.append("break ");
-                    break;
-                case CONTINUE_KW:
-                    sb.append("continue ");
                     break;
                 case NUMERIC:
                     if (tokenValue instanceof Integer) {

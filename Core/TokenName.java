@@ -1,19 +1,17 @@
 // Authors: Hunter Oxley, Branden Purdum, Skyler Putney, Emma Kupec
 // Reviewers: William Valentine, Alyssa Mesinere
 
-package Lexer;
+package Core;
 
 //Token name with corresponding final state
 public enum TokenName {
     IN_KW(2), //in keyword 
     IF_KW(3), //if keyword
-    LOOP_KW(32), //loop keyword
+    WHILE_KW(32), //loop keyword
     LET_KW(29), //let keyword
     ELSE_KW(26), //else keyword
     FOR_KW(22), //for keyword
     MUT_KW(19), //mut keyword
-    BREAK_KW(16), //break keyword
-    CONTINUE_KW(11), //continue keyword
     NUMERIC(34), //numeric
     DECIMAL(50), //decimal
     RANGE_OP(51), //range operator 
@@ -47,7 +45,8 @@ public enum TokenName {
     IDENTIFIER(71),
 
     INVALID_INPUT(100),
-    EOI(101);
+    EOI(101),
+    UNEQUAL_OP(103); //temporary until Lexer modified
 
 
     private final int token;

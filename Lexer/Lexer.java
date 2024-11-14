@@ -7,10 +7,9 @@
     import java.util.Arrays;
     import java.util.LinkedList;
     import java.util.Queue;
-    import Lexer.Token;
-    import Lexer.TokenName;
-    import java.io.File;
-    import java.io.InputStreamReader;
+    import Core.Token;
+    import Core.TokenName;
+
     import java.nio.file.Files;
     import java.nio.file.Path;
     import java.io.IOException;
