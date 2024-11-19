@@ -16,8 +16,8 @@ public class atom {
     //based on big boy: (name, left, right, result, cmp, dest). 
     
     //data
-    String name, left, right, result, dest;
-    int cmp;
+    public String name, left, right, result, dest;
+    public int cmp;
     
     //constructor
     public atom(String name, String left, String right, String result, int cmp, String dest){
