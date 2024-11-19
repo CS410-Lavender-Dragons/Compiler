@@ -22,8 +22,8 @@
             Lexer lex = new Lexer();
 
            //WARNING: I CODED THIS PATH ON MY MAC, IF YOU ARE ON WINDOWS CHANGE THIS TO WORK FOR YOUR MACHINE 
-           Path sampleCodeFile = Path.of("/Users/zane/Desktop/Compiler/Lexer/SampleCode.txt");
-           String sampleCode = Files.readString(sampleCodeFile);          ;
+           //Path sampleCodeFile = Path.of("/Users/zane/Desktop/Compiler/Lexer/SampleCode.txt");
+           //String sampleCode = Files.readString(sampleCodeFile);          ;
            
 
 
@@ -47,22 +47,22 @@
             	System.out.println(tokens4.remove().toString());
             }
             System.out.println("\n");
-            var tokens5 = lex.tokenize("for i in 1..= 99 { x = ( 62.0 + 9.0) < > : ;}");
+            var tokens5 = lex.tokenize("for i in 1..= 99 != { x = ( 62.0 + 9.0) < > : ;}");
             while (!tokens5.isEmpty()) {
                 System.out.println(tokens5.remove().toString());
             }
             //File reader for multiline and custom code
             System.out.println('\n');
-            var tokens6 = lex.tokenize(sampleCode);
-            while(!tokens6.isEmpty()){
-                System.out.println(tokens6.remove().toString());
-            }
+            //var tokens6 = lex.tokenize(sampleCode);
+            //while(!tokens6.isEmpty()){
+              //  System.out.println(tokens6.remove().toString());
+            //}
         }
 
         private final StateTransitionTable table = new StateTransitionTable();
 
         // List of states that imply an Identifier Token
-        LinkedList<Integer> idList = new LinkedList<>(Arrays.asList(1, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 17, 18, 20, 21, 23, 24, 25, 27, 28, 30, 31, 54, 56, 58, 60, 63, 65, 67, 69));
+        LinkedList<Integer> idList = new LinkedList<>(Arrays.asList(1, 12, 13, 14, 15, 17, 18, 20, 21, 23, 24, 25, 27, 28, 54, 56, 58, 60, 63, 65, 67, 69));
 
         public Queue<Token> tokenize(String input) {
             @SuppressWarnings("unused")

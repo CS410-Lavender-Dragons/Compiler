@@ -21,8 +21,8 @@ public class LexerTest {
 		System.out.println(generatedTokens);
 		System.out.println(lexedTokens);
 		System.out.println(compareTokens(generatedTokens, lexedTokens));
-		
-		for(int i = 0; i < 10000; i++)
+
+        for(int i = 0; i < 10000; i++)
 		{
 			generatedTokens = generateTokenStream();
 			toLex = generateInputFromTokens(generatedTokens);
@@ -38,8 +38,8 @@ public class LexerTest {
 			
 		}
 	}
-	
-    private static LinkedList<Integer> idList = new LinkedList<>(Arrays.asList(1, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 17, 18, 20, 21, 23, 24, 25, 27, 28, 30, 31, 54, 56, 58, 60, 63, 65, 67, 69));
+
+    private static LinkedList<Integer> idList = new LinkedList<>(Arrays.asList(1, 12, 13, 14, 15, 17, 18, 20, 21, 23, 24, 25, 27, 28, 54, 56, 58, 60, 63, 65, 67, 69));
     
 	private static Queue<Token> generateTokenStream(){
 		Queue<Token> tokens = new LinkedList<Token>();
@@ -48,7 +48,9 @@ public class LexerTest {
     	
     	for(int i = 0; i < length; i++) {
     		int tokenType = RANDOM.nextInt(71) + 1;
-    		
+
+            while ((tokenType >= 6 && tokenType <= 11) || (tokenType >= 30 && tokenType <= 32) || tokenType == 4) //skip unused states + '!'
+                tokenType = RANDOM.nextInt(71) + 1;
     		if (tokenType == TokenName.IDENTIFIER.getValue())
     			tokens.add(new Token(TokenName.IDENTIFIER, getRandomIdentifier()));
     		else if (tokenType == TokenName.NUMERIC.getValue())
@@ -56,7 +58,7 @@ public class LexerTest {
     		else if (idList.contains(tokenType))
     			tokens.add(new Token(TokenName.IDENTIFIER, getTransitionalTokenValue(tokenType)));
     		else
-    			tokens.add(new Token(TokenName.valToToken(tokenType)));
+                tokens.add(new Token(TokenName.valToToken(tokenType)));
     	}
     	
     	tokens.add(new Token(TokenName.EOI));
@@ -154,6 +156,9 @@ public class LexerTest {
                 case COLON:
                     sb.append(":");
                     break;
+                case UNEQUAL_OP:
+                    sb.append("!= ");
+                    break;
                 case BIT_8_INT_OP:
                     sb.append("i8 ");
                     break;
@@ -204,38 +209,17 @@ public class LexerTest {
 	    	case 1:
 	    		sb.append("i");
 	    		break;
-	    	case 4:
-	    		sb.append("c");
-	    		break;
-	    	case 5:
-	    		sb.append("co");
-	    		break;
-	    	case 6:
-	    		sb.append("con");
-	    		break;
-	    	case 7:
-	    		sb.append("cont");
-	    		break;
-	    	case 8:
-	    		sb.append("conti");
-	    		break;
-	    	case 9:
-	    		sb.append("contin");
-	    		break;
-	    	case 10:
-	    		sb.append("continu");
-	    		break;
 	    	case 12:
-	    		sb.append("b");
+	    		sb.append("w");
 	    		break;
 	    	case 13:
-	    		sb.append("br");
+	    		sb.append("wh");
 	    		break;
 	    	case 14:
-	    		sb.append("bre");
+	    		sb.append("whi");
 	    		break;
 	    	case 15:
-	    		sb.append("brea");
+	    		sb.append("whil");
 	    		break;
 	    	case 17:
 	    		sb.append("m");
@@ -263,12 +247,6 @@ public class LexerTest {
 	    		break;
 	    	case 28:
 	    		sb.append("le");
-	    		break;
-	    	case 30:
-	    		sb.append("lo");
-	    		break;
-	    	case 31:
-	    		sb.append("loo");
 	    		break;
 	    	case 54:
 	    		sb.append("i1");

@@ -7,7 +7,8 @@ package Core;
 public enum TokenName {
     IN_KW(2), //in keyword 
     IF_KW(3), //if keyword
-    WHILE_KW(32), //loop keyword
+    UNEQUAL_OP(5), //unequal operator
+    WHILE_KW(16), //while keyword
     LET_KW(29), //let keyword
     ELSE_KW(26), //else keyword
     FOR_KW(22), //for keyword
@@ -45,8 +46,7 @@ public enum TokenName {
     IDENTIFIER(71),
 
     INVALID_INPUT(100),
-    EOI(101),
-    UNEQUAL_OP(103); //temporary until Lexer modified
+    EOI(101);
 
 
     private final int token;
