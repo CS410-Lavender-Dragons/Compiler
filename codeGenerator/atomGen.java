@@ -76,4 +76,7 @@ public class atomGen {
         }
     }
 
+    public Queue<atom> getAtomList() {
+        return this.atomList;
+    }
 }

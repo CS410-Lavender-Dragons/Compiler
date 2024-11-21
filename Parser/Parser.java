@@ -4,6 +4,8 @@ import Core.Token;
 import Core.TokenName;
 
 import java.util.Queue;
+
+import codeGenerator.atom;
 import codeGenerator.atomGen;
 import Core.Variable;
 import Core.Variable.Type;
@@ -22,7 +24,7 @@ public class Parser {
     int lblCounter;
     int tRegCount;
 
-    public void parse(Queue<Token> tokenQueue) {
+    public Queue<atom> parse(Queue<Token> tokenQueue) {
         this.tokenQueue = tokenQueue;
         this.lookupTable = new Hashtable<>();
         this.atomList = new atomGen();
@@ -31,6 +33,7 @@ public class Parser {
         STATEMENTS();
         expect(TokenName.EOI);
         atomList.end();
+        return atomList.getAtomList();
     }
 
     boolean accept(TokenName tokenName) {
