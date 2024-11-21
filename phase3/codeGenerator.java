@@ -1,10 +1,16 @@
 package phase3;
+import phase3.machineCode;
+
+import java.util.LinkedList;
 import java.util.Queue;
 
 import codeGenerator.atom;
 
 public class codeGenerator {
-    
+
+    //creating a machineCode queue for our functions to populate with machineCode
+    Queue<String> machieQueue = new LinkedList<>();
+
     public void generate(Queue<atom> atoms){
 
         //Part B
@@ -15,6 +21,7 @@ public class codeGenerator {
         //TODO create bin file
 
 
+        
        for (int i = 0; i < atoms.size(); i++) {
             atom atom = atoms.remove();
             String command = atom.name;
@@ -40,8 +47,10 @@ public class codeGenerator {
                 case "LBL":
                     break;
                 case "TST":
+                    cmp(atom);
                     break;
                 case "MOV":
+                    sto(atom);
                     break;
             }
 
@@ -50,6 +59,8 @@ public class codeGenerator {
 
         //TODO flush and close bin file
     }
+
+
 
     public void add(atom atom){
 
@@ -68,10 +79,17 @@ public class codeGenerator {
     }
 
     public void jmp(atom atom){
-        
+        machineCode jmpCode = new machineCode(0, 0, 0, 0);
+        jmpCode.opcode = 5;
+        jmpCode.a = Integer.parseInt(atom.dest);
+        machieQueue.add(jmpCode.toString());
     }
 
-    public void cmd(atom atom){
+    public void cmp(atom atom){
+        machineCode cmpCode = new machineCode(0, 0, 0, 0);
+        cmpCode.opcode = 6;
+        cmpCode.cmp = atom.cmp;
+        cmpCode.a = Integer.parseInt(atom.dest);
         
     }
 
