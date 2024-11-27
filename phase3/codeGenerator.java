@@ -56,17 +56,26 @@ public class codeGenerator {
 
             //TODO add to bin file
         }
-
+=
         //TODO flush and close bin file
+    }
+
+    public void clr(atom atom){
+        machineCode clrCode = new machineCode(0, 0, Integer.parseInt(atom.result), 0);
+        machineQueue.add(clrCode.toString());
+        
     }
 
 
 
     public void add(atom atom){
-
+        machineCode addCode = new machineCode(1, 0, Integer.parseInt(atom.result), Integer.parseInt(atom.left));
+        machineQueue.add(addCode.toString());
+      
     }
 
     public void sub(atom atom){
+        machineCode subCode = new machineCode(2, 0, Integer.parseInt(atom.result), Integer.parseInt(atom.left));
         
     }
 
