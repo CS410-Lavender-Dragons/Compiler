@@ -1,15 +1,12 @@
 package phase3;
-import phase3.machineCode;
-
+import codeGenerator.atom;
 import java.util.LinkedList;
 import java.util.Queue;
-
-import codeGenerator.atom;
 
 public class codeGenerator {
 
     //creating a machineCode queue for our functions to populate with machineCode
-    Queue<String> machieQueue = new LinkedList<>();
+    Queue<String> machineQueue = new LinkedList<>();
 
     public void generate(Queue<atom> atoms){
 
@@ -56,27 +53,32 @@ public class codeGenerator {
 
             //TODO add to bin file
         }
-=
+
         //TODO flush and close bin file
     }
 
     public void clr(atom atom){
-        machineCode clrCode = new machineCode(0, 0, Integer.parseInt(atom.result), 0);
+        machineCode clrCode = new machineCode(0, 0, 0, 0);
         machineQueue.add(clrCode.toString());
-        
     }
 
 
 
     public void add(atom atom){
-        machineCode addCode = new machineCode(1, 0, Integer.parseInt(atom.result), Integer.parseInt(atom.left));
+        machineCode addCode = new machineCode(1,0,0,0);
+        addCode.r = Integer.parseInt(atom.result);
+        addCode.a = Integer.parseInt(atom.left);
+        
         machineQueue.add(addCode.toString());
       
     }
 
     public void sub(atom atom){
-        machineCode subCode = new machineCode(2, 0, Integer.parseInt(atom.result), Integer.parseInt(atom.left));
-        
+        machineCode subCode = new machineCode(2, 0,0,0);
+        subCode.r = Integer.parseInt(atom.result);
+        subCode.a = Integer.parseInt(atom.left);
+
+        machineQueue.add(subCode.toString());
     }
 
     public void mul(atom atom){
@@ -91,7 +93,7 @@ public class codeGenerator {
         machineCode jmpCode = new machineCode(0, 0, 0, 0);
         jmpCode.opcode = 5;
         jmpCode.a = Integer.parseInt(atom.dest);
-        machieQueue.add(jmpCode.toString());
+        machineQueue.add(jmpCode.toString());
     }
 
     public void cmp(atom atom){
