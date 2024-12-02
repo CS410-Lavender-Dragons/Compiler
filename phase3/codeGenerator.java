@@ -103,14 +103,21 @@ public class codeGenerator {
     }
 
     public void lod(atom atom){
-        
+        machineCode lodCode = new machineCode(7, 0, 0, 0);
+        lodCode.a = Integer.parseInt(atom.dest); //not sure if these lines are right 
+        lodCode.r = Integer.parseInt(atom.result); //
+        machineQueue.add(lodCode.toString());         
     }
 
     public void sto(atom atom){
-        
+        machineCode stoCode = new machineCode(8, 0, 0, 0);
+        stoCode.a = Integer.parseInt(atom.dest);//
+        stoCode.r = Integer.parseInt(atom.result);//
+        machineQueue.add(stoCode.toString());        
     }
 
     public void hlt(atom atom){
-        
+        machineCode hltCode = new machineCode(9, 0, 0, 0);
+        machineQueue.add(hltCode.toString());        
     }
 }
