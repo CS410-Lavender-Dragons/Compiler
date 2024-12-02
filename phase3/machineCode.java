@@ -13,10 +13,32 @@ public class machineCode {
     }
 
     public String toString(){
-        String opString = opcode.toString();
-        String cmpString = cmp.toString();
-        String rString = r.toString();
-        String aString = a.toString();
+        
+        //1 bit
+        String opString = Integer.toBinaryString(opcode);
+
+        //4 bits
+        String cmpString = Integer.toBinaryString(cmp);
+
+        //4 bits
+        String rString = Integer.toBinaryString(r);
+
+        //20 bits
+        String aString = Integer.toBinaryString(a);
+
+
+        while(opString.length() < 4){
+            opString = '0' + opString;
+        }
+
+        while (rString.length() < 4){
+            rString = '0' + rString;
+        }
+
+        while(aString.length() < 20){
+            aString = '0' + aString;
+        }
+
 
         String machCode = (opString + cmpString + rString + aString);
 
