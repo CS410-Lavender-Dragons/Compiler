@@ -82,11 +82,20 @@ public class codeGenerator {
     }
 
     public void mul(atom atom){
-        
+        machineCode mulCode = new machineCode(3, 0,0,0);
+        mulCode.r = Integer.parseInt(atom.left);
+        mulCode.a = Integer.parseInt(atom.right);
+
+        machineQueue.add(mulCode.toString());
     }
 
     public void div(atom atom){
-        
+        machineCode divCode = new machineCode(4, 0,0,0);
+
+        divCode.r = Integer.parseInt(atom.left);
+        divCode.a = Integer.parseInt(atom.right);
+
+        machineQueue.add(divCode.toString());
     }
 
     public void jmp(atom atom){
