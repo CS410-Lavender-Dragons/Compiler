@@ -8,9 +8,9 @@ import java.util.Queue;
 public class codeGenerator {
 
     // machineCode queue for our functions to populate with machineCode
-    Queue<String> machineQueue;
+    private Queue<String> machineQueue;
     //labelTable to store labels' associated address (pc value)
-    Hashtable<String, Integer> labelTable;
+    private Hashtable<String, Integer> labelTable;
 
     //First pass - builds label table
     public void buildLabels(Queue<atom> atoms) {
@@ -51,6 +51,8 @@ public class codeGenerator {
                     div(atom);
                     break;
                 case "JMP":
+                    machineCode trueCmpCode = new machineCode(6, 0, 0, 0);
+                    machineQueue.add(trueCmpCode.toString()); //Set flag to true
                     jmp(atom);
                     break;
                 case "NEG":
@@ -108,11 +110,11 @@ public class codeGenerator {
 
         machineQueue.add(divCode.toString());
     }
-
+    
     public void jmp(atom atom){
         machineCode jmpCode = new machineCode(0, 0, 0, 0);
         jmpCode.opcode = 5;
-        jmpCode.a = Integer.parseInt(atom.dest);
+        jmpCode.a = labelTable.get(atom.dest);
         machineQueue.add(jmpCode.toString());
     }
 
