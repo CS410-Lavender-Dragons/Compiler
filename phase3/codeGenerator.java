@@ -56,17 +56,16 @@ public class codeGenerator {
             }
         }
     }
-    private void generate(Queue<atom> atoms){
 
+    // Second pass - generate machine code
+    private void generate(Queue<atom> atoms){
         int pc = 0; // Set the PC for second pass
-        // Second pass to generate the machine code
+
         for (int i = 0; i < atoms.size(); i++) {
             atom atom = atoms.remove();
-            String command = atom.name;
 
-            switch(command){
+            switch(atom.name){
                 case "ADD":
-
                     add(atom);
                     break;
                 case "SUB":
