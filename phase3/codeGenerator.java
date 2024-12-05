@@ -5,21 +5,31 @@ import java.util.Queue;
 
 public class codeGenerator {
 
-    //creating a machineCode queue for our functions to populate with machineCode
+    // machineCode queue for our functions to populate with machineCode
     Queue<String> machineQueue = new LinkedList<>();
 
     public void generate(Queue<atom> atoms){
+        long labels[] = new long[100]; //TODO magic number
+        int pc = 0; //TODO is it an int?
+        
+        // First pass to build lable table
+        for (int i = 0; i < atoms.size(); i++) {
+            atom atom = atoms.remove();
+            String command = atom.name;
 
-        //Part B
-        //Build a label table while your code generator translates label-based atoms to placeholder instructions.
-        // Follow either the single-pass strategy or the multi-pass strategy.
-        //  Incorporate your design into the code generator of step A above.
+            if (command == "LBL") {
+                labels[Integer.parseInt(atom.dest)] = pc;
+            } else if (command == "MOV" || command == "JMP") {
+                pc += 2;
+            } else {
+                pc += 3;
+            }
+        }
 
         //TODO create bin file
 
-
-        
-       for (int i = 0; i < atoms.size(); i++) {
+        pc = 0; // Reset the PC for second pass
+        for (int i = 0; i < atoms.size(); i++) { //TODO now in this second pass, use the lable table and actually gen the code
             atom atom = atoms.remove();
             String command = atom.name;
 
@@ -41,7 +51,7 @@ public class codeGenerator {
                     break;
                 case "NEG":
                     break;
-                case "LBL":
+                case "LBL": //we end up ignoring these in second pass
                     break;
                 case "TST":
                     cmp(atom);
@@ -62,15 +72,12 @@ public class codeGenerator {
         machineQueue.add(clrCode.toString());
     }
 
-
-
     public void add(atom atom){
         machineCode addCode = new machineCode(1,0,0,0);
         addCode.r = Integer.parseInt(atom.result);
         addCode.a = Integer.parseInt(atom.left);
         
         machineQueue.add(addCode.toString());
-      
     }
 
     public void sub(atom atom){
@@ -110,7 +117,6 @@ public class codeGenerator {
         cmpCode.opcode = 6;
         cmpCode.cmp = atom.cmp;
         cmpCode.a = Integer.parseInt(atom.dest);
-        
     }
 
     public void lod(atom atom){
