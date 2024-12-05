@@ -32,7 +32,6 @@ public class codeGenerator {
         int pc = 0;
 
         for (atom atom : atoms) {
-            String command = atom.name;
             switch(atom.name){
                 case "ADD":
                 case "SUB":
@@ -95,8 +94,10 @@ public class codeGenerator {
                     jmp(atom);
                     break;
                 case "NEG":
-                    break;
-                case "LBL": //we end up ignoring these in second pass
+                    int neg_register = getRegister();
+                    clr(neg_register);
+                    sub(neg_register, memoryTable.get(atom.left));
+                    sto(neg_register, memoryTable.get(atom.result));
                     break;
                 case "TST":
                     int tst_register = getRegister();
@@ -105,14 +106,16 @@ public class codeGenerator {
                     jmp(atom);
                     break;
                 case "MOV":
-                    sto(atom);
+                    int mov_register = getRegister();
+                    lod(mov_register, memoryTable.get(atom.left));
+                    sto(mov_register, memoryTable.get(atom.result));
                     break;
             }
         }
     }
 
-    public void clr(atom atom){
-        machineCode clrCode = new machineCode(0, 0, 0, 0);
+    public void clr(int register){
+        machineCode clrCode = new machineCode(0, 0, register, 0);
         machineQueue.add(clrCode.toString());
     }
 
