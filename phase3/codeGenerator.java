@@ -1,23 +1,26 @@
 package phase3;
 import codeGenerator.atom;
+
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class codeGenerator {
 
     // machineCode queue for our functions to populate with machineCode
-    Queue<String> machineQueue = new LinkedList<>();
+    Queue<String> machineQueue;
+    //labelTable to store labels' associated address (pc value)
+    Hashtable<String, Integer> labelTable;
 
-
+    //First pass - builds label table
     public void buildLabels(Queue<atom> atoms) {
-        long labels[] = new long[100]; //TODO magic number
+        labelTable = new Hashtable<>();
         int pc = 0; //TODO is it an int?
 
-        // First pass to build lable table
         for (atom atom : atoms) {
             String command = atom.name;
             if (command == "LBL") {
-                labels[Integer.parseInt(atom.dest)] = pc;
+                labelTable.put(atom.dest, Integer.valueOf(pc));
             } else if (command == "MOV" || command == "JMP") {
                 pc += 2;
             } else {
@@ -27,6 +30,8 @@ public class codeGenerator {
     }
     public void generate(Queue<atom> atoms){
         //TODO create bin file
+        //Initialize machineQueue here so it's reusable for multiple passes
+        machineQueue = new LinkedList<>();
         int pc = 0; // Reset the PC for second pass
         for (int i = 0; i < atoms.size(); i++) { //TODO now in this second pass, use the lable table and actually gen the code
             atom atom = atoms.remove();
