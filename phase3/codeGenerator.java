@@ -66,7 +66,10 @@ public class codeGenerator {
 
             switch(atom.name){
                 case "ADD":
-                    add(atom);
+                    int register = getRegister();
+                    lod(register, memoryTable.get(atom.left));
+                    add(register, memoryTable.get(atom.right));
+                    sto(register, memoryTable.get(atom.result));
                     break;
                 case "SUB":
                     sub(atom);
@@ -101,11 +104,8 @@ public class codeGenerator {
         machineQueue.add(clrCode.toString());
     }
 
-    public void add(atom atom){
-        machineCode addCode = new machineCode(1,0,0,0);
-        addCode.r = Integer.parseInt(atom.result);
-        addCode.a = Integer.parseInt(atom.left);
-        
+    public void add(int register, int addr){
+        machineCode addCode = new machineCode(1,0,register,addr);
         machineQueue.add(addCode.toString());
     }
 
@@ -148,17 +148,13 @@ public class codeGenerator {
         cmpCode.a = Integer.parseInt(atom.dest);
     }
 
-    public void lod(atom atom){
-        machineCode lodCode = new machineCode(7, 0, 0, 0);
-        lodCode.a = Integer.parseInt(atom.dest); //not sure if these lines are right 
-        lodCode.r = Integer.parseInt(atom.result); //
+    public void lod(int register, int addr){
+        machineCode lodCode = new machineCode(7, 0, register, addr);
         machineQueue.add(lodCode.toString());         
     }
 
-    public void sto(atom atom){
-        machineCode stoCode = new machineCode(8, 0, 0, 0);
-        stoCode.a = Integer.parseInt(atom.dest);//
-        stoCode.r = Integer.parseInt(atom.result);//
+    public void sto(int register, int addr){
+        machineCode stoCode = new machineCode(8, 0, register, addr);
         machineQueue.add(stoCode.toString());        
     }
 
