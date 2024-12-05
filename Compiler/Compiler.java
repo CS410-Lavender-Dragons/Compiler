@@ -1,6 +1,5 @@
 package Compiler;
 
-import java.util.LinkedList;
 import java.util.Queue;
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +15,7 @@ public class Compiler {
     public static void main(String[] args){
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
+        codeGenerator codegen = new codeGenerator();
 
         //var tokens7 = lexer.tokenize("x = 5;");
         //var tokens7 = lexer.tokenize("let x = 5;");
@@ -50,7 +50,7 @@ public class Compiler {
         System.out.println("\n");
         var tokens6 = lexer.tokenize("let x : i8 = 1; let mut y : f32 = 0; loop x < 10 { y = x * 3 + 2; }");
         Queue<atom> atoms = parser.parse(tokens6);
-        LinkedList<machineCode> machineCode = generate(atoms);
+        Queue<String> machineCode = codegen.generate(atoms);
 
         // Create bin file
         String filename = "oxide.bin";
@@ -73,8 +73,8 @@ public class Compiler {
             FileWriter fw = new FileWriter(filename);
 
             // Loop through machine code queue and write each instruction to bin file
-            for (machineCode mCode : machineCode) {
-                fw.write(mCode);
+            while (!machineCode.isEmpty()) {
+                fw.write(machineCode.remove());
             }
 
             fw.close();
