@@ -9,13 +9,13 @@ public class codeGenerator {
 
     // machineCode queue for our functions to populate with machineCode
     private Queue<String> machineQueue;
-    //labelTable to store labels' associated address (pc value)
+    // labelTable to store labels' associated address (pc value)
     private Hashtable<String, Integer> labelTable;
 
-    //First pass - builds label table
+    // First pass - builds label table
     public void buildLabels(Queue<atom> atoms) {
         labelTable = new Hashtable<>();
-        int pc = 0; //TODO is it an int?
+        int pc = 0;
 
         for (atom atom : atoms) {
             String command = atom.name;
@@ -28,12 +28,13 @@ public class codeGenerator {
             }
         }
     }
-    public void generate(Queue<atom> atoms){
-        //TODO create bin file
-        //Initialize machineQueue here so it's reusable for multiple passes
+    public Queue<String> generate(Queue<atom> atoms){
+        // Initialize machineQueue here so it's reusable for multiple passes
         machineQueue = new LinkedList<>();
-        int pc = 0; // Reset the PC for second pass
-        for (int i = 0; i < atoms.size(); i++) { //TODO now in this second pass, use the lable table and actually gen the code
+
+        int pc = 0; // Set the PC for second pass
+        // Second pass to generate the machine code
+        for (int i = 0; i < atoms.size(); i++) {
             atom atom = atoms.remove();
             String command = atom.name;
 
@@ -52,7 +53,7 @@ public class codeGenerator {
                     break;
                 case "JMP":
                     machineCode trueCmpCode = new machineCode(6, 0, 0, 0);
-                    machineQueue.add(trueCmpCode.toString()); //Set flag to true
+                    machineQueue.add(trueCmpCode.toString()); // Set flag to true
                     jmp(atom);
                     break;
                 case "NEG":
@@ -66,11 +67,9 @@ public class codeGenerator {
                     sto(atom);
                     break;
             }
-
-            //TODO add to bin file
         }
 
-        //TODO flush and close bin file
+        return machineQueue;
     }
 
     public void clr(atom atom){
