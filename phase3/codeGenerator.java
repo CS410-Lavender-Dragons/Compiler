@@ -8,15 +8,14 @@ public class codeGenerator {
     // machineCode queue for our functions to populate with machineCode
     Queue<String> machineQueue = new LinkedList<>();
 
-    public void generate(Queue<atom> atoms){
+
+    public void buildLabels(Queue<atom> atoms) {
         long labels[] = new long[100]; //TODO magic number
         int pc = 0; //TODO is it an int?
-        
-        // First pass to build lable table
-        for (int i = 0; i < atoms.size(); i++) {
-            atom atom = atoms.remove();
-            String command = atom.name;
 
+        // First pass to build lable table
+        for (atom atom : atoms) {
+            String command = atom.name;
             if (command == "LBL") {
                 labels[Integer.parseInt(atom.dest)] = pc;
             } else if (command == "MOV" || command == "JMP") {
@@ -25,10 +24,10 @@ public class codeGenerator {
                 pc += 3;
             }
         }
-
+    }
+    public void generate(Queue<atom> atoms){
         //TODO create bin file
-
-        pc = 0; // Reset the PC for second pass
+        int pc = 0; // Reset the PC for second pass
         for (int i = 0; i < atoms.size(); i++) { //TODO now in this second pass, use the lable table and actually gen the code
             atom atom = atoms.remove();
             String command = atom.name;
