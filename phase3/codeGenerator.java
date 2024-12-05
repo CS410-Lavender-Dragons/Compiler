@@ -72,7 +72,10 @@ public class codeGenerator {
                     sto(register, memoryTable.get(atom.result));
                     break;
                 case "SUB":
-                    sub(atom);
+                    int sub_register = getRegister();
+                    lod(sub_register, memoryTable.get(atom.left));
+                    sub(sub_register, memoryTable.get(atom.right));
+                    sto(sub_register, memoryTable.get(atom.result));
                     break;
                 case "MUL":
                     int mul_register = getRegister();
@@ -81,7 +84,10 @@ public class codeGenerator {
                     sto(mul_register, memoryTable.get(atom.result));
                     break;
                 case "DIV":
-                    div(atom);
+                    int div_register = getRegister();
+                    lod(div_register, memoryTable.get(atom.left));
+                    div(div_register, memoryTable.get(atom.right));
+                    sto(div_register, memoryTable.get(atom.result));
                     break;
                 case "JMP":
                     machineCode trueCmpCode = new machineCode(6, 0, 0, 0);
@@ -115,11 +121,8 @@ public class codeGenerator {
         machineQueue.add(addCode.toString());
     }
 
-    public void sub(atom atom){
-        machineCode subCode = new machineCode(2, 0,0,0);
-        subCode.r = Integer.parseInt(atom.result);
-        subCode.a = Integer.parseInt(atom.left);
-
+    public void sub(int register, int addr){
+        machineCode subCode = new machineCode(2, 0,register,addr);
         machineQueue.add(subCode.toString());
     }
 
@@ -128,12 +131,8 @@ public class codeGenerator {
         machineQueue.add(mulCode.toString());
     }
 
-    public void div(atom atom){
-        machineCode divCode = new machineCode(4, 0,0,0);
-
-        divCode.r = Integer.parseInt(atom.left);
-        divCode.a = Integer.parseInt(atom.right);
-
+    public void div(int register, int addr){
+        machineCode divCode = new machineCode(4, 0,register,addr);
         machineQueue.add(divCode.toString());
     }
     
