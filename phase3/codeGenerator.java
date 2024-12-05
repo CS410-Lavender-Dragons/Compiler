@@ -93,7 +93,10 @@ public class codeGenerator {
                 case "LBL": //we end up ignoring these in second pass
                     break;
                 case "TST":
-                    cmp(atom);
+                    int tst_register = getRegister();
+                    lod(tst_register, memoryTable.get(atom.left));
+                    cmp(tst_register, memoryTable.get(atom.right), atom.cmp);
+                    jmp(atom);
                     break;
                 case "MOV":
                     sto(atom);
@@ -141,10 +144,8 @@ public class codeGenerator {
         machineQueue.add(jmpCode.toString());
     }
 
-    public void cmp(atom atom){
-        machineCode cmpCode = new machineCode(0, 0, 0, 0);
-        cmpCode.opcode = 6;
-        cmpCode.cmp = atom.cmp;
+    public void cmp(int register, int addr, int cmp){
+        machineCode cmpCode = new machineCode(6, cmp, register, addr);
         cmpCode.a = Integer.parseInt(atom.dest);
     }
 
