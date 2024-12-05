@@ -72,7 +72,10 @@ public class codeGenerator {
                     sto(register, memoryTable.get(atom.result));
                     break;
                 case "SUB":
-                    sub(atom);
+                    int sub_register = getRegister();
+                    lod(sub_register, memoryTable.get(atom.left));
+                    sub(sub_register, memoryTable.get(atom.right));
+                    sto(sub_register, memoryTable.get(atom.result));
                     break;
                 case "MUL":
                     int mul_register = getRegister();
@@ -112,11 +115,8 @@ public class codeGenerator {
         machineQueue.add(addCode.toString());
     }
 
-    public void sub(atom atom){
-        machineCode subCode = new machineCode(2, 0,0,0);
-        subCode.r = Integer.parseInt(atom.result);
-        subCode.a = Integer.parseInt(atom.left);
-
+    public void sub(int register, int addr){
+        machineCode subCode = new machineCode(2, 0,register,addr);
         machineQueue.add(subCode.toString());
     }
 
