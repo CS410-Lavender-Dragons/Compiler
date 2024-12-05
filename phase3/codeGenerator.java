@@ -75,7 +75,10 @@ public class codeGenerator {
                     sub(atom);
                     break;
                 case "MUL":
-                    mul(atom);
+                    int mul_register = getRegister();
+                    lod(mul_register, memoryTable.get(atom.left));
+                    mul(mul_register, memoryTable.get(atom.right));
+                    sto(mul_register, memoryTable.get(atom.result));
                     break;
                 case "DIV":
                     div(atom);
@@ -117,11 +120,8 @@ public class codeGenerator {
         machineQueue.add(subCode.toString());
     }
 
-    public void mul(atom atom){
-        machineCode mulCode = new machineCode(3, 0,0,0);
-        mulCode.r = Integer.parseInt(atom.left);
-        mulCode.a = Integer.parseInt(atom.right);
-
+    public void mul(int register, int addr){
+        machineCode mulCode = new machineCode(3, 0,register,addr);
         machineQueue.add(mulCode.toString());
     }
 
