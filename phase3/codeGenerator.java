@@ -11,26 +11,52 @@ public class codeGenerator {
     private Queue<String> machineQueue;
     // labelTable to store labels' associated address (pc value)
     private Hashtable<String, Integer> labelTable;
+    // memoryTable to store identifier's associated memory address
+    private Hashtable<String, Integer> memoryTable;
+    // tracks memory address generation
+    int memAddr;
+
+    public Queue<String> generateCode(Queue<atom> atoms){
+        // Initialize labelTable, machineQueue, memoryTable, memAddr here so reusable for multiple passes
+        labelTable = new Hashtable<>();
+        machineQueue = new LinkedList<>();
+        memoryTable = new Hashtable<>();
+        memAddr = 0;
+        buildLabels(atoms);
+        generate(atoms);
+        return machineQueue;
+    }
 
     // First pass - builds label table
     public void buildLabels(Queue<atom> atoms) {
-        labelTable = new Hashtable<>();
         int pc = 0;
 
         for (atom atom : atoms) {
             String command = atom.name;
-            if (command == "LBL") {
-                labelTable.put(atom.dest, Integer.valueOf(pc));
-            } else if (command == "MOV" || command == "JMP") {
-                pc += 2;
-            } else {
-                pc += 3;
+            switch(atom.name){
+                case "ADD":
+                case "SUB":
+                case "MUL":
+                case "DIV":
+                case "NEG":
+                    memoryTable.putIfAbsent(atom.result, memAddr++);
+                    pc += 3;
+                    break;
+                case "LBL":
+                    labelTable.put(atom.dest, Integer.valueOf(pc));
+                    break;
+                case "JMP":
+                    pc += 2;
+                    break;
+                case "MOV":
+                    memoryTable.putIfAbsent(atom.dest, memAddr++);
+                    break;
+                default:
+                    pc += 3;
             }
         }
     }
-    public Queue<String> generate(Queue<atom> atoms){
-        // Initialize machineQueue here so it's reusable for multiple passes
-        machineQueue = new LinkedList<>();
+    private void generate(Queue<atom> atoms){
 
         int pc = 0; // Set the PC for second pass
         // Second pass to generate the machine code
@@ -40,6 +66,7 @@ public class codeGenerator {
 
             switch(command){
                 case "ADD":
+
                     add(atom);
                     break;
                 case "SUB":
@@ -68,8 +95,6 @@ public class codeGenerator {
                     break;
             }
         }
-
-        return machineQueue;
     }
 
     public void clr(atom atom){
@@ -141,5 +166,9 @@ public class codeGenerator {
     public void hlt(atom atom){
         machineCode hltCode = new machineCode(9, 0, 0, 0);
         machineQueue.add(hltCode.toString());        
+    }
+
+    private int getRegister(){
+        return 1;
     }
 }
