@@ -1,6 +1,8 @@
 package phase3;
 import codeGenerator.atom;
-
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -13,17 +15,25 @@ public class codeGenerator {
     private Hashtable<String, Integer> labelTable;
     // memoryTable to store identifier's associated memory address
     private Hashtable<String, Integer> memoryTable;
+    // constantsTable to store literal constants memory addresses
+    private Hashtable<Integer, Integer> constantsTable;
     // tracks memory address generation
     int memAddr;
+    private int constantsBaseAddress = 100; 
+    private int constantsAddress;
 
-    public Queue<String> generateCode(Queue<atom> atoms){
+    public Queue<String> generateCode(Queue<atom> atoms) throws IOException{
         // Initialize labelTable, machineQueue, memoryTable, memAddr here so reusable for multiple passes
         labelTable = new Hashtable<>();
         machineQueue = new LinkedList<>();
         memoryTable = new Hashtable<>();
+        constantsTable = new Hashtable<>();
+        constantsAddress = constantsBaseAddress;
         memAddr = 0;
+        writeConstantsToBin();
         buildLabels(atoms);
         generate(atoms);
+       
         return machineQueue;
     }
 
@@ -39,6 +49,8 @@ public class codeGenerator {
                 case "DIV":
                 case "NEG":
                     memoryTable.putIfAbsent(atom.result, memAddr++);
+                    handleOperand(atom.left);
+                    
                     pc += 3;
                     break;
                 case "LBL":
@@ -67,6 +79,7 @@ public class codeGenerator {
             switch(atom.name){
                 case "ADD":
                     int register = getRegister();
+
                     lod(register, memoryTable.get(atom.left));
                     add(register, memoryTable.get(atom.right));
                     sto(register, memoryTable.get(atom.result));
@@ -112,6 +125,45 @@ public class codeGenerator {
                     sto(mov_register, memoryTable.get(atom.dest));
                     break;
             }
+        }
+    }
+
+
+    private void handleOperand(String operand){
+        try {
+            int constant = Integer.parseInt(operand);
+            constantsTable.putIfAbsent(constant, constantsAddress++);         
+        } catch (Exception e) {
+
+            //else, is variable
+            memoryTable.putIfAbsent(operand, memAddr++);
+        }
+    }
+
+
+
+    //write constants to binary file
+    private void writeConstantsToBin() throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("output.bin"))) {
+            for (Integer constant : constantsTable.keySet()) {
+                int address = constantsTable.get(constant);
+                writer.write(String.format("Memory %d %d%n", address, constant));
+            }
+        } catch (Exception e){
+        System.err.print(e);
+        }
+    }
+
+    //helper function to get the memory address
+    private int getMemoryAddress(String operand){
+        try {
+            //if constant, return memory address
+            int constant = Integer.parseInt(operand);
+            return constantsTable.get(constant);
+
+        } catch (Exception e) {
+            //else, is variable
+            return memoryTable.get(operand);
         }
     }
 
@@ -170,4 +222,6 @@ public class codeGenerator {
     private int getRegister(){
         return 1;
     }
+
+  
 }
