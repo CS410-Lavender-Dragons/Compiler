@@ -49,6 +49,7 @@ public class codeGenerator {
                     break;
                 case "MOV":
                     memoryTable.putIfAbsent(atom.dest, memAddr++);
+                    memoryTable.putIfAbsent(atom.left, memAddr++);
                     break;
                 default:
                     pc += 3;
@@ -108,7 +109,7 @@ public class codeGenerator {
                 case "MOV":
                     int mov_register = getRegister();
                     lod(mov_register, memoryTable.get(atom.left));
-                    sto(mov_register, memoryTable.get(atom.result));
+                    sto(mov_register, memoryTable.get(atom.dest));
                     break;
             }
         }
