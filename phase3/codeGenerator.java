@@ -148,7 +148,7 @@ public class codeGenerator {
 
     public void cmp(int register, int addr, int cmp){
         machineCode cmpCode = new machineCode(6, cmp, register, addr);
-        cmpCode.a = Integer.parseInt(atom.dest);
+        machineQueue.add(cmpCode.toString());
     }
 
     public void lod(int register, int addr){
