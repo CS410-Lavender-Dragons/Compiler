@@ -48,9 +48,9 @@ public class Compiler {
         // parser.parse(tokens5);
 
         System.out.println("\n");
-        var tokens6 = lexer.tokenize("let x : i8 = 1; let mut y : f32 = 0; loop x < 10 { y = x * 3 + 2; }");
+        var tokens6 = lexer.tokenize("let x : i8 = 1; let mut y : f32 = 0; while x < 10 { y = x * 3 + 2; }");
         Queue<atom> atoms = parser.parse(tokens6);
-        Queue<String> machineCode = codegen.generate(atoms);
+        Queue<String> machineCode = codegen.generateCode(atoms);
 
         // Create bin file
         String filename = "oxide.bin";
