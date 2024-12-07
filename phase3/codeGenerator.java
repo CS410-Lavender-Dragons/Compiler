@@ -34,7 +34,7 @@ public class codeGenerator {
         memAddr = 0;
         pc = 0;
         //writeConstantsToBin();
-        buildLabels(atoms);
+        buildLabelsAndMem(atoms);
         System.out.println(pc);
         adjustMemAddr();
         System.out.println(memoryTable);
@@ -44,7 +44,7 @@ public class codeGenerator {
     }
 
     // First pass - builds label table
-    public void buildLabels(Queue<atom> atoms) {
+    public void buildLabelsAndMem(Queue<atom> atoms) {
         for (atom atom : atoms) {
             switch(atom.name){
                 case "ADD":
