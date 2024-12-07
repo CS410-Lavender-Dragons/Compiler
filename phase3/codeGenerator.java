@@ -13,35 +13,26 @@ public class codeGenerator {
     private Hashtable<String, Integer> labelTable;
     // memoryTable to store identifier's associated memory address
     private LinkedHashMap<String, Integer> memoryTable;
-    // constantsTable to store literal constants memory addresses
-    private Hashtable<Integer, Integer> constantsTable;
     // tracks memory address generation
     private int memAddr;
     private int pc;
-    private int constantsBaseAddress = 100; 
-    private int constantsAddress;
 
     public Queue<String> generateCode(Queue<atom> atoms){
         // Initialize labelTable, machineQueue, memoryTable, memAddr here so reusable for multiple passes
         labelTable = new Hashtable<>();
         machineQueue = new LinkedList<>();
         memoryTable = new LinkedHashMap<>();
-        constantsTable = new Hashtable<>();
-        constantsAddress = constantsBaseAddress;
         memAddr = 0;
         pc = 0;
         buildLabelsAndMem(atoms);
         adjustMemAddr();
         generate(atoms);
-        System.out.println(machineQueue);
-        System.out.println(memoryTable);
-        System.out.println(genMemArea());
         machineQueue.addAll(genMemArea());
        
         return machineQueue;
     }
 
-    // First pass - builds label table
+    // First pass - builds label and mem tables
     public void buildLabelsAndMem(Queue<atom> atoms) {
         for (atom atom : atoms) {
             switch(atom.name){
@@ -129,9 +120,10 @@ public class codeGenerator {
                     break;
             }
         }
+        hlt();
     }
 
-    public Queue<String> genMemArea(){
+    private Queue<String> genMemArea(){
         Queue<String> memStrings = new LinkedList<>();
         for (Map.Entry<String, Integer> mem : memoryTable.entrySet()) {
             memStrings.add(Character.isAlphabetic(mem.getKey().charAt(0)) ? "00000000000000000000000000000000" : String.format("%32s", Integer.toBinaryString(Float.floatToIntBits(Float.parseFloat(mem.getKey())))).replace(' ', '0') );
@@ -139,54 +131,54 @@ public class codeGenerator {
         return memStrings;
     }
 
-    public void clr(int register){
+    private void clr(int register){
         machineCode clrCode = new machineCode(0, 0, register, 0);
         machineQueue.add(clrCode.toString());
     }
 
-    public void add(int register, int addr){
+    private void add(int register, int addr){
         machineCode addCode = new machineCode(1,0,register,addr);
         machineQueue.add(addCode.toString());
     }
 
-    public void sub(int register, int addr){
+    private void sub(int register, int addr){
         machineCode subCode = new machineCode(2, 0,register,addr);
         machineQueue.add(subCode.toString());
     }
 
-    public void mul(int register, int addr){
+    private void mul(int register, int addr){
         machineCode mulCode = new machineCode(3, 0,register,addr);
         machineQueue.add(mulCode.toString());
     }
 
-    public void div(int register, int addr){
+    private void div(int register, int addr){
         machineCode divCode = new machineCode(4, 0,register,addr);
         machineQueue.add(divCode.toString());
     }
     
-    public void jmp(atom atom){
+    private void jmp(atom atom){
         machineCode jmpCode = new machineCode(0, 0, 0, 0);
         jmpCode.opcode = 5;
         jmpCode.a = labelTable.get(atom.dest);
         machineQueue.add(jmpCode.toString());
     }
 
-    public void cmp(int register, int addr, int cmp){
+    private void cmp(int register, int addr, int cmp){
         machineCode cmpCode = new machineCode(6, cmp, register, addr);
         machineQueue.add(cmpCode.toString());
     }
 
-    public void lod(int register, int addr){
+    private void lod(int register, int addr){
         machineCode lodCode = new machineCode(7, 0, register, addr);
         machineQueue.add(lodCode.toString());         
     }
 
-    public void sto(int register, int addr){
+    private void sto(int register, int addr){
         machineCode stoCode = new machineCode(8, 0, register, addr);
         machineQueue.add(stoCode.toString());        
     }
 
-    public void hlt(atom atom){
+    private void hlt(){
         machineCode hltCode = new machineCode(9, 0, 0, 0);
         machineQueue.add(hltCode.toString());        
     }
