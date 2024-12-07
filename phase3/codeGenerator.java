@@ -51,7 +51,7 @@ public class codeGenerator {
                 case "DIV":
                 case "NEG":
                     memoryTable.putIfAbsent(atom.result, memAddr++);
-                    handleOperand(atom.left);
+                    memoryTable.putIfAbsent(atom.left, memAddr++);
                     pc += 12;
                     break;
                 case "LBL":
@@ -134,7 +134,7 @@ public class codeGenerator {
 
     private void handleOperand(String operand){
         try {
-            Double constant = Double.parseDouble(operand)
+            Double constant = Double.parseDouble(operand);
             memoryTable.putIfAbsent(operand, memAddr++);
         } catch (Exception e) {
             //else, is variable
