@@ -35,7 +35,9 @@ public class codeGenerator {
         pc = 0;
         //writeConstantsToBin();
         buildLabels(atoms);
+        System.out.println(pc);
         adjustMemAddr();
+        System.out.println(memoryTable);
         generate(atoms);
        
         return machineQueue;
@@ -63,6 +65,7 @@ public class codeGenerator {
                 case "MOV":
                     memoryTable.putIfAbsent(atom.dest, memAddr++);
                     memoryTable.putIfAbsent(atom.left, memAddr++);
+                    pc += 8;
                     break;
                 default:
                     pc += 12;
