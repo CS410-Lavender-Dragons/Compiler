@@ -39,6 +39,7 @@ public class codeGenerator {
         adjustMemAddr();
         System.out.println(memoryTable);
         generate(atoms);
+        machineQueue.addAll(genMemArea());
        
         return machineQueue;
     }
@@ -136,7 +137,7 @@ public class codeGenerator {
     public Queue<String> genMemArea(){
         Queue<String> memStrings = new LinkedList<>();
         for (Map.Entry<String, Integer> mem : memoryTable.entrySet()) {
-            memStrings.add(Character.isAlphabetic(mem.getKey().charAt(0)) ? "00000000000000000000000000000000" : Long.toBinaryString(Double.doubleToLongBits(Double.parseDouble(mem.getKey()))));
+            memStrings.add(Character.isAlphabetic(mem.getKey().charAt(0)) ? "00000000000000000000000000000000" : Integer.toBinaryString(Float.floatToIntBits(Float.parseFloat(mem.getKey()))));
         }
         return memStrings;
     }
