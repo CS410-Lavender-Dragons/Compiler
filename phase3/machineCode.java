@@ -14,7 +14,7 @@ public class machineCode {
 
     public String toString(){
         
-        //1 bit
+        //4 bits
         String opString = Integer.toBinaryString(opcode);
 
         //4 bits
@@ -29,6 +29,10 @@ public class machineCode {
 
         while(opString.length() < 4){
             opString = '0' + opString;
+        }
+
+        while (cmpString.length() < 4){
+            cmpString = '0' + cmpString;
         }
 
         while (rString.length() < 4){
