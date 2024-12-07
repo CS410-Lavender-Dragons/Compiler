@@ -202,6 +202,4 @@ public class codeGenerator {
         if (memoryTable.putIfAbsent(val, memAddr) == null)
             memAddr++;
     }
-
-  
 }
