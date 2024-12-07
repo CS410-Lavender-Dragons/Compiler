@@ -3,10 +3,7 @@ import codeGenerator.atom;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 public class codeGenerator {
 
@@ -15,7 +12,7 @@ public class codeGenerator {
     // labelTable to store labels' associated address (pc value)
     private Hashtable<String, Integer> labelTable;
     // memoryTable to store identifier's associated memory address
-    private Hashtable<String, Integer> memoryTable;
+    private LinkedHashMap<String, Integer> memoryTable;
     // constantsTable to store literal constants memory addresses
     private Hashtable<Integer, Integer> constantsTable;
     // tracks memory address generation
@@ -28,17 +25,17 @@ public class codeGenerator {
         // Initialize labelTable, machineQueue, memoryTable, memAddr here so reusable for multiple passes
         labelTable = new Hashtable<>();
         machineQueue = new LinkedList<>();
-        memoryTable = new Hashtable<>();
+        memoryTable = new LinkedHashMap<>();
         constantsTable = new Hashtable<>();
         constantsAddress = constantsBaseAddress;
         memAddr = 0;
         pc = 0;
-        //writeConstantsToBin();
         buildLabelsAndMem(atoms);
-        System.out.println(pc);
         adjustMemAddr();
-        System.out.println(memoryTable);
         generate(atoms);
+        System.out.println(machineQueue);
+        System.out.println(memoryTable);
+        System.out.println(genMemArea());
         machineQueue.addAll(genMemArea());
        
         return machineQueue;
