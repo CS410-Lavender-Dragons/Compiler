@@ -53,8 +53,8 @@ public class codeGenerator {
                 case "MUL":
                 case "DIV":
                 case "NEG":
-                    memoryTable.putIfAbsent(atom.result, memAddr++);
-                    memoryTable.putIfAbsent(atom.left, memAddr++);
+                    addToMemTable(atom.result);
+                    addToMemTable(atom.left);
                     pc += 12;
                     break;
                 case "LBL":
@@ -64,8 +64,8 @@ public class codeGenerator {
                     pc += 8;
                     break;
                 case "MOV":
-                    memoryTable.putIfAbsent(atom.dest, memAddr++);
-                    memoryTable.putIfAbsent(atom.left, memAddr++);
+                    addToMemTable(atom.dest);
+                    addToMemTable(atom.left);
                     pc += 8;
                     break;
                 default:
@@ -196,6 +196,11 @@ public class codeGenerator {
 
     private int getRegister(){
         return 1;
+    }
+
+    private void addToMemTable(String val){
+        if (memoryTable.putIfAbsent(val, memAddr) == null)
+            memAddr++;
     }
 
   
