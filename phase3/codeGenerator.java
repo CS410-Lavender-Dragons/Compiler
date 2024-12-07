@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 
 public class codeGenerator {
@@ -18,11 +19,12 @@ public class codeGenerator {
     // constantsTable to store literal constants memory addresses
     private Hashtable<Integer, Integer> constantsTable;
     // tracks memory address generation
-    int memAddr;
+    private int memAddr;
+    private int pc;
     private int constantsBaseAddress = 100; 
     private int constantsAddress;
 
-    public Queue<String> generateCode(Queue<atom> atoms) throws IOException{
+    public Queue<String> generateCode(Queue<atom> atoms){
         // Initialize labelTable, machineQueue, memoryTable, memAddr here so reusable for multiple passes
         labelTable = new Hashtable<>();
         machineQueue = new LinkedList<>();
@@ -30,8 +32,10 @@ public class codeGenerator {
         constantsTable = new Hashtable<>();
         constantsAddress = constantsBaseAddress;
         memAddr = 0;
-        writeConstantsToBin();
+        pc = 0;
+        //writeConstantsToBin();
         buildLabels(atoms);
+        adjustMemAddr();
         generate(atoms);
        
         return machineQueue;
@@ -39,8 +43,6 @@ public class codeGenerator {
 
     // First pass - builds label table
     public void buildLabels(Queue<atom> atoms) {
-        int pc = 0;
-
         for (atom atom : atoms) {
             switch(atom.name){
                 case "ADD":
@@ -50,32 +52,33 @@ public class codeGenerator {
                 case "NEG":
                     memoryTable.putIfAbsent(atom.result, memAddr++);
                     handleOperand(atom.left);
-                    
-                    pc += 3;
+                    pc += 12;
                     break;
                 case "LBL":
                     labelTable.put(atom.dest, Integer.valueOf(pc));
                     break;
                 case "JMP":
-                    pc += 2;
+                    pc += 8;
                     break;
                 case "MOV":
                     memoryTable.putIfAbsent(atom.dest, memAddr++);
                     memoryTable.putIfAbsent(atom.left, memAddr++);
                     break;
                 default:
-                    pc += 3;
+                    pc += 12;
             }
         }
     }
 
+    private void adjustMemAddr(){
+        for (Map.Entry<String, Integer> mem : memoryTable.entrySet())
+            mem.setValue(mem.getValue() * 4 + pc);
+    }
+
     // Second pass - generate machine code
     private void generate(Queue<atom> atoms){
-        int pc = 0; // Set the PC for second pass
-
         for (int i = 0; i < atoms.size(); i++) {
             atom atom = atoms.remove();
-
             switch(atom.name){
                 case "ADD":
                     int register = getRegister();
@@ -131,10 +134,9 @@ public class codeGenerator {
 
     private void handleOperand(String operand){
         try {
-            int constant = Integer.parseInt(operand);
-            constantsTable.putIfAbsent(constant, constantsAddress++);         
+            Double constant = Double.parseDouble(operand)
+            memoryTable.putIfAbsent(operand, memAddr++);
         } catch (Exception e) {
-
             //else, is variable
             memoryTable.putIfAbsent(operand, memAddr++);
         }
