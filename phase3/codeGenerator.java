@@ -85,7 +85,6 @@ public class codeGenerator {
             switch(atom.name){
                 case "ADD":
                     int register = getRegister();
-
                     lod(register, memoryTable.get(atom.left));
                     add(register, memoryTable.get(atom.right));
                     sto(register, memoryTable.get(atom.result));
@@ -134,42 +133,12 @@ public class codeGenerator {
         }
     }
 
-
-    private void handleOperand(String operand){
-        try {
-            Double constant = Double.parseDouble(operand);
-            memoryTable.putIfAbsent(operand, memAddr++);
-        } catch (Exception e) {
-            //else, is variable
-            memoryTable.putIfAbsent(operand, memAddr++);
+    public Queue<String> genMemArea(){
+        Queue<String> memStrings = new LinkedList<>();
+        for (Map.Entry<String, Integer> mem : memoryTable.entrySet()) {
+            memStrings.add(Character.isAlphabetic(mem.getKey().charAt(0)) ? "00000000000000000000000000000000" : Long.toBinaryString(Double.doubleToLongBits(Double.parseDouble(mem.getKey()))));
         }
-    }
-
-
-
-    //write constants to binary file
-    private void writeConstantsToBin() throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("output.bin"))) {
-            for (Integer constant : constantsTable.keySet()) {
-                int address = constantsTable.get(constant);
-                writer.write(String.format("Memory %d %d%n", address, constant));
-            }
-        } catch (Exception e){
-        System.err.print(e);
-        }
-    }
-
-    //helper function to get the memory address
-    private int getMemoryAddress(String operand){
-        try {
-            //if constant, return memory address
-            int constant = Integer.parseInt(operand);
-            return constantsTable.get(constant);
-
-        } catch (Exception e) {
-            //else, is variable
-            return memoryTable.get(operand);
-        }
+        return memStrings;
     }
 
     public void clr(int register){
