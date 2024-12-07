@@ -13,13 +13,13 @@ package codeGenerator;
 
 //data holder 
 public class atom {
-    //based on big boy: (name, left, right, result, cmp, dest). 
+    // Based on (name, left, right, result, cmp, dest). 
     
-    //data
-    String name, left, right, result, dest;
-    int cmp;
+    // Data
+    public String name, left, right, result, dest;
+    public int cmp;
     
-    //constructor
+    // Constructor
     public atom(String name, String left, String right, String result, int cmp, String dest){
         this.name = name; 
         this.left = left; 
@@ -27,11 +27,6 @@ public class atom {
         this.result = result; 
         this.cmp = cmp; 
         this.dest = dest; 
-    }
-
-    //print
-    public void print(){
-        System.out.println(name + "," + left+ "," + right+ "," + result+ "," + cmp+ "," + dest); 
     }
 
     @Override
@@ -74,8 +69,4 @@ public class atom {
         
         return str;
     }
-
-    //nothing else? 
-
 }    
-

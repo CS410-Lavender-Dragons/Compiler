@@ -11,16 +11,9 @@ import java.util.ArrayList;
 
 import java.util.Arrays; 
 
-//annoying
 @SuppressWarnings("unused")
 
-
-
-
 public class atomGen {    
-
-    //dogwater code at its finest 
-
     private Queue<atom> atomList; 
     public atomGen(){
         atomList = new LinkedList<>(); 
@@ -76,4 +69,7 @@ public class atomGen {
         }
     }
 
+    public Queue<atom> getAtomList() {
+        return this.atomList;
+    }
 }
