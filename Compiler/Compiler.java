@@ -75,6 +75,8 @@ public class Compiler {
             // Loop through machine code queue and write each instruction to bin file
             while (!machineCode.isEmpty()) {
                 fw.write(machineCode.remove());
+                fw.write('\n');
+                // System.out.println(machineCode.remove());
             }
 
             fw.close();
