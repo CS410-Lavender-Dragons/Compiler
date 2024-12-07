@@ -137,7 +137,7 @@ public class codeGenerator {
     public Queue<String> genMemArea(){
         Queue<String> memStrings = new LinkedList<>();
         for (Map.Entry<String, Integer> mem : memoryTable.entrySet()) {
-            memStrings.add(Character.isAlphabetic(mem.getKey().charAt(0)) ? "00000000000000000000000000000000" : Integer.toBinaryString(Float.floatToIntBits(Float.parseFloat(mem.getKey()))));
+            memStrings.add(Character.isAlphabetic(mem.getKey().charAt(0)) ? "00000000000000000000000000000000" : String.format("%32s", Integer.toBinaryString(Float.floatToIntBits(Float.parseFloat(mem.getKey())))).replace(' ', '0') );
         }
         return memStrings;
     }
