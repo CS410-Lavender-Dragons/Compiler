@@ -60,6 +60,7 @@ public class codeGenerator {
                     pc += 12;
             }
         }
+        pc += 4; // Account for hlt instruction
     }
 
     private void adjustMemAddr(){
@@ -69,7 +70,8 @@ public class codeGenerator {
 
     // Second pass - generate machine code
     private void generate(Queue<atom> atoms){
-        for (int i = 0; i < atoms.size(); i++) {
+        int initializeSize = atoms.size();
+        for (int i = 0; i < initializeSize; i++) {
             atom atom = atoms.remove();
             switch(atom.name){
                 case "ADD":
