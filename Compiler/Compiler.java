@@ -74,11 +74,14 @@ public class Compiler {
 
             // Loop through machine code queue and write each instruction to bin file
             while (!machineCode.isEmpty()) {
-                fw.write(machineCode.remove());
-                fw.write('\n');
-                // System.out.println(machineCode.remove());
+                String byteString = machineCode.remove();
+                for(int i = 0; i < 4; i ++){
+                    fw.write(Byte.parseByte(byteString.substring(0, 4), 2));
+                    fw.write(Byte.parseByte(byteString.substring(4, 8), 2));
+                    fw.write(Byte.parseByte(byteString.substring(8, 12), 2));
+                    fw.write(Byte.parseByte(byteString.substring(12, 16), 2));
+                }
             }
-
             fw.close();
             System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {
