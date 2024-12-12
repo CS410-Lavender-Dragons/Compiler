@@ -2,27 +2,27 @@ package Parser;
 
 import Core.Token;
 import Core.TokenName;
-
-import java.util.Queue;
-
-import codeGenerator.atom;
-import codeGenerator.atomGen;
 import Core.Variable;
 import Core.Variable.Type;
-
-
+import codeGenerator.atom;
+import codeGenerator.atomGen;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.Queue;
+
 
 //casting needs to be done right before use to avoid data types issues 
 
 public class Parser {
+
     Queue<Token> tokenQueue;
     Dictionary<String, Variable> lookupTable;
     Object destroyed = null;
     atomGen atomList;
     int lblCounter;
     int tRegCount;
+    private boolean optimizationEnabled;
 
     public Queue<atom> parse(Queue<Token> tokenQueue) {
         this.tokenQueue = tokenQueue;
@@ -398,4 +398,116 @@ public class Parser {
     public String generateLabel() {
         return "L" + lblCounter++;
     }
+
+    //Constant folding globabl optimization
+    public Queue<Token> constantFolding(Queue<Token> tokens) {
+        Queue<Token> optimizedTokens = new LinkedList<>();
+        LinkedList<Token> buffer = new LinkedList<>(); 
+
+        while (!tokens.isEmpty()) {
+            Token token = tokens.poll();
+
+            //process numeric constants and operators
+            if (token.getName() == TokenName.NUMERIC || isOperator(token.getName())) {
+                buffer.add(token);
+
+                //check for at least two numbers and an operator in the buffer
+                if (buffer.size() >= 3) {
+                    Token leftOperand = buffer.get(buffer.size() - 3);
+                    Token operator = buffer.get(buffer.size() - 2);
+                    Token rightOperand = buffer.get(buffer.size() - 1);
+
+                    if (leftOperand.getName() == TokenName.NUMERIC &&
+                        rightOperand.getName() == TokenName.NUMERIC &&
+                        isOperator(operator.getName())) {
+
+                        //perform constant folding
+                        long leftValue = Long.parseLong(leftOperand.getValue().toString());
+                        long rightValue = Long.parseLong(rightOperand.getValue().toString());
+                        long result = 0;
+
+                        switch (operator.getName()) {
+                            case ADD_OP:
+                                result = leftValue + rightValue;
+                                break;
+                            case SUB_OP:
+                                result = leftValue - rightValue;
+                                break;
+                            case MULT_OP:
+                                result = leftValue * rightValue;
+                                break;
+                            case DIV_OP:
+                                result = rightValue != 0 ? leftValue / rightValue : 0; 
+                                break;
+                            default:
+                                //if operator is unrecognized, move on
+                                optimizedTokens.add(leftOperand);
+                                optimizedTokens.add(operator);
+                                optimizedTokens.add(rightOperand);
+                                buffer.clear();
+                                break;
+                        }
+
+                        //replace the last three tokens with the folded result
+                        buffer.removeLast();
+                        buffer.removeLast(); 
+                        buffer.removeLast(); 
+                        buffer.add(new Token(TokenName.NUMERIC, result));
+                    }
+                }
+            } else {
+                //flush buffer if theres a non-numeric/operator token
+                optimizedTokens.addAll(buffer);
+                buffer.clear();
+                optimizedTokens.add(token);
+            }
+        }
+
+        // add any remaining buffered tokens to the optimized tokens
+        optimizedTokens.addAll(buffer);
+
+        return optimizedTokens;
+    }
+    
+    private boolean isOperator(TokenName tokenName) {
+        return tokenName == TokenName.ADD_OP || tokenName == TokenName.SUB_OP || tokenName == TokenName.MULT_OP || tokenName == TokenName.DIV_OP;
+    }
+
+    //TODO: Implement flag option
+
+    //This is just here to test the constant folding, will remove once complete
+    public static void main(String[] args) {
+        Queue<Token> tokens = new LinkedList<>();
+        tokens.add(new Token(TokenName.NUMERIC, "10"));
+        tokens.add(new Token(TokenName.ADD_OP, "+"));
+        tokens.add(new Token(TokenName.NUMERIC, "20"));
+        tokens.add(new Token(TokenName.MULT_OP, "*"));
+        tokens.add(new Token(TokenName.NUMERIC, "2"));
+        tokens.add(new Token(TokenName.SUB_OP, "-"));
+        tokens.add(new Token(TokenName.NUMERIC, "5"));
+    
+        
+        System.out.println("Original Expression:");
+        printExpression(tokens);
+    
+   
+        Parser parser = new Parser();
+        Queue<Token> optimizedTokens = parser.constantFolding(new LinkedList<>(tokens));
+    
+      
+        System.out.println("Optimized Expression:");
+        printExpression(optimizedTokens);
+    }
+    
+    // Helper method to print tokens as an expression for testing, will remove once complete
+    private static void printExpression(Queue<Token> tokens) {
+        StringBuilder expression = new StringBuilder();
+        for (Token token : tokens) {
+            expression.append(token.getValue()).append(" ");
+        }
+        System.out.println(expression.toString().trim());
+    }
+    
+
+    
 }

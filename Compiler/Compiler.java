@@ -1,9 +1,7 @@
 package Compiler;
 
+import java.io.*;
 import java.util.Queue;
-import java.io.File;
-import java.io.IOException;
-import java.io.FileWriter;
 
 import Lexer.Lexer;
 import Parser.Parser;
@@ -50,8 +48,7 @@ public class Compiler {
         System.out.println("\n");
         var tokens6 = lexer.tokenize("let x : i8 = 1; let mut y : f32 = 0; while x < 10 { y = x * 3 + 2; }");
         Queue<atom> atoms = parser.parse(tokens6);
-        Queue<String> machineCode = codegen.generateCode(atoms);
-
+        Queue<Integer> machineCode = codegen.generateCode(atoms);
         // Create bin file
         String filename = "oxide.bin";
 
@@ -70,16 +67,15 @@ public class Compiler {
 
         try {
             // Create File writer
-            FileWriter fw = new FileWriter(filename);
-
+            //FileWriter fw = new FileWriter(filename);
+            DataOutputStream dos = new DataOutputStream(new FileOutputStream(filename));
             // Loop through machine code queue and write each instruction to bin file
             while (!machineCode.isEmpty()) {
-                fw.write(machineCode.remove());
-                fw.write('\n');
-                // System.out.println(machineCode.remove());
+                int currByte = machineCode.remove();
+                dos.writeInt(currByte);
             }
-
-            fw.close();
+            //fw.close();
+            dos.close();
             System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {
             System.out.println("An error occurred.");

@@ -8,7 +8,8 @@ import java.util.*;
 public class codeGenerator {
 
     // machineCode queue for our functions to populate with machineCode
-    private Queue<String> machineQueue;
+    //private Queue<String> machineQueue;
+    private Queue<Integer> machineQueue;
     // labelTable to store labels' associated address (pc value)
     private Hashtable<String, Integer> labelTable;
     // memoryTable to store identifier's associated memory address
@@ -17,7 +18,7 @@ public class codeGenerator {
     private int memAddr;
     private int pc;
 
-    public Queue<String> generateCode(Queue<atom> atoms){
+    public Queue<Integer> generateCode(Queue<atom> atoms){
         // Initialize labelTable, machineQueue, memoryTable, memAddr here so reusable for multiple passes
         labelTable = new Hashtable<>();
         machineQueue = new LinkedList<>();
@@ -26,6 +27,7 @@ public class codeGenerator {
         pc = 0;
         buildLabelsAndMem(atoms);
         adjustMemAddr();
+        System.out.println(memoryTable);
         generate(atoms);
         machineQueue.addAll(genMemArea());
        
@@ -60,6 +62,7 @@ public class codeGenerator {
                     pc += 12;
             }
         }
+        pc += 4; // Account for hlt instruction
     }
 
     private void adjustMemAddr(){
@@ -69,7 +72,8 @@ public class codeGenerator {
 
     // Second pass - generate machine code
     private void generate(Queue<atom> atoms){
-        for (int i = 0; i < atoms.size(); i++) {
+        int initializeSize = atoms.size();
+        for (int i = 0; i < initializeSize; i++) {
             atom atom = atoms.remove();
             switch(atom.name){
                 case "ADD":
@@ -98,7 +102,7 @@ public class codeGenerator {
                     break;
                 case "JMP":
                     machineCode trueCmpCode = new machineCode(6, 0, 0, 0);
-                    machineQueue.add(trueCmpCode.toString()); // Set flag to true
+                    machineQueue.add(trueCmpCode.combineParameters()); // Set flag to true
                     jmp(atom);
                     break;
                 case "NEG":
@@ -123,64 +127,65 @@ public class codeGenerator {
         hlt();
     }
 
-    private Queue<String> genMemArea(){
-        Queue<String> memStrings = new LinkedList<>();
+    private Queue<Integer> genMemArea(){
+        Queue<Integer> memStrings = new LinkedList<>();
         for (Map.Entry<String, Integer> mem : memoryTable.entrySet()) {
-            memStrings.add(Character.isAlphabetic(mem.getKey().charAt(0)) ? "00000000000000000000000000000000" : String.format("%32s", Integer.toBinaryString(Float.floatToIntBits(Float.parseFloat(mem.getKey())))).replace(' ', '0') );
+            //memStrings.add(Character.isAlphabetic(mem.getKey().charAt(0)) ? "00000000000000000000000000000000" : String.format("%32s", Integer.toBinaryString(Float.floatToIntBits(Float.parseFloat(mem.getKey())))).replace(' ', '0') );
+            memStrings.add(Float.floatToIntBits(Float.parseFloat(Character.isAlphabetic(mem.getKey().charAt(0)) ? "00000000000000000000000000000000" : mem.getKey())));
         }
         return memStrings;
     }
 
     private void clr(int register){
         machineCode clrCode = new machineCode(0, 0, register, 0);
-        machineQueue.add(clrCode.toString());
+        machineQueue.add(clrCode.combineParameters());
     }
 
     private void add(int register, int addr){
         machineCode addCode = new machineCode(1,0,register,addr);
-        machineQueue.add(addCode.toString());
+        machineQueue.add(addCode.combineParameters());
     }
 
     private void sub(int register, int addr){
         machineCode subCode = new machineCode(2, 0,register,addr);
-        machineQueue.add(subCode.toString());
+        machineQueue.add(subCode.combineParameters());
     }
 
     private void mul(int register, int addr){
         machineCode mulCode = new machineCode(3, 0,register,addr);
-        machineQueue.add(mulCode.toString());
+        machineQueue.add(mulCode.combineParameters());
     }
 
     private void div(int register, int addr){
         machineCode divCode = new machineCode(4, 0,register,addr);
-        machineQueue.add(divCode.toString());
+        machineQueue.add(divCode.combineParameters());
     }
     
     private void jmp(atom atom){
         machineCode jmpCode = new machineCode(0, 0, 0, 0);
         jmpCode.opcode = 5;
         jmpCode.a = labelTable.get(atom.dest);
-        machineQueue.add(jmpCode.toString());
+        machineQueue.add(jmpCode.combineParameters());
     }
 
     private void cmp(int register, int addr, int cmp){
         machineCode cmpCode = new machineCode(6, cmp, register, addr);
-        machineQueue.add(cmpCode.toString());
+        machineQueue.add(cmpCode.combineParameters());
     }
 
     private void lod(int register, int addr){
         machineCode lodCode = new machineCode(7, 0, register, addr);
-        machineQueue.add(lodCode.toString());         
+        machineQueue.add(lodCode.combineParameters());
     }
 
     private void sto(int register, int addr){
         machineCode stoCode = new machineCode(8, 0, register, addr);
-        machineQueue.add(stoCode.toString());        
+        machineQueue.add(stoCode.combineParameters());
     }
 
     private void hlt(){
         machineCode hltCode = new machineCode(9, 0, 0, 0);
-        machineQueue.add(hltCode.toString());        
+        machineQueue.add(hltCode.combineParameters());
     }
 
     private int getRegister(){
