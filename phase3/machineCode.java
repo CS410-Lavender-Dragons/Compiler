@@ -48,4 +48,8 @@ public class machineCode {
 
         return machCode;
     }
+
+    public int combineParameters(){
+        return ((this.opcode & 0xF) << 28) | ((this.cmp & 0xF) << 24) | ((this.r & 0xF) << 20) | (a & 0xFFFFF);
+    }
 }   
