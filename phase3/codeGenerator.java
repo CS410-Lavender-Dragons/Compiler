@@ -15,28 +15,35 @@ public class codeGenerator {
     private LinkedHashMap<String, Integer> memoryTable;
     // tracks memory address generation
     private int memAddr;
+    // tracks # of instructions
     private int pc;
+    private boolean optimizeLODSTO; // Flag for optimization
+    private Map<Integer, Integer> registerMemoryMap = new HashMap<>(); // Tracks register-memory mappings
 
-    public Queue<Integer> generateCode(Queue<atom> atoms){
+    public Queue<Integer> generateCode(Queue<atom> atoms, final boolean optimized){
+        optimizeLODSTO = optimized;
         generateInstructions(atoms);
+        if (optimizeLODSTO)
+            updateOptimizedMemAddr();
         Queue<Integer> machineQueue = instructionQueue.stream().map(instr -> instr.combineParameters()).collect(Collectors.toCollection(LinkedList::new));
         machineQueue.addAll(genMemArea());
         return machineQueue;
     }
 
 
-    public Queue<machineCode> generateInstructions(Queue<atom> atoms){
+    private Queue<machineCode> generateInstructions(Queue<atom> atoms){
         // Initialize pc, instructionQueue here so reusable for multiple passes
         instructionQueue = new LinkedList<>();
         pc = 0;
         buildLabelsAndMem(atoms);
-        adjustMemAddr();
+        if (!optimizeLODSTO)
+            adjustMemAddr();
         generate(atoms);
         return instructionQueue;
     }
 
     // First pass - builds label and mem tables
-    public void buildLabelsAndMem(Queue<atom> atoms) {
+    private void buildLabelsAndMem(Queue<atom> atoms) {
         // Initialize labelTable, memoryTable, memAddr here so reusable for multiple passes
         labelTable = new Hashtable<>();
         memoryTable = new LinkedHashMap<>();
@@ -73,6 +80,25 @@ public class codeGenerator {
     private void adjustMemAddr(){
         for (Map.Entry<String, Integer> mem : memoryTable.entrySet())
             mem.setValue(mem.getValue() * 4 + pc);
+    }
+    private static <T, V> T getKeyByValue(Map<T, V> map, V value) {
+        for (Map.Entry<T, V> entry : map.entrySet()) {
+            if (entry.getValue().equals(value)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+    private void updateOptimizedMemAddr(){
+        Map<String, Integer> oldMemMap = Map.copyOf(memoryTable);
+        adjustMemAddr();
+        for (int i = 0; i < instructionQueue.size(); i++){
+            machineCode instruction = instructionQueue.remove();
+            String valueKey = getKeyByValue(oldMemMap, instruction.a);
+            if (valueKey != null)
+                instruction.a = memoryTable.get(valueKey);
+            instructionQueue.add(instruction);
+        }
     }
 
     // Second pass - generate machine code
@@ -179,13 +205,27 @@ public class codeGenerator {
     }
 
     private void lod(int register, int addr){
+        if (optimizeLODSTO) {
+            if (registerMemoryMap.getOrDefault(register, -1) == addr) {
+                pc -=4;
+                return; // Skip redundant LOD - return & adjust mem addrs following
+            }
+        }
         machineCode lodCode = new machineCode(7, 0, register, addr);
         instructionQueue.add(lodCode);
+        registerMemoryMap.put(register, addr);
     }
 
     private void sto(int register, int addr){
+        if (optimizeLODSTO) {
+            if (registerMemoryMap.getOrDefault(register, -1) == addr) {
+                pc -= 4;
+                return; // Skip redundant LOD
+            }
+        }
         machineCode stoCode = new machineCode(8, 0, register, addr);
         instructionQueue.add(stoCode);
+        registerMemoryMap.put(register, addr);
     }
 
     private void hlt(){
