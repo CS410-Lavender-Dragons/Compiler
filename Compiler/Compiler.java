@@ -48,6 +48,12 @@ public class Compiler {
         System.out.println("\n");
         var tokens6 = lexer.tokenize("let x : i8 = 1; let mut y : f32 = 0; while x < 10 { y = x * 3 + 2; }");
         Queue<atom> atoms = parser.parse(tokens6);
+        //TODO write atoms to intermediary file
+        // Create File writer
+        //FileWriter fw = new FileWriter(filename);
+
+        //fw.close();
+
         Queue<Integer> machineCode = codegen.generateCode(atoms);
         // Create bin file
         String filename = "oxide.bin";
@@ -66,15 +72,13 @@ public class Compiler {
         }
 
         try {
-            // Create File writer
-            //FileWriter fw = new FileWriter(filename);
             DataOutputStream dos = new DataOutputStream(new FileOutputStream(filename));
             // Loop through machine code queue and write each instruction to bin file
             while (!machineCode.isEmpty()) {
                 int currByte = machineCode.remove();
                 dos.writeInt(currByte);
             }
-            //fw.close();
+
             dos.close();
             System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {
