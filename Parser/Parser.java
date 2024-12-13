@@ -399,115 +399,101 @@ public class Parser {
         return "L" + lblCounter++;
     }
 
-    //Constant folding globabl optimization
-    public Queue<Token> constantFolding(Queue<Token> tokens) {
-        Queue<Token> optimizedTokens = new LinkedList<>();
-        LinkedList<Token> buffer = new LinkedList<>(); 
+    //constant folding optimization
+    //TODO: Add a flag option, fix the output
+    public static Queue<atom> constantFolding(Queue<atom> atoms) {
+        Queue<atom> optimizedAtoms = new LinkedList<>();
 
-        while (!tokens.isEmpty()) {
-            Token token = tokens.poll();
+        while (!atoms.isEmpty()) {
+            atom currentAtom = atoms.poll();
 
-            //process numeric constants and operators
-            if (token.getName() == TokenName.NUMERIC || isOperator(token.getName())) {
-                buffer.add(token);
+            //check for operators
+            if (currentAtom.name.equals("ADD") || currentAtom.name.equals("SUB") ||  currentAtom.name.equals("MUL") || currentAtom.name.equals("DIV")) {
+                
+                //check if both left and right operands are constants
+                if (isNumeric(currentAtom.left) && isNumeric(currentAtom.right)) {
+                    //preform the constant folding
+                    double leftValue = Double.parseDouble(currentAtom.left);
+                    double rightValue = Double.parseDouble(currentAtom.right);
+                    double resultValue = 0;
 
-                //check for at least two numbers and an operator in the buffer
-                if (buffer.size() >= 3) {
-                    Token leftOperand = buffer.get(buffer.size() - 3);
-                    Token operator = buffer.get(buffer.size() - 2);
-                    Token rightOperand = buffer.get(buffer.size() - 1);
-
-                    if (leftOperand.getName() == TokenName.NUMERIC &&
-                        rightOperand.getName() == TokenName.NUMERIC &&
-                        isOperator(operator.getName())) {
-
-                        //perform constant folding
-                        long leftValue = Long.parseLong(leftOperand.getValue().toString());
-                        long rightValue = Long.parseLong(rightOperand.getValue().toString());
-                        long result = 0;
-
-                        switch (operator.getName()) {
-                            case ADD_OP:
-                                result = leftValue + rightValue;
-                                break;
-                            case SUB_OP:
-                                result = leftValue - rightValue;
-                                break;
-                            case MULT_OP:
-                                result = leftValue * rightValue;
-                                break;
-                            case DIV_OP:
-                                result = rightValue != 0 ? leftValue / rightValue : 0; 
-                                break;
-                            default:
-                                //if operator is unrecognized, move on
-                                optimizedTokens.add(leftOperand);
-                                optimizedTokens.add(operator);
-                                optimizedTokens.add(rightOperand);
-                                buffer.clear();
-                                break;
-                        }
-
-                        //replace the last three tokens with the folded result
-                        buffer.removeLast();
-                        buffer.removeLast(); 
-                        buffer.removeLast(); 
-                        buffer.add(new Token(TokenName.NUMERIC, result));
+                   //does the  actual operation
+                    switch (currentAtom.name) {
+                        case "ADD":
+                            resultValue = leftValue + rightValue;
+                            break;
+                        case "SUB":
+                            resultValue = leftValue - rightValue;
+                            break;
+                        case "MUL":
+                            resultValue = leftValue * rightValue;
+                            break;
+                        case "DIV":
+                        //make sure we dont divide by 0
+                            if (rightValue != 0) {
+                                resultValue = leftValue / rightValue;
+                            } else {
+                                System.err.println("Division by zero detected.");
+                                resultValue = 0; 
+                            }
+                            break;
                     }
+
+                    //replace with MOV atom with the result
+                    atom movedAtom = new atom("MOV", String.valueOf(resultValue), "", "", 0, currentAtom.dest);
+
+                    //add the new MOV atom to the optimized atoms list
+                    optimizedAtoms.add(movedAtom);
+                } else {
+                    // if operands are not constants, add the atom as-is
+                    optimizedAtoms.add(currentAtom);
                 }
             } else {
-                //flush buffer if theres a non-numeric/operator token
-                optimizedTokens.addAll(buffer);
-                buffer.clear();
-                optimizedTokens.add(token);
+                //for others, just add them to the optimized list without modification
+                optimizedAtoms.add(currentAtom);
             }
         }
 
-        // add any remaining buffered tokens to the optimized tokens
-        optimizedTokens.addAll(buffer);
-
-        return optimizedTokens;
+        return optimizedAtoms; 
     }
-    
-    private boolean isOperator(TokenName tokenName) {
-        return tokenName == TokenName.ADD_OP || tokenName == TokenName.SUB_OP || tokenName == TokenName.MULT_OP || tokenName == TokenName.DIV_OP;
-    }
-
-    //TODO: Implement flag option
-
-    //This is just here to test the constant folding, will remove once complete
-    public static void main(String[] args) {
-        Queue<Token> tokens = new LinkedList<>();
-        tokens.add(new Token(TokenName.NUMERIC, "10"));
-        tokens.add(new Token(TokenName.ADD_OP, "+"));
-        tokens.add(new Token(TokenName.NUMERIC, "20"));
-        tokens.add(new Token(TokenName.MULT_OP, "*"));
-        tokens.add(new Token(TokenName.NUMERIC, "2"));
-        tokens.add(new Token(TokenName.SUB_OP, "-"));
-        tokens.add(new Token(TokenName.NUMERIC, "5"));
-    
-        
-        System.out.println("Original Expression:");
-        printExpression(tokens);
-    
-   
-        Parser parser = new Parser();
-        Queue<Token> optimizedTokens = parser.constantFolding(new LinkedList<>(tokens));
-    
-      
-        System.out.println("Optimized Expression:");
-        printExpression(optimizedTokens);
-    }
-    
-    // Helper method to print tokens as an expression for testing, will remove once complete
-    private static void printExpression(Queue<Token> tokens) {
-        StringBuilder expression = new StringBuilder();
-        for (Token token : tokens) {
-            expression.append(token.getValue()).append(" ");
+   //helper to check for constants
+    private static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str); 
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
-        System.out.println(expression.toString().trim());
     }
     
+  //just a helper function to print the expressions for testing, will remove once complete 
+     public static void printExpression(Queue<atom> atoms) {
+        for (atom a : atoms) {
+            System.out.println(a);
+        }
+    }
+
+    //main method for testing purposes only, will remove once complete.
+    public static void main(String[] args) {
+       
+        Queue<atom> test = new LinkedList<>();
+        
+      
+       test.add(new atom("ADD", "3", "4", "", 0, "R1")); 
+        test.add(new atom("SUB", "10", "5", "", 0, "R2")); 
+        test.add(new atom("MUL", "2", "3", "", 0, "R3")); 
+        test.add(new atom("DIV", "6", "2", "", 0, "R4")); 
+        
+       
+        System.out.println("Original Expressions:");
+        printExpression(test);
+
+   
+        Queue<atom> optimizedAtoms = constantFolding(test);
 
     
+        System.out.println("\nOptimzed Expression");
+        printExpression(optimizedAtoms);
+    }
+
 }
