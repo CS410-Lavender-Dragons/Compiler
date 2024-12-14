@@ -18,6 +18,7 @@ public class codeGenerator {
     // tracks # of instructions
     private int pc;
     private boolean optimizeLODSTO; // Flag for optimization
+    private static final int ADDRESSING_MULTIPLIER = 1;
     private Map<Integer, Integer> registerMemoryMap = new HashMap<>(); // Tracks register-memory mappings
 
     public Queue<Integer> generateCode(Queue<atom> atoms, final boolean optimized){
@@ -57,29 +58,29 @@ public class codeGenerator {
                 case "NEG":
                     addToMemTable(atom.result);
                     addToMemTable(atom.left);
-                    pc += 12;
+                    pc += 3 * ADDRESSING_MULTIPLIER;
                     break;
                 case "LBL":
                     labelTable.put(atom.dest, Integer.valueOf(pc));
                     break;
                 case "JMP":
-                    pc += 8;
+                    pc += 2 * ADDRESSING_MULTIPLIER;
                     break;
                 case "MOV":
                     addToMemTable(atom.dest);
                     addToMemTable(atom.left);
-                    pc += 8;
+                    pc += 2 * ADDRESSING_MULTIPLIER;
                     break;
                 default:
-                    pc += 12;
+                    pc += 3 * ADDRESSING_MULTIPLIER;
             }
         }
-        pc += 4; // Account for hlt instruction
+        pc += 1 * ADDRESSING_MULTIPLIER; // Account for hlt instruction
     }
 
     private void adjustMemAddr(){
         for (Map.Entry<String, Integer> mem : memoryTable.entrySet())
-            mem.setValue(mem.getValue() * 4 + pc);
+            mem.setValue(mem.getValue() * ADDRESSING_MULTIPLIER + pc * ADDRESSING_MULTIPLIER + ADDRESSING_MULTIPLIER); // +ADDRESSING_MULTIPLIER accounts for extra CLR instr at beginning
     }
     private static <T, V> T getKeyByValue(Map<T, V> map, V value) {
         for (Map.Entry<T, V> entry : map.entrySet()) {
@@ -207,7 +208,7 @@ public class codeGenerator {
     private void lod(int register, int addr){
         if (optimizeLODSTO) {
             if (registerMemoryMap.getOrDefault(register, -1) == addr) {
-                pc -=4;
+                pc -= 1 * ADDRESSING_MULTIPLIER;
                 return; // Skip redundant LOD - return & adjust mem addrs following
             }
         }

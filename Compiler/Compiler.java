@@ -46,7 +46,8 @@ public class Compiler {
         // parser.parse(tokens5);
 
         System.out.println("\n");
-        var tokens6 = lexer.tokenize("let x : i8 = 1; let mut y : f32 = 0; while x < 10 { y = x * 3 + 2; }");
+        //var tokens6 = lexer.tokenize("let x : i8 = 1; let mut y : f32 = 0; while x < 10 { y = x * 3 + 2; }");
+        var tokens6 = lexer.tokenize("let mut x : i8 = 2; x = 2 * 3; x = 3;");
         Queue<atom> atoms = parser.parse(tokens6);
         //TODO write atoms to intermediary file
         // Create File writer
@@ -54,7 +55,7 @@ public class Compiler {
 
         //fw.close();
 
-        Queue<Integer> machineCode = codegen.generateCode(atoms);
+        Queue<Integer> machineCode = codegen.generateCode(atoms, false);
         // Create bin file
         String filename = "oxide.bin";
 
@@ -74,6 +75,7 @@ public class Compiler {
         try {
             DataOutputStream dos = new DataOutputStream(new FileOutputStream(filename));
             // Loop through machine code queue and write each instruction to bin file
+            dos.writeInt(0);
             while (!machineCode.isEmpty()) {
                 int currByte = machineCode.remove();
                 dos.writeInt(currByte);
