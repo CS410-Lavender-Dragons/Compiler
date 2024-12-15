@@ -400,7 +400,7 @@ public class Parser {
     }
 
     //constant folding optimization
-    //TODO: Add a flag option, fix the output
+    //TODO: Add a flag option. 
     public static Queue<atom> constantFolding(Queue<atom> atoms) {
         Queue<atom> optimizedAtoms = new LinkedList<>();
 
@@ -413,11 +413,12 @@ public class Parser {
                 //check if both left and right operands are constants
                 if (isNumeric(currentAtom.left) && isNumeric(currentAtom.right)) {
                     //preform the constant folding
-                    double leftValue = Double.parseDouble(currentAtom.left);
-                    double rightValue = Double.parseDouble(currentAtom.right);
-                    double resultValue = 0;
+                    int leftValue = Integer.parseInt(currentAtom.left);
+                    int rightValue = Integer.parseInt(currentAtom.right);
+                    int resultValue = 0;
 
                    //does the  actual operation
+                   //probably will have to  calculate div as floats??
                     switch (currentAtom.name) {
                         case "ADD":
                             resultValue = leftValue + rightValue;
