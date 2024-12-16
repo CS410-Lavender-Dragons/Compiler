@@ -55,10 +55,18 @@ public class Compiler {
 
         //fw.close();
 
-        Queue<Integer> machineCode = codegen.generateCode(atoms, false);
+        //TODO read atoms in from intermediary file and pass to generateCode
+
+        // Check for optimization flag
+        Queue<Integer> machineCodes;
+        if (args[0] == "-o") {
+            machineCodes = codegen.generateCode(atoms, true);
+        } else {
+           machineCodes = codegen.generateCode(atoms, false);
+        }
+        
         // Create bin file
         String filename = "oxide.bin";
-
         try {
             File binF = new File(filename);
 
@@ -76,8 +84,8 @@ public class Compiler {
             DataOutputStream dos = new DataOutputStream(new FileOutputStream(filename));
             // Loop through machine code queue and write each instruction to bin file
             dos.writeInt(0);
-            while (!machineCode.isEmpty()) {
-                int currByte = machineCode.remove();
+            while (!machineCodes.isEmpty()) {
+                int currByte = machineCodes.remove();
                 dos.writeInt(currByte);
             }
 
