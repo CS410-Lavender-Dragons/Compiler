@@ -59,7 +59,9 @@ public class Compiler {
 
         // Check for optimization flag
         Queue<Integer> machineCodes;
-        if (args[0] == "-o") {
+
+        if (args.length > 0 && args[0].equals("-o")) {
+            System.out.println("Optimized arg");
             machineCodes = codegen.generateCode(atoms, true);
         } else {
            machineCodes = codegen.generateCode(atoms, false);
