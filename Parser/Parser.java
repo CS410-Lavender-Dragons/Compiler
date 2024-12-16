@@ -6,6 +6,8 @@ import Core.Variable;
 import Core.Variable.Type;
 import codeGenerator.atom;
 import codeGenerator.atomGen;
+import phase3.localOptimizations;
+
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -28,8 +30,6 @@ public class Parser {
     public Parser(boolean global, boolean local){
         globalFlag = global;
         localFlag = local; 
-        System.out.println(global); 
-        System.out.println(local); 
     }
 
     public Queue<atom> parse(Queue<Token> tokenQueue) {
@@ -41,6 +41,14 @@ public class Parser {
         STATEMENTS();
         expect(TokenName.EOI);
         atomList.end();
+        //constant folding
+        if(globalFlag){
+            constantFolding(atomList.getAtomList());
+        }
+        //what
+        if(localFlag){
+            //loadStoreOptimization(); 
+        }
 
         return atomList.getAtomList();
     }
@@ -413,26 +421,27 @@ public class Parser {
     public static Queue<atom> constantFolding(Queue<atom> atoms) {
         Queue<atom> optimizedAtoms = new LinkedList<>();
         Queue<atom> secondary = new LinkedList<>();
+        
+        
 
-        //get the list of atoms that can be folded, so it can be looked at in its entirety 
+
+        //isolate
         while(!atoms.isEmpty()){
             atom currentAtom = atoms.poll();
-            atom prevAtom = null; 
             String atomName = currentAtom.name; 
             
             if (atomName.equals("ADD") || atomName.equals("SUB") ||  atomName.equals("MUL") || atomName.equals("DIV")) {
-                secondary.add(prevAtom); 
                 secondary.add(currentAtom);
             }
-            prevAtom = currentAtom; 
         }
-        //get the last one?
-        System.out.println(secondary.toString());
+        for(var atom : secondary){
+            System.out.println(atom);
+        }
 
         //keep track of if it's m/d or a/s time 
         int runNum = 0; 
         while (!secondary.isEmpty()) {
-            atom currentAtom = atoms.poll();
+            atom currentAtom = secondary.poll();
             String atomName = currentAtom.name; 
 
             //check for operators
@@ -447,7 +456,6 @@ public class Parser {
                     //placeholder
                     String operator = ""; 
                     
-
                     double resultVal = 0; 
                     //pass for m/d, feed in 
                     if(runNum == 0 && (atomName.equals("DIV") || atomName.equals("MUL"))){
@@ -455,7 +463,7 @@ public class Parser {
                     }
 
                     //pass for add/sub
-                    if(runNum == 0 && (atomName.equals("ADD") || atomName.equals("SUB"))){
+                    if(runNum >= 1 && (atomName.equals("ADD") || atomName.equals("SUB"))){
                         resultVal = calculator(leftValue, rightValue, atomName); 
                     }
                    
@@ -473,7 +481,7 @@ public class Parser {
                 //for others, just add them to the optimized list without modification
                 optimizedAtoms.add(currentAtom);
             }
-            
+            runNum ++; 
         }
         System.out.println("here");
 
@@ -532,7 +540,7 @@ public class Parser {
         Queue<atom> test = new LinkedList<>();
         
       
-       test.add(new atom("ADD", "3", "4", "", 0, "R1")); 
+        test.add(new atom("ADD", "3", "4", "", 0, "R1")); 
         test.add(new atom("SUB", "10", "5", "", 0, "R2")); 
         test.add(new atom("MUL", "2", "3", "", 0, "R3")); 
         test.add(new atom("DIV", "6", "2", "", 0, "R4")); 
