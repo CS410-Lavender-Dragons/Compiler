@@ -6,8 +6,6 @@ import Core.Variable;
 import Core.Variable.Type;
 import codeGenerator.atom;
 import codeGenerator.atomGen;
-import phase3.localOptimizations;
-
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -417,106 +415,112 @@ public class Parser {
     }
 
     //constant folding optimization
-    //TODO: Add a flag option, fix the output
+    //TODO: Add a flag option. 
     public static Queue<atom> constantFolding(Queue<atom> atoms) {
         Queue<atom> optimizedAtoms = new LinkedList<>();
-        Queue<atom> secondary = new LinkedList<>();
-        
-        
 
+        boolean firstIter = true;
+        int resultValue = 0;
+        //atom lastDest = null; 
 
-        //isolate
-        while(!atoms.isEmpty()){
+        while (!atoms.isEmpty()) {
             atom currentAtom = atoms.poll();
-            String atomName = currentAtom.name; 
-            
-            if (atomName.equals("ADD") || atomName.equals("SUB") ||  atomName.equals("MUL") || atomName.equals("DIV")) {
-                secondary.add(currentAtom);
-            }
-        }
-        for(var atom : secondary){
-            System.out.println(atom);
-        }
-
-        //keep track of if it's m/d or a/s time 
-        int runNum = 0; 
-        while (!secondary.isEmpty()) {
-            atom currentAtom = secondary.poll();
-            String atomName = currentAtom.name; 
-
             //check for operators
-            if (atomName.equals("ADD") || atomName.equals("SUB") ||  atomName.equals("MUL") || atomName.equals("DIV")) {
-                
-                //check if both left and right operands are constants
-                if (isNumeric(currentAtom.left) && isNumeric(currentAtom.right)) {
+            if (currentAtom.name.equals("ADD") || currentAtom.name.equals("SUB") ||  currentAtom.name.equals("MUL") || currentAtom.name.equals("DIV")) {
+
+                //check if both left and right operands are constants, or if one of them is a temp reg 
+                if ((isNumeric(currentAtom.left) && isNumeric(currentAtom.right)) || (currentAtom.left.contains("T") || currentAtom.right.contains("T"))) {
                     //preform the constant folding
-                    double leftValue = Double.parseDouble(currentAtom.left);
-                    double rightValue = Double.parseDouble(currentAtom.right);
                     
-                    //placeholder
-                    String operator = ""; 
-                    
-                    double resultVal = 0; 
-                    //pass for m/d, feed in 
-                    if(runNum == 0 && (atomName.equals("DIV") || atomName.equals("MUL"))){
-                        resultVal = calculator(leftValue, rightValue, atomName); 
+                    int leftValue = 0; 
+                    int rightValue = 0; 
+
+                    //has to start somewhere 
+                    if(firstIter){
+                        leftValue = Integer.parseInt(currentAtom.left);
+                        rightValue = Integer.parseInt(currentAtom.right);
                     }
 
-                    //pass for add/sub
-                    if(runNum >= 1 && (atomName.equals("ADD") || atomName.equals("SUB"))){
-                        resultVal = calculator(leftValue, rightValue, atomName); 
+                    //if this is not the first iteration 
+                    if(!firstIter){
+                        //if the t register is on the left 
+                        if(currentAtom.left.contains("T")){
+                            //from the last iteration 
+                            leftValue = resultValue;
+                        }
+                        else{
+                            leftValue = Integer.parseInt(currentAtom.left);
+                        }
+                        //if the t register is on the right 
+                        if(currentAtom.right.contains("T")){
+                            rightValue = resultValue; 
+                        }
+                        else{
+                            rightValue = Integer.parseInt(currentAtom.right);
+                        }
                     }
-                   
-                    //double resultValue = calculator(leftValue, rightValue, atomName);
-                    //replace with MOV atom with the result
-                    atom movedAtom = new atom("MOV", String.valueOf((int)resultVal), "", "", 0, currentAtom.dest);
+
+                   //does the  actual operation
+                   //probably will have to  calculate div as floats??
+                    switch (currentAtom.name) {
+                        case "ADD":
+                            resultValue = leftValue + rightValue;
+                            break;
+                        case "SUB":
+                            resultValue = leftValue - rightValue;
+                            break;
+                        case "MUL":
+                            resultValue = leftValue * rightValue;
+                            break;
+                        case "DIV":
+                        //make sure we dont divide by 0
+                            if (rightValue != 0) {
+                                resultValue = leftValue / rightValue;
+                            } else {
+                                System.err.println("Division by zero detected.");
+                                resultValue = 0; 
+                            }
+                            break;
+                    }
+
+                    /* //replace with MOV atom with the result
+                    atom movedAtom = new atom("MOV", String.valueOf(resultValue), "", "", 0, currentAtom.dest);
 
                     //add the new MOV atom to the optimized atoms list
-                    optimizedAtoms.add(movedAtom);
-                } else {
+                    optimizedAtoms.add(movedAtom); */
+                    
+                    
+                } 
+
+                //this is the end of the line, no more t registers, nothing else 
+                else {
+                    
                     // if operands are not constants, add the atom as-is
                     optimizedAtoms.add(currentAtom);
+                    System.out.println("here"); 
                 }
-            } else {
-                //for others, just add them to the optimized list without modification
-                optimizedAtoms.add(currentAtom);
+            } 
+            
+            else {
+                atom movAtom = new atom("MOV", String.valueOf(resultValue), "","", 0, currentAtom.dest);    
+                optimizedAtoms.add(movAtom); 
+                //if this is not the end of a cont. sequence of stuff that can be folded
+                if(firstIter == true){
+                    optimizedAtoms.add(currentAtom); 
+                }
+                /* //for others, just add them to the optimized list without modification
+                optimizedAtoms.add(currentAtom); */
             }
-            runNum ++; 
-        }
-        System.out.println("here");
+            
 
+            
+            //add the final result to the 
+            firstIter = false; 
+            System.out.println(resultValue);
+        }
+        
         return optimizedAtoms; 
     }
-
-    //return result value, broke logic out 
-    public static double calculator(double leftValue, double rightValue, String op){
-        double resultValue = 0;
-
-        //does the  actual operation
-        switch (op) {
-            case "ADD":
-                resultValue = leftValue + rightValue;
-                break;
-            case "SUB":
-                resultValue = leftValue - rightValue;
-                break;
-            case "MUL":
-                resultValue = leftValue * rightValue;
-                break;
-            case "DIV":
-            //make sure we dont divide by 0
-                if (rightValue != 0) {
-                    resultValue = leftValue / rightValue;
-                } else {
-                    System.err.println("Division by zero detected.");
-                    resultValue = 0; 
-                }
-                break;
-        }
-
-        return resultValue; 
-    }
-
    //helper to check for constants
     private static boolean isNumeric(String str) {
         try {
@@ -540,10 +544,15 @@ public class Parser {
         Queue<atom> test = new LinkedList<>();
         
       
-        test.add(new atom("ADD", "3", "4", "", 0, "R1")); 
+       /* test.add(new atom("ADD", "3", "4", "", 0, "R1")); 
         test.add(new atom("SUB", "10", "5", "", 0, "R2")); 
         test.add(new atom("MUL", "2", "3", "", 0, "R3")); 
-        test.add(new atom("DIV", "6", "2", "", 0, "R4")); 
+        test.add(new atom("DIV", "6", "2", "", 0, "R4"));  */
+        
+        test.add(new atom("MUL", "3", "10", "", 0, "T1")); 
+        test.add(new atom("DIV", "T1", "2", "", 0, "T2")); 
+        test.add(new atom("ADD", "1", "T2", "", 0, "T3")); 
+        test.add(new atom("MOV", "T3", "", "", 0, "R1"));
         
        
         System.out.println("Original Expressions:");
