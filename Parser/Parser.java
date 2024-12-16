@@ -39,9 +39,10 @@ public class Parser {
         STATEMENTS();
         expect(TokenName.EOI);
         atomList.end();
-        //constant folding
+        //constant folding if flag is set 
         if(globalFlag){
-            constantFolding(atomList.getAtomList());
+            var newList = constantFolding(atomList.getAtomList());
+            return newList; 
         }
         //what
         if(localFlag){
