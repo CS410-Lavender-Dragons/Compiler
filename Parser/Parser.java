@@ -421,8 +421,10 @@ public class Parser {
         Queue<atom> optimizedAtoms = new LinkedList<>();
 
         boolean firstIter = true;
-        int resultValue = 0;
+        Double resultValue = 0.0;
         //atom lastDest = null; 
+
+        Dictionary<String, Double> memory= new Hashtable<>();
 
         while (!atoms.isEmpty()) {
             atom currentAtom = atoms.poll();
@@ -433,13 +435,15 @@ public class Parser {
                 if ((isNumeric(currentAtom.left) && isNumeric(currentAtom.right)) || (currentAtom.left.contains("T") || currentAtom.right.contains("T"))) {
                     //preform the constant folding
                     
-                    int leftValue = 0; 
-                    int rightValue = 0; 
+                    Double leftValue = 0.0; 
+                    Double rightValue = 0.0; 
 
                     //has to start somewhere 
                     if(firstIter){
-                        leftValue = Integer.parseInt(currentAtom.left);
-                        rightValue = Integer.parseInt(currentAtom.right);
+                        firstIter = false; 
+                        leftValue = Double.parseDouble(currentAtom.left);
+                        rightValue = Double.parseDouble(currentAtom.right);
+                        
                     }
 
                     //if this is not the first iteration 
@@ -447,17 +451,18 @@ public class Parser {
                         //if the t register is on the left 
                         if(currentAtom.left.contains("T")){
                             //from the last iteration 
-                            leftValue = resultValue;
+                            leftValue = memory.get(currentAtom.left); 
                         }
                         else{
-                            leftValue = Integer.parseInt(currentAtom.left);
+                            leftValue = Double.parseDouble(currentAtom.left);
                         }
                         //if the t register is on the right 
                         if(currentAtom.right.contains("T")){
-                            rightValue = resultValue; 
+                            
+                            rightValue = memory.get(currentAtom.right); 
                         }
                         else{
-                            rightValue = Integer.parseInt(currentAtom.right);
+                            rightValue = Double.parseDouble(currentAtom.right);
                         }
                     }
 
@@ -479,10 +484,12 @@ public class Parser {
                                 resultValue = leftValue / rightValue;
                             } else {
                                 System.err.println("Division by zero detected.");
-                                resultValue = 0; 
+                                resultValue = 0.0; 
                             }
                             break;
                     }
+                    //log
+                    memory.put(currentAtom.dest, resultValue);
 
                     /* //replace with MOV atom with the result
                     atom movedAtom = new atom("MOV", String.valueOf(resultValue), "", "", 0, currentAtom.dest);
@@ -497,8 +504,7 @@ public class Parser {
                 else {
                     
                     // if operands are not constants, add the atom as-is
-                    optimizedAtoms.add(currentAtom);
-                    System.out.println("here"); 
+                    optimizedAtoms.add(currentAtom); 
                 }
             } 
             
@@ -517,9 +523,10 @@ public class Parser {
             
             //add the final result to the 
             firstIter = false; 
-            System.out.println(resultValue);
         }
         
+
+
         return optimizedAtoms; 
     }
    //helper to check for constants
@@ -550,11 +557,28 @@ public class Parser {
         test.add(new atom("MUL", "2", "3", "", 0, "R3")); 
         test.add(new atom("DIV", "6", "2", "", 0, "R4"));  */
         
-        test.add(new atom("MUL", "3", "10", "", 0, "T1")); 
+        /* test.add(new atom("MUL", "3", "10", "", 0, "T1")); 
         test.add(new atom("DIV", "T1", "2", "", 0, "T2")); 
         test.add(new atom("ADD", "1", "T2", "", 0, "T3")); 
-        test.add(new atom("MOV", "T3", "", "", 0, "R1"));
-        
+        test.add(new atom("MOV", "T3", "", "", 0, "R1")); */
+
+        test.add(new atom("MUL", "2", "10", "", 0, "T1")); 
+        test.add(new atom("DIV", "5", "3", "", 0, "T2")); 
+        test.add(new atom("SUB", "100", "T1", "", 0, "T3")); 
+        test.add(new atom("ADD", "T3", "T2", "", 0, "T4")); 
+        test.add(new atom("ADD", "T4", "2", "", 0, "T5")); 
+        test.add(new atom("MOV", "T5", "", "", 0, "b"));
+
+ /*        test.add(new atom("SUB", "20", "5", "", 0, "T1"));   
+        test.add(new atom("ADD", "8", "2", "", 0, "T2"));        
+        test.add(new atom("MUL", "4", "T1", "", 0, "T3"));       
+        test.add(new atom("DIV", "T3", "3", "", 0, "T4"));       
+        test.add(new atom("ADD", "T4", "7", "", 0, "T5"));       
+        test.add(new atom("MUL", "T5", "2", "", 0, "T6"));       
+        test.add(new atom("DIV", "100", "T2", "", 0, "T7"));     
+        test.add(new atom("ADD", "50", "T6", "", 0, "T8"));      
+        test.add(new atom("SUB", "T8", "T7", "", 0, "T9"));     
+        test.add(new atom("MOV", "T9", "", "", 0, "b"));   */ 
        
         System.out.println("Original Expressions:");
         printExpression(test);
