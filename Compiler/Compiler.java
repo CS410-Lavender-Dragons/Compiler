@@ -12,7 +12,7 @@ import phase3.*;
 public class Compiler {
     public static void main(String[] args){
         Lexer lexer = new Lexer();
-        Parser parser = new Parser((args.length == 1 && args[0].contains("-g")), (args.length == 1 && args[0].contains("-l")));
+        Parser parser = new Parser((args.length == 1 && args[0].contains("-g")), (args.length == 1 && args[0].contains("-o")));
         codeGenerator codegen = new codeGenerator();
 
         //var tokens7 = lexer.tokenize("x = 5;");
