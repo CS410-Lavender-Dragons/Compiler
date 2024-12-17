@@ -1,6 +1,8 @@
 package Compiler;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Queue;
 
 import Lexer.Lexer;
@@ -10,10 +12,37 @@ import phase3.*;
 
 
 public class Compiler {
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException{
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
         codeGenerator codegen = new codeGenerator();
+
+        String inputFile = args[0];
+        String outputFile = args[1];
+        int optimizedFlag = 0;
+
+        try {
+            if(args[2] == "-o"){
+                optimizedFlag = 1;
+            }
+        }
+        catch (IndexOutOfBoundsException e){
+            optimizedFlag = 0;
+        }
+
+        Path file = Path.of(inputFile);
+        String sampleCode = Files.readString(file);
+        var pipelineToken = lexer.tokenize(sampleCode);
+
+        Queue<atom> atomList = parser.parse(pipelineToken, optimizedFlag);
+
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter("IOfiles/atoms.txt"))){
+            for(int i = 0; i < atomList.size(); i++){
+                String atom = atomList.poll().toString();
+                writer.write(atom);
+                writer.newLine();
+            }
+        }
 
         //var tokens7 = lexer.tokenize("x = 5;");
         //var tokens7 = lexer.tokenize("let x = 5;");
@@ -48,7 +77,7 @@ public class Compiler {
         System.out.println("\n");
         //var tokens6 = lexer.tokenize("let x : i8 = 1; let mut y : f32 = 0; while x < 10 { y = x * 3 + 2; }");
         var tokens6 = lexer.tokenize("let mut x : i8 = 2; x = 2 * 3; x = 3;");
-        Queue<atom> atoms = parser.parse(tokens6);
+        Queue<atom> atoms = parser.parse(tokens6, 0);
         //TODO write atoms to intermediary file
         // Create File writer
         //FileWriter fw = new FileWriter(filename);

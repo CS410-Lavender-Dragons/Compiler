@@ -1,0 +1,5 @@
+let a_float: f64 = 1.0;
+let an_integer: i32 = 5;
+
+let mut mutable: i32 = 12;
+mutable = 21;

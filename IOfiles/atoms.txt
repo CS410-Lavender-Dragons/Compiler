@@ -1,0 +1,4 @@
+(MOV, 1.0, , T0)
+(MOV, T0, , a_float)
+(MOV, 5.0, , T1)
+(MOV, T1, , an_integer)
