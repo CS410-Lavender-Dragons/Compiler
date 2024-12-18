@@ -3,6 +3,7 @@ package Compiler;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedList;
 import java.util.Queue;
 
 import Lexer.Lexer;
@@ -78,18 +79,12 @@ public class Compiler {
         //var tokens6 = lexer.tokenize("let x : i8 = 1; let mut y : f32 = 0; while x < 10 { y = x * 3 + 2; }");
         //var tokens6 = lexer.tokenize("let mut x : i8 = 2; x = 2 * 3; x = 3;");
         //Queue<atom> atoms = parser.parse(tokens6, 0);
-        //TODO write atoms to intermediary file
-        // Create File writer
-        //FileWriter fw = new FileWriter(filename);
 
-        //fw.close();
-
-        //read atoms in from intermediary file and pass to generateCode
-        Queue<atom> atoms = readAtomsFromFile("IOfiles/atoms.txt");// unsure if this is the correct file name 
+        // Read atoms in from intermediary file and pass to generateCode
+        Queue<atom> atoms = readAtomsFromFile("IOfiles/atoms.txt"); //TODO add correct file name
 
         // Check for optimization flag
         Queue<Integer> machineCodes;
-
         if (args.length > 0 && args[0].equals("-o")) {
             System.out.println("Optimized arg");
             machineCodes = codegen.generateCode(atoms, true);
@@ -129,14 +124,13 @@ public class Compiler {
         }
     }
 
-
-    Queue<Atom> readAtomsFromFile(String filePath) throws IOException {
-        // creates an empty queue for atoms
-        Queue<Atom> atomsQueue = new LinkedList<>(); 
+    public static Queue<atom> readAtomsFromFile(String filePath) throws IOException {
+        // Create an empty queue for atoms
+        Queue<atom> atomsQueue = new LinkedList<>(); 
     
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
-            // reads the each file line until the end
+            // Reads the each file line until the end
             while ((line = reader.readLine()) != null) {
                 //parses the line into an atom using helper method
                 atomsQueue.add(parseAtom(line)); 
