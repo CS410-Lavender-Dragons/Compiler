@@ -74,17 +74,18 @@ public class Compiler {
         // var tokens5 = lexer.tokenize("let x : i64 = 5; let mut y : f32 = 0; if x < 5 { y = 2; } else if x > 10 { y = 3; } else { y = 4; }");
         // parser.parse(tokens5);
 
-        System.out.println("\n");
+        //System.out.println("\n");
         //var tokens6 = lexer.tokenize("let x : i8 = 1; let mut y : f32 = 0; while x < 10 { y = x * 3 + 2; }");
-        var tokens6 = lexer.tokenize("let mut x : i8 = 2; x = 2 * 3; x = 3;");
-        Queue<atom> atoms = parser.parse(tokens6, 0);
+        //var tokens6 = lexer.tokenize("let mut x : i8 = 2; x = 2 * 3; x = 3;");
+        //Queue<atom> atoms = parser.parse(tokens6, 0);
         //TODO write atoms to intermediary file
         // Create File writer
         //FileWriter fw = new FileWriter(filename);
 
         //fw.close();
 
-        //TODO read atoms in from intermediary file and pass to generateCode
+        //read atoms in from intermediary file and pass to generateCode
+        Queue<atom> atoms = readAtomsFromFile("IOfiles/atoms.txt");// unsure if this is the correct file name 
 
         // Check for optimization flag
         Queue<Integer> machineCodes;
@@ -127,5 +128,76 @@ public class Compiler {
             e.printStackTrace();
         }
     }
+
+
+    Queue<Atom> readAtomsFromFile(String filePath) throws IOException {
+        // creates an empty queue for atoms
+        Queue<Atom> atomsQueue = new LinkedList<>(); 
+    
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            // reads the each file line until the end
+            while ((line = reader.readLine()) != null) {
+                //parses the line into an atom using helper method
+                atomsQueue.add(parseAtom(line)); 
+            }
+        }
+        // returns the queue of atoms
+        return atomsQueue;
+    }
+
+    //reads a line from file and turns it into an atom
+    private static atom parseAtom(String line) {
+        // removes parentheses and split by commas
+        line = line.trim().substring(1, line.length() - 1); 
+        
+        //string array to hold parts of the atom
+        String[] parts = line.split(",\\s*");
+    
+        String name = parts[0];
+        String left = null, right = null, result = null, dest = null;
+        int cmp = -1;
+        
+        //gets the info for each part of the atom
+        switch(name) {
+            case "ADD":
+            case "SUB":
+            case "MUL":
+            case "DIV":
+                left = parts[1];
+                right = parts[2];
+                result = parts[3];
+                break;
+    
+            case "JMP":
+            case "LBL":
+                dest = parts[4];
+                break;
+    
+            case "NEG":
+                left = parts[1];
+                result = parts[3];
+                break;
+    
+            case "TST":
+                left = parts[1];
+                right = parts[2];
+                cmp = Integer.parseInt(parts[4]);
+                dest = parts[5];
+                break;
+    
+            case "MOV":
+                left = parts[1];
+                dest = parts[3];
+                break;
+    
+            default:
+                System.err.println("Unknown atom type: " + name);
+        }
+        
+        //returns the info in an atom
+        return new atom(name, left, right, result, cmp, dest);
+    }
+
 }
     
