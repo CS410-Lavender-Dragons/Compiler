@@ -1,0 +1,4 @@
+(MOV, 1.0, , a_float)
+(MOV, 5.0, , an_integer)
+(MOV, 12.0, , mutable)
+(MOV, 21.0, , mutable)
