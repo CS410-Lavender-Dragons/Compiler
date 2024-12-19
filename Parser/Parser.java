@@ -473,10 +473,14 @@ public class Parser {
         while (!atoms.isEmpty()){
             System.out.println(tRegMap);
             Atom a = atoms.remove();
-            if(a.name.equals("MOV") && isNumeric(a.left)) {
+            if (a.name.equals("MOV") && isNumeric(a.left)) {
                 tRegMap.put(a.dest, Double.parseDouble(a.left));
                 movAtoms.put(a.dest, a);
                 optimizedAtoms.add(a);
+            }
+            else if (a.name.equals("MOV") && tRegMap.containsKey(a.left)){
+                optimizedAtoms.remove(movAtoms.remove(a.left));
+                optimizedAtoms.add(new Atom("MOV", Double.toString(tRegMap.get(a.left)), null, null, -1, a.dest));
             }
             else if (a.name.equals("MUL")){
                 Double left = tRegMap.get(a.left);
@@ -551,7 +555,7 @@ public class Parser {
     public static void main(String[] args) {
 
         Lexer lex = new Lexer();
-        Queue<Token> lexed = lex.tokenize("let mut x:i32 = 2 * 4 / 20; let mut y : f16 = 2;");
+        Queue<Token> lexed = lex.tokenize("let mut x:i32 = (2 * 4 + 12) / 20 - 1 + 300 - 50; let mut y : f16 = 2 * x;");
         Parser p = new Parser();
         Queue<Atom> atoms = p.parse(lexed, false);
 
