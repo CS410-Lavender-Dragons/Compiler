@@ -20,15 +20,14 @@ public class Compiler {
 
         String inputFile = args[0];
         String outputFile = args[1];
-        int optimizedFlag = 0;
+        boolean optimizedFlag = false;
 
         try {
-            if(args[2] == "-o"){
-                optimizedFlag = 1;
+            if(args[2].equals("-o")){
+                optimizedFlag = true;
             }
         }
         catch (IndexOutOfBoundsException e){
-            optimizedFlag = 0;
         }
 
         Path file = Path.of(inputFile);

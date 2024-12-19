@@ -2,3 +2,7 @@
 (MOV, T0, , a_float)
 (MOV, 5.0, , T1)
 (MOV, T1, , an_integer)
+(MOV, 12.0, , T2)
+(MOV, T2, , mutable)
+(MOV, 21.0, , T3)
+(MOV, T3, , mutable)

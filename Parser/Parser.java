@@ -23,7 +23,7 @@ public class Parser {
     int lblCounter;
     int tRegCount;
 
-    public Queue<Atom> parse(Queue<Token> tokenQueue, int optimizedFlag) {
+    public Queue<Atom> parse(Queue<Token> tokenQueue, boolean optimizedFlag) {
         this.tokenQueue = tokenQueue;
         this.lookupTable = new Hashtable<>();
         this.atomList = new AtomGen();
@@ -31,18 +31,11 @@ public class Parser {
         tRegCount = 0;
         STATEMENTS();
         expect(TokenName.EOI);
-        atomList.end();
-        atomList.getAtomList();
-       
-       
-        if(optimizedFlag == 0){
+        if(!optimizedFlag)
             return atomList.getAtomList();
-        }
-        else{
-            Queue<Atom> optimizedList = constantFolding(atomList.getAtomList());
-            return optimizedList;
-        }
 
+        Queue<Atom> optimizedList = constantFolding(atomList.getAtomList());
+        return optimizedList;
     }
 
     boolean accept(TokenName tokenName) {

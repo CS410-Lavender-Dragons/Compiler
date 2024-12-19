@@ -21,26 +21,22 @@ public class Backend {
             throw new RuntimeException("Please enter the input file name, output file name, and additionally an optimization flag -o");
         String inputFile = args[0];
         String outputFile = args[1];
-        int optimizedFlag = 0;
+        boolean optimizedFlag = false;
 
         try {
-            if(args[1].toLowerCase() == "-o"){
-                optimizedFlag = 1;
+            if(args[2].toLowerCase().equals("-o")){
+                optimizedFlag = true;
             }
         }
         catch (IndexOutOfBoundsException e){
-            optimizedFlag = 0;
         }
 
         // Read atoms in from intermediary file and pass to generateCode
         Queue<Atom> atoms = readAtomsFromFile(inputFile);
 
         Queue<Integer> machineCodes = new LinkedList<Integer>();
-        if (optimizedFlag == 1) {
-            machineCodes = codegen.generateCode(atoms, true);
-        } else if (optimizedFlag == 0) {
-            machineCodes = codegen.generateCode(atoms, false);
-        }
+        System.out.println(optimizedFlag);
+        machineCodes = codegen.generateCode(atoms, optimizedFlag);
 
         // Create bin file -> outputFile
         //String filename = "oxide.bin";

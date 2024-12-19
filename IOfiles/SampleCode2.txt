@@ -1,0 +1,5 @@
+let mut y : f32 = 10;
+let x : f32 = 5;
+y = y * x;
+
+let mut z : f32 = 5 * 10 / 20;

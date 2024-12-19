@@ -21,15 +21,14 @@ public class Frontend {
             throw new RuntimeException("Please enter the input file name, output file name, and additionally an optimization flag -o");
         String inputFile = args[0];
         String outputFile = args[1];
-        int optimizedFlag = 0;
+        boolean optimizedFlag = false;
 
         try {
-            if(args[2].toLowerCase() == "-o"){
-                optimizedFlag = 1;
+            if(args[2].toLowerCase().equals("-o")){
+                optimizedFlag = true;
             }
         }
         catch (IndexOutOfBoundsException e){
-            optimizedFlag = 0;
         }
 
         Path file = Path.of(inputFile);
@@ -37,10 +36,10 @@ public class Frontend {
         var tokenizedCode = lexer.tokenize(inputCode);
 
         Queue<Atom> atomList = parser.parse(tokenizedCode, optimizedFlag);
-
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))){
-            for(int i = 0; i < atomList.size(); i++){
-                String atom = atomList.poll().toString();
+            int listSize = atomList.size();
+            for(int i = 0; i < listSize; i++){
+                String atom = atomList.remove().toString();
                 writer.write(atom);
                 writer.newLine();
             }
