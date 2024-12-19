@@ -9,7 +9,7 @@ import java.util.Queue;
 
 import Lexer.Lexer;
 import Parser.Parser;
-import codeGenerator.atom;
+import Core.Atom;
 
 public class Frontend {
     public static void main(String[] args) throws IOException {
@@ -34,7 +34,7 @@ public class Frontend {
         String inputCode = Files.readString(file);
         var tokenizedCode = lexer.tokenize(inputCode);
 
-        Queue<atom> atomList = parser.parse(tokenizedCode, optimizedFlag);
+        Queue<Atom> atomList = parser.parse(tokenizedCode, optimizedFlag);
 
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))){
             for(int i = 0; i < atomList.size(); i++){

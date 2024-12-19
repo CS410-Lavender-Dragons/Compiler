@@ -4,8 +4,8 @@ import Core.Token;
 import Core.TokenName;
 import Core.Variable;
 import Core.Variable.Type;
-import codeGenerator.atom;
-import codeGenerator.atomGen;
+import Core.Atom;
+import Core.AtomGen;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -19,14 +19,14 @@ public class Parser {
     Queue<Token> tokenQueue;
     Dictionary<String, Variable> lookupTable;
     Object destroyed = null;
-    atomGen atomList;
+    AtomGen atomList;
     int lblCounter;
     int tRegCount;
 
-    public Queue<atom> parse(Queue<Token> tokenQueue, int optimizedFlag) {
+    public Queue<Atom> parse(Queue<Token> tokenQueue, int optimizedFlag) {
         this.tokenQueue = tokenQueue;
         this.lookupTable = new Hashtable<>();
-        this.atomList = new atomGen();
+        this.atomList = new AtomGen();
         lblCounter = 0;
         tRegCount = 0;
         STATEMENTS();
@@ -39,7 +39,7 @@ public class Parser {
             return atomList.getAtomList();
         }
         else{
-            Queue<atom> optimizedList = constantFolding(atomList.getAtomList());
+            Queue<Atom> optimizedList = constantFolding(atomList.getAtomList());
             return optimizedList;
         }
 
@@ -409,11 +409,11 @@ public class Parser {
     }
 
     //constant folding optimization
-    public static Queue<atom> constantFolding(Queue<atom> atoms) {
-        Queue<atom> optimizedAtoms = new LinkedList<>();
+    public static Queue<Atom> constantFolding(Queue<Atom> atoms) {
+        Queue<Atom> optimizedAtoms = new LinkedList<>();
 
         while (!atoms.isEmpty()) {
-            atom currentAtom = atoms.poll();
+            Atom currentAtom = atoms.poll();
 
             //check for operators
             if (currentAtom.name.equals("ADD") || currentAtom.name.equals("SUB") ||  currentAtom.name.equals("MUL") || currentAtom.name.equals("DIV")) {
@@ -449,7 +449,7 @@ public class Parser {
                     }
 
                     //replace with MOV atom with the result
-                    atom movedAtom = new atom("MOV", String.valueOf(resultValue), "", "", 0, currentAtom.dest);
+                    Atom movedAtom = new Atom("MOV", String.valueOf(resultValue), "", "", 0, currentAtom.dest);
 
                     //add the new MOV atom to the optimized atoms list
                     optimizedAtoms.add(movedAtom);
@@ -476,8 +476,8 @@ public class Parser {
     }
     
   //just a helper function to print the expressions for testing, will remove once complete 
-     public static void printExpression(Queue<atom> atoms) {
-        for (atom a : atoms) {
+     public static void printExpression(Queue<Atom> atoms) {
+        for (Atom a : atoms) {
             System.out.println(a);
         }
     }
@@ -485,20 +485,20 @@ public class Parser {
     //main method for testing purposes only, will remove once complete.
     public static void main(String[] args) {
        
-        Queue<atom> test = new LinkedList<>();
+        Queue<Atom> test = new LinkedList<>();
         
       
-       test.add(new atom("ADD", "3", "4", "", 0, "R1")); 
-        test.add(new atom("SUB", "10", "5", "", 0, "R2")); 
-        test.add(new atom("MUL", "2", "3", "", 0, "R3")); 
-        test.add(new atom("DIV", "6", "2", "", 0, "R4")); 
+       test.add(new Atom("ADD", "3", "4", "", 0, "R1"));
+        test.add(new Atom("SUB", "10", "5", "", 0, "R2"));
+        test.add(new Atom("MUL", "2", "3", "", 0, "R3"));
+        test.add(new Atom("DIV", "6", "2", "", 0, "R4"));
         
        
         System.out.println("Original Expressions:");
         printExpression(test);
 
    
-        Queue<atom> optimizedAtoms = constantFolding(test);
+        Queue<Atom> optimizedAtoms = constantFolding(test);
 
     
         System.out.println("\nOptimzed Expression");

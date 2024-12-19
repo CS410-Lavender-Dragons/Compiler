@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import codeGenerator.atom;
-import phase3.codeGenerator;
+import Core.Atom;
+import CodeGenerator.CodeGenerator;
 
 public class Backend {
     public static void main(String[] args) throws IOException {
-        codeGenerator codegen = new codeGenerator();
+        CodeGenerator codegen = new CodeGenerator();
 
         String inputFile = args[0];
         int optimizedFlag = 0;
@@ -29,7 +29,7 @@ public class Backend {
         }
 
         // Read atoms in from intermediary file and pass to generateCode
-        Queue<atom> atoms = readAtomsFromFile(inputFile);
+        Queue<Atom> atoms = readAtomsFromFile(inputFile);
 
         Queue<Integer> machineCodes = new LinkedList<Integer>();
         if (optimizedFlag == 1) {
@@ -70,9 +70,9 @@ public class Backend {
         }
     }
 
-    public static Queue<atom> readAtomsFromFile(String filePath) throws IOException {
+    public static Queue<Atom> readAtomsFromFile(String filePath) throws IOException {
         // Create an empty queue for atoms
-        Queue<atom> atomsQueue = new LinkedList<>(); 
+        Queue<Atom> atomsQueue = new LinkedList<>();
     
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -87,7 +87,7 @@ public class Backend {
     }
 
     //reads a line from file and turns it into an atom
-    private static atom parseAtom(String line) {
+    private static Atom parseAtom(String line) {
         // removes parentheses and split by commas
         line = line.trim().substring(1, line.length() - 1); 
         
@@ -136,6 +136,6 @@ public class Backend {
         }
         
         //returns the info in an atom
-        return new atom(name, left, right, result, cmp, dest);
+        return new Atom(name, left, right, result, cmp, dest);
     }
 }

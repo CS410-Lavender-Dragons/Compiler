@@ -8,15 +8,15 @@ import java.util.Queue;
 
 import Lexer.Lexer;
 import Parser.Parser;
-import codeGenerator.atom;
-import phase3.*;
+import Core.Atom;
+import CodeGenerator.*;
 
 
 public class Compiler {
     public static void main(String[] args) throws IOException{
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
-        codeGenerator codegen = new codeGenerator();
+        CodeGenerator codegen = new CodeGenerator();
 
         String inputFile = args[0];
         String outputFile = args[1];
@@ -35,7 +35,7 @@ public class Compiler {
         String sampleCode = Files.readString(file);
         var pipelineToken = lexer.tokenize(sampleCode);
 
-        Queue<atom> atomList = parser.parse(pipelineToken, optimizedFlag);
+        Queue<Atom> atomList = parser.parse(pipelineToken, optimizedFlag);
 
         try(BufferedWriter writer = new BufferedWriter(new FileWriter("IOfiles/atoms.txt"))){
             for(int i = 0; i < atomList.size(); i++){
@@ -81,7 +81,7 @@ public class Compiler {
         //Queue<atom> atoms = parser.parse(tokens6, 0);
 
         // Read atoms in from intermediary file and pass to generateCode
-        Queue<atom> atoms = readAtomsFromFile("IOfiles/atoms.txt"); //TODO add correct file name
+        Queue<Atom> atoms = readAtomsFromFile("IOfiles/atoms.txt"); //TODO add correct file name
 
         // Check for optimization flag
         Queue<Integer> machineCodes;
@@ -124,9 +124,9 @@ public class Compiler {
         }
     }
 
-    public static Queue<atom> readAtomsFromFile(String filePath) throws IOException {
+    public static Queue<Atom> readAtomsFromFile(String filePath) throws IOException {
         // Create an empty queue for atoms
-        Queue<atom> atomsQueue = new LinkedList<>(); 
+        Queue<Atom> atomsQueue = new LinkedList<>();
     
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -141,7 +141,7 @@ public class Compiler {
     }
 
     //reads a line from file and turns it into an atom
-    private static atom parseAtom(String line) {
+    private static Atom parseAtom(String line) {
         // removes parentheses and split by commas
         line = line.trim().substring(1, line.length() - 1); 
         
@@ -190,7 +190,7 @@ public class Compiler {
         }
         
         //returns the info in an atom
-        return new atom(name, left, right, result, cmp, dest);
+        return new Atom(name, left, right, result, cmp, dest);
     }
 
 }

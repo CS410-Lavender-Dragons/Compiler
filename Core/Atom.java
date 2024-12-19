@@ -1,4 +1,4 @@
-package codeGenerator;
+package Core;
 
 
 //reference
@@ -12,7 +12,7 @@ package codeGenerator;
 
 
 //data holder 
-public class atom {
+public class Atom {
     // Based on (name, left, right, result, cmp, dest). 
     
     // Data
@@ -20,7 +20,7 @@ public class atom {
     public int cmp;
     
     // Constructor
-    public atom(String name, String left, String right, String result, int cmp, String dest){
+    public Atom(String name, String left, String right, String result, int cmp, String dest){
         this.name = name; 
         this.left = left; 
         this.right = right; 

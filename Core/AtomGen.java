@@ -1,63 +1,57 @@
-package codeGenerator;
+package Core;
 
-import Parser.Parser;
-
-import Core.Token;
-import Core.TokenName;
+import Core.Atom;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.ArrayList;
-
-import java.util.Arrays; 
 
 @SuppressWarnings("unused")
 
-public class atomGen {    
-    private Queue<atom> atomList; 
-    public atomGen(){
+public class AtomGen {
+    private Queue<Atom> atomList;
+    public AtomGen(){
         atomList = new LinkedList<>(); 
     }
 
     // add add atom: (ADD, left, right, result)
     public  void addAtom(String left, String right, String result) {
-        atomList.add(new atom("ADD", left, right, result, -1, null));
+        atomList.add(new Atom("ADD", left, right, result, -1, null));
     }
 
     // add sub atom: (SUB, left, right, result)
     public  void subAtom(String left, String right, String result) {
-        atomList.add(new atom("SUB", left, right, result, -1, null));
+        atomList.add(new Atom("SUB", left, right, result, -1, null));
     }
 
     //add mul atom: (MUL, left, right, result)
     public void mulAtom(String left, String right, String result){
-        atomList.add(new atom("MUL", left, right, result, -1, null));
+        atomList.add(new Atom("MUL", left, right, result, -1, null));
     }
 
     //add div atom: (div, left, right, result)
     public void divAtom(String left, String right, String result){
-        atomList.add(new atom("DIV", left, right, result, -1, null));
+        atomList.add(new Atom("DIV", left, right, result, -1, null));
     }
 
     public void jmpAtom(String dest){
-        atomList.add(new atom("JMP", null, null, null, -1, dest));
+        atomList.add(new Atom("JMP", null, null, null, -1, dest));
     }
 
     public void negAtom(String left, String result){
-        atomList.add(new atom("NEG", left, null, result, -1, null));
+        atomList.add(new Atom("NEG", left, null, result, -1, null));
     }
 
     public void lblAtom(String dest){
-        atomList.add(new atom("LBL", null, null, null, -1, dest));
+        atomList.add(new Atom("LBL", null, null, null, -1, dest));
     }
 
     public void tstAtom(String left, String right, int cmp, String dest){
-        atomList.add(new atom("TST", left, right, null, cmp, dest));
+        atomList.add(new Atom("TST", left, right, null, cmp, dest));
 
     }
 
     public void movAtom(String left, String dest){
-        atomList.add(new atom("MOV", left, null, null, -1, dest));
+        atomList.add(new Atom("MOV", left, null, null, -1, dest));
     }
 
     //problem of identifying stuff, counter as well
@@ -69,7 +63,7 @@ public class atomGen {
         }
     }
 
-    public Queue<atom> getAtomList() {
+    public Queue<Atom> getAtomList() {
         return this.atomList;
     }
 }
