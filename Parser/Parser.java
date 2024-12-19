@@ -409,7 +409,6 @@ public class Parser {
     }
 
     //constant folding optimization
-    //TODO: Add a flag option. 
     public static Queue<atom> constantFolding(Queue<atom> atoms) {
         Queue<atom> optimizedAtoms = new LinkedList<>();
 
