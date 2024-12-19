@@ -11,7 +11,7 @@ import java.util.Queue;
 import java.util.Scanner;
 
 import Core.Atom;
-import CodeGenerator.CodeGenerator;
+import codeGenerator.CodeGenerator;
 
 public class Backend {
     public static void main(String[] args) throws IOException {
@@ -22,6 +22,15 @@ public class Backend {
         String inputFile = args[0];
         String outputFile = args[1];
         boolean optimizedFlag = false;
+
+        File input = new File(args[0]);
+        if(!input.exists()){
+            throw new RuntimeException("Error: input file " + args[0] + " does not exist");
+        }
+        File output = new File(args[1]);
+        if(!output.exists()){
+            throw new RuntimeException("Error: output file " + args[1] + " does not exist");
+        }
 
         try {
             if(args[2].toLowerCase().trim().equals("-o")){

@@ -9,7 +9,7 @@ import java.util.Queue;
 import Lexer.Lexer;
 import Parser.Parser;
 import Core.Atom;
-import CodeGenerator.*;
+import codeGenerator.*;
 
 
 public class Compiler {
@@ -30,13 +30,24 @@ public class Compiler {
         catch (IndexOutOfBoundsException e){
         }
 
+        File input = new File(args[0]);
+        if(!input.exists()){
+            throw new RuntimeException("Error: input file " + args[0] + " does not exist");
+        }
+        File output = new File(args[1]);
+        if(!output.exists()){
+            throw new RuntimeException("Error: output file " + args[1] + " does not exist");
+        }
+
+
+
         Path file = Path.of(inputFile);
         String sampleCode = Files.readString(file);
         var pipelineToken = lexer.tokenize(sampleCode);
 
         Queue<Atom> atomList = parser.parse(pipelineToken, optimizedFlag);
 
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter("IOfiles/atoms.txt"))){
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(inputFile))){
             for(int i = 0; i < atomList.size(); i++){
                 String atom = atomList.poll().toString();
                 writer.write(atom);
