@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Scanner;
 
 import Core.Atom;
 import CodeGenerator.CodeGenerator;
@@ -16,11 +17,14 @@ public class Backend {
     public static void main(String[] args) throws IOException {
         CodeGenerator codegen = new CodeGenerator();
 
+        if (args.length < 2)
+            throw new RuntimeException("Please enter the input file name, output file name, and additionally an optimization flag -o");
         String inputFile = args[0];
+        String outputFile = args[1];
         int optimizedFlag = 0;
 
         try {
-            if(args[1] == "-o"){
+            if(args[1].toLowerCase() == "-o"){
                 optimizedFlag = 1;
             }
         }
@@ -38,15 +42,21 @@ public class Backend {
             machineCodes = codegen.generateCode(atoms, false);
         }
 
-        // Create bin file
-        String filename = "oxide.bin";
+        // Create bin file -> outputFile
+        //String filename = "oxide.bin";
         try {
-            File binF = new File(filename);
+            File binF = new File(outputFile);
 
             if (binF.createNewFile()) {
                 System.out.println("File created: " + binF.getName());
             } else {
-                System.out.println("File already exists.");
+                System.out.println("File already exists. Proceed? (Y/N)");
+                String response = (new Scanner(System.in)).nextLine().toLowerCase();
+                if (!response.equals("y")){
+                    System.out.println("Code generation terminated.");
+                    return;
+                }
+
             }
         } catch (IOException e) {
             System.out.println("An error occurred.");
@@ -54,7 +64,7 @@ public class Backend {
         }
 
         try {
-            DataOutputStream dos = new DataOutputStream(new FileOutputStream(filename));
+            DataOutputStream dos = new DataOutputStream(new FileOutputStream(outputFile));
             // Loop through machine code queue and write each instruction to bin file
             dos.writeInt(0);
             while (!machineCodes.isEmpty()) {

@@ -229,7 +229,7 @@ public class Parser {
 
         //Generate LBL for before loop atoms
         atomList.lblAtom(beforeLabel);
-        // Generate TST atom using cmp of 5 for “..” and cmp of 3 for “..=” which jumps
+        // Generate TST atom using cmp of 5 for ".." and cmp of 3 for "..=" which jumps
         // to labelAfterName (left value is identifier, right is second ARITHMETIC_EXPR
         // return)
         atomList.tstAtom(loopIdent, upperLoopVal, cmp, labelAfterName);

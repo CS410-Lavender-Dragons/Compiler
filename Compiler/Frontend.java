@@ -17,12 +17,14 @@ public class Frontend {
         Parser parser = new Parser();
 
         // Parse arguments
+        if (args.length < 2)
+            throw new RuntimeException("Please enter the input file name, output file name, and additionally an optimization flag -o");
         String inputFile = args[0];
         String outputFile = args[1];
         int optimizedFlag = 0;
 
         try {
-            if(args[2] == "-o"){
+            if(args[2].toLowerCase() == "-o"){
                 optimizedFlag = 1;
             }
         }
