@@ -428,7 +428,6 @@ public class Parser {
 
         while (!atoms.isEmpty()) {
             atom currentAtom = atoms.poll();
-
             //mov case
             if(currentAtom.name.equals("MOV")){
                 //#? 
@@ -440,13 +439,14 @@ public class Parser {
 
 
             if (currentAtom.name.equals("ADD") || currentAtom.name.equals("SUB") ||  currentAtom.name.equals("MUL") || currentAtom.name.equals("DIV")) {
-
-                //check if both left and right operands are constants, or if one of them is a temp reg 
                 if ((currentAtom.left.contains("T") || currentAtom.right.contains("T"))) {
                     //preform the constant folding
                     
                     Double leftValue = 0.0; 
                     Double rightValue = 0.0; 
+
+                    /* leftValue = memory.get(currentAtom.left); 
+                    rightValue = memory.get(currentAtom.right);  */
 
                     leftValue = currentAtom.left.contains("T") ? memory.get(currentAtom.left) : Double.parseDouble(currentAtom.left);
                     rightValue = currentAtom.right.contains("T") ? memory.get(currentAtom.right) : Double.parseDouble(currentAtom.right);
@@ -490,10 +490,13 @@ public class Parser {
                 if(resultValue != -10.0234991299921293999){
                     atom movAtom = new atom("MOV", String.valueOf(resultValue), "","", 0, currentAtom.dest);    
                     optimizedAtoms.add(movAtom); 
+                    resultValue = -10.0234991299921293999;
+
                 }
             }
             
         }
+        System.out.println(memory); 
 
         return optimizedAtoms; 
     }
@@ -537,17 +540,7 @@ public class Parser {
         test.add(new atom("ADD", "T4", "2", "", 0, "T5")); 
         test.add(new atom("MOV", "T5", "", "", 0, "b")); */
 
- /*        test.add(new atom("SUB", "20", "5", "", 0, "T1"));   
-        test.add(new atom("ADD", "8", "2", "", 0, "T2"));        
-        test.add(new atom("MUL", "4", "T1", "", 0, "T3"));       
-        test.add(new atom("DIV", "T3", "3", "", 0, "T4"));       
-        test.add(new atom("ADD", "T4", "7", "", 0, "T5"));       
-        test.add(new atom("MUL", "T5", "2", "", 0, "T6"));       
-        test.add(new atom("DIV", "100", "T2", "", 0, "T7"));     
-        test.add(new atom("ADD", "50", "T6", "", 0, "T8"));      
-        test.add(new atom("SUB", "T8", "T7", "", 0, "T9"));     
-        test.add(new atom("MOV", "T9", "", "", 0, "b"));   */ 
-
+        //first test one 
         test.add(new atom("MOV", "20", "", "", 0, "T1"));         
         test.add(new atom("MOV", "5", "", "", 0, "T2"));          
         test.add(new atom("MOV", "15", "", "", 0, "T3"));         
@@ -568,9 +561,35 @@ public class Parser {
         test.add(new atom("SUB", "T8", "T13", "", 0, "T15"));     
         test.add(new atom("ADD", "T15", "T14", "", 0, "T16"));    
 
-        test.add(new atom("MOV", "T16", "", "", 0, "b"));         
+        test.add(new atom("MOV", "T16", "", "", 0, "b"));       
 
-       
+
+        //other test one 
+        test.add(new atom("MOV", "10", "", "", 0, "T1"));         
+        test.add(new atom("MOV", "5", "", "", 0, "T2"));          
+        test.add(new atom("MOV", "15", "", "", 0, "T3"));         
+        test.add(new atom("MOV", "3", "", "", 0, "T4"));          
+        test.add(new atom("MOV", "8", "", "", 0, "T5"));          
+        test.add(new atom("MOV", "2", "", "", 0, "T6"));          
+        test.add(new atom("MOV", "100", "", "", 0, "T7"));        
+        test.add(new atom("MOV", "300", "", "", 0, "T8"));        
+
+        test.add(new atom("ADD", "T1", "T2", "", 0, "T9"));       
+        test.add(new atom("SUB", "T3", "T4", "", 0, "T10"));      
+        test.add(new atom("ADD", "T5", "T6", "", 0, "T11"));      
+
+        test.add(new atom("MUL", "T9", "2", "", 0, "T12"));       
+        test.add(new atom("DIV", "T12", "T10", "", 0, "T13"));    
+        test.add(new atom("DIV", "T7", "T11", "", 0, "T14"));     
+
+        test.add(new atom("SUB", "T8", "T13", "", 0, "T15"));     
+        test.add(new atom("ADD", "T15", "T14", "", 0, "T16"));    
+
+        test.add(new atom("MOV", "T16", "", "", 0, "b")); 
+    
+
+        // Move the final result into x
+
         System.out.println("Original Expressions:");
         printExpression(test);
 
