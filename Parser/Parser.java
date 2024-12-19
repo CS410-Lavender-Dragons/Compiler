@@ -471,7 +471,6 @@ public class Parser {
         HashMap<String, Double> tRegMap = new HashMap<>();
         HashMap<String, Atom> movAtoms = new HashMap<>();
         while (!atoms.isEmpty()){
-            System.out.println(tRegMap);
             Atom a = atoms.remove();
             if (a.name.equals("MOV") && isNumeric(a.left)) {
                 tRegMap.put(a.dest, Double.parseDouble(a.left));
@@ -493,8 +492,11 @@ public class Parser {
                     tRegMap.put(a.result, left * right);
                     movAtoms.put(a.result, n);
                 }
-                else
+                else {
+                    if (atoms.peek() != null && atoms.peek().name.equals("MOV") && atoms.peek().left.equals(a.result))
+                            a.result = atoms.remove().dest;
                     optimizedAtoms.add(a);
+                }
             }
             else if (a.name.equals("DIV")){
                 Double left = tRegMap.get(a.left);
@@ -507,8 +509,11 @@ public class Parser {
                     tRegMap.put(a.result, left / right);
                     movAtoms.put(a.result, n);
                 }
-                else
+                else {
+                    if (atoms.peek() != null && atoms.peek().name.equals("MOV") && atoms.peek().left.equals(a.result))
+                        a.result = atoms.remove().dest;
                     optimizedAtoms.add(a);
+                }
             }
             else if (a.name.equals("ADD")){
                 Double left = tRegMap.get(a.left);
@@ -521,8 +526,11 @@ public class Parser {
                     tRegMap.put(a.result, left + right);
                     movAtoms.put(a.result, n);
                 }
-                else
+                else {
+                    if (atoms.peek() != null && atoms.peek().name.equals("MOV") && atoms.peek().left.equals(a.result))
+                        a.result = atoms.remove().dest;
                     optimizedAtoms.add(a);
+                }
             }
             else if (a.name.equals("SUB")){
                 Double left = tRegMap.get(a.left);
@@ -535,8 +543,11 @@ public class Parser {
                     tRegMap.put(a.result, left - right);
                     movAtoms.put(a.result, n);
                 }
-                else
+                else {
+                    if (atoms.peek() != null && atoms.peek().name.equals("MOV") && atoms.peek().left.equals(a.result))
+                        a.result = atoms.remove().dest;
                     optimizedAtoms.add(a);
+                }
             }
             else
                 optimizedAtoms.add(a);
@@ -555,7 +566,7 @@ public class Parser {
     public static void main(String[] args) {
 
         Lexer lex = new Lexer();
-        Queue<Token> lexed = lex.tokenize("let mut x:i32 = (2 * 4 + 12) / 20 - 1 + 300 - 50; let mut y : f16 = 2 * x;");
+        Queue<Token> lexed = lex.tokenize("let mut x:i32 = (2 * 4 + 12) / 20 - 1 + 300 - 50; let mut y : f16 = 2 * x + 36 * 2; let z:f32 = x / y - y;");
         Parser p = new Parser();
         Queue<Atom> atoms = p.parse(lexed, false);
 
