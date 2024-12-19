@@ -24,7 +24,7 @@ public class Frontend {
         boolean optimizedFlag = false;
 
         try {
-            if(args[2].toLowerCase().equals("-o")){
+            if(args[2].toLowerCase().trim().equals("-o")){
                 optimizedFlag = true;
             }
         }

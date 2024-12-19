@@ -23,7 +23,7 @@ public class Compiler {
         boolean optimizedFlag = false;
 
         try {
-            if(args[2].equals("-o")){
+            if(args[2].toLowerCase().trim().equals("-o")){
                 optimizedFlag = true;
             }
         }
