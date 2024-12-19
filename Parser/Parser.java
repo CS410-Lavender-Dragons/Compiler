@@ -6,10 +6,9 @@ import Core.Variable;
 import Core.Variable.Type;
 import Core.Atom;
 import Core.AtomGen;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.Queue;
+import Lexer.Lexer;
+
+import java.util.*;
 
 
 //casting needs to be done right before use to avoid data types issues 
@@ -33,8 +32,7 @@ public class Parser {
         expect(TokenName.EOI);
         if(!optimizedFlag)
             return atomList.getAtomList();
-
-        Queue<Atom> optimizedList = constantFolding(atomList.getAtomList());
+        Queue<Atom> optimizedList = constantFolding2(atomList.getAtomList());
         return optimizedList;
     }
 
@@ -467,6 +465,80 @@ public class Parser {
             return false;
         }
     }
+
+    public static Queue<Atom> constantFolding2(Queue<Atom> atoms){
+        Queue<Atom> optimizedAtoms = new LinkedList<>();
+        HashMap<String, Double> tRegMap = new HashMap<>();
+        HashMap<String, Atom> movAtoms = new HashMap<>();
+        while (!atoms.isEmpty()){
+            System.out.println(tRegMap);
+            Atom a = atoms.remove();
+            if(a.name.equals("MOV") && isNumeric(a.left)) {
+                tRegMap.put(a.dest, Double.parseDouble(a.left));
+                movAtoms.put(a.dest, a);
+                optimizedAtoms.add(a);
+            }
+            else if (a.name.equals("MUL")){
+                Double left = tRegMap.get(a.left);
+                Double right = tRegMap.get(a.right);
+                if (left != null && right != null){
+                    Atom n = new Atom("MOV", Double.toString(left * right), null, null, -1, a.result);
+                    optimizedAtoms.add(n);
+                    optimizedAtoms.remove(movAtoms.remove(a.left));
+                    optimizedAtoms.remove(movAtoms.remove(a.right));
+                    tRegMap.put(a.result, left * right);
+                    movAtoms.put(a.result, n);
+                }
+                else
+                    optimizedAtoms.add(a);
+            }
+            else if (a.name.equals("DIV")){
+                Double left = tRegMap.get(a.left);
+                Double right = tRegMap.get(a.right);
+                if (left != null && right != null){
+                    Atom n = new Atom("MOV", Double.toString(left / right), null, null, -1, a.result);
+                    optimizedAtoms.add(n);
+                    optimizedAtoms.remove(movAtoms.remove(a.left));
+                    optimizedAtoms.remove(movAtoms.remove(a.right));
+                    tRegMap.put(a.result, left / right);
+                    movAtoms.put(a.result, n);
+                }
+                else
+                    optimizedAtoms.add(a);
+            }
+            else if (a.name.equals("ADD")){
+                Double left = tRegMap.get(a.left);
+                Double right = tRegMap.get(a.right);
+                if (left != null && right != null){
+                    Atom n = new Atom("MOV", Double.toString(left + right), null, null, -1, a.result);
+                    optimizedAtoms.add(n);
+                    optimizedAtoms.remove(movAtoms.remove(a.left));
+                    optimizedAtoms.remove(movAtoms.remove(a.right));
+                    tRegMap.put(a.result, left + right);
+                    movAtoms.put(a.result, n);
+                }
+                else
+                    optimizedAtoms.add(a);
+            }
+            else if (a.name.equals("SUB")){
+                Double left = tRegMap.get(a.left);
+                Double right = tRegMap.get(a.right);
+                if (left != null && right != null){
+                    Atom n = new Atom("MOV", Double.toString(left - right), null, null, -1, a.result);
+                    optimizedAtoms.add(n);
+                    optimizedAtoms.remove(movAtoms.remove(a.left));
+                    optimizedAtoms.remove(movAtoms.remove(a.right));
+                    tRegMap.put(a.result, left - right);
+                    movAtoms.put(a.result, n);
+                }
+                else
+                    optimizedAtoms.add(a);
+            }
+            else
+                optimizedAtoms.add(a);
+        }
+        return optimizedAtoms;
+    }
     
   //just a helper function to print the expressions for testing, will remove once complete 
      public static void printExpression(Queue<Atom> atoms) {
@@ -477,25 +549,22 @@ public class Parser {
 
     //main method for testing purposes only, will remove once complete.
     public static void main(String[] args) {
-       
-        Queue<Atom> test = new LinkedList<>();
-        
-      
-       test.add(new Atom("ADD", "3", "4", "", 0, "R1"));
-        test.add(new Atom("SUB", "10", "5", "", 0, "R2"));
-        test.add(new Atom("MUL", "2", "3", "", 0, "R3"));
-        test.add(new Atom("DIV", "6", "2", "", 0, "R4"));
-        
+
+        Lexer lex = new Lexer();
+        Queue<Token> lexed = lex.tokenize("let mut x:i32 = 2 * 4 / 20; let mut y : f16 = 2;");
+        Parser p = new Parser();
+        Queue<Atom> atoms = p.parse(lexed, false);
+
        
         System.out.println("Original Expressions:");
-        printExpression(test);
+        printExpression(atoms);
 
    
-        Queue<Atom> optimizedAtoms = constantFolding(test);
+        //Queue<Atom> optimizedAtoms = constantFolding(test);
 
     
         System.out.println("\nOptimzed Expression");
-        printExpression(optimizedAtoms);
+        printExpression(p.constantFolding2(atoms));
     }
 
 }
