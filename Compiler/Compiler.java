@@ -10,7 +10,7 @@ import java.util.Scanner;
 import Lexer.Lexer;
 import Parser.Parser;
 import Core.Atom;
-import CodeGenerator.*;
+import codeGenerator.*;
 
 
 public class Compiler {
