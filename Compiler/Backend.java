@@ -11,7 +11,7 @@ import java.util.Queue;
 import java.util.Scanner;
 
 import Core.Atom;
-import codeGenerator.CodeGenerator;
+import CodeGenerator.CodeGenerator;
 
 public class Backend {
     public static void main(String[] args) throws IOException {
@@ -40,18 +40,13 @@ public class Backend {
         Queue<Atom> atoms = readAtomsFromFile(inputFile);
 
         Queue<Integer> machineCodes = new LinkedList<Integer>();
-        System.out.println(optimizedFlag);
         machineCodes = codegen.generateCode(atoms, optimizedFlag);
 
-        // Create bin file -> outputFile
-        //String filename = "oxide.bin";
         try {
             File binF = new File(outputFile);
 
-            if (binF.createNewFile()) {
-                System.out.println("File created: " + binF.getName());
-            } else {
-                System.out.println("File already exists. Proceed? (Y/N)");
+            if (!binF.createNewFile()) {
+                System.out.println("Output file already exists. Proceed? (Y/N)");
                 String response = (new Scanner(System.in)).nextLine().toLowerCase();
                 if (!response.equals("y")){
                     System.out.println("Code generation terminated.");

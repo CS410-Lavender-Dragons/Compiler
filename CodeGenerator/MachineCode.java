@@ -1,4 +1,4 @@
-package codeGenerator;
+package CodeGenerator;
 
 public class MachineCode {
 

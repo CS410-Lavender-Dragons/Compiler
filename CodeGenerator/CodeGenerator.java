@@ -1,4 +1,4 @@
-package codeGenerator;
+package CodeGenerator;
 import Core.Atom;
 
 import java.util.*;
