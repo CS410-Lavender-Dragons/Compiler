@@ -4,12 +4,11 @@ import Core.Token;
 import Core.TokenName;
 import Core.Variable;
 import Core.Variable.Type;
-import codeGenerator.atom;
-import codeGenerator.atomGen;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.Queue;
+import Core.Atom;
+import Core.AtomGen;
+import Lexer.Lexer;
+
+import java.util.*;
 
 
 //casting needs to be done right before use to avoid data types issues 
@@ -19,21 +18,22 @@ public class Parser {
     Queue<Token> tokenQueue;
     Dictionary<String, Variable> lookupTable;
     Object destroyed = null;
-    atomGen atomList;
+    AtomGen atomList;
     int lblCounter;
     int tRegCount;
-    private boolean optimizationEnabled;
 
-    public Queue<atom> parse(Queue<Token> tokenQueue) {
+    public Queue<Atom> parse(Queue<Token> tokenQueue, boolean optimizedFlag) {
         this.tokenQueue = tokenQueue;
         this.lookupTable = new Hashtable<>();
-        this.atomList = new atomGen();
+        this.atomList = new AtomGen();
         lblCounter = 0;
         tRegCount = 0;
         STATEMENTS();
         expect(TokenName.EOI);
-        atomList.end();
-        return atomList.getAtomList();
+        if(!optimizedFlag)
+            return atomList.getAtomList();
+        Queue<Atom> optimizedList = constantFolding(atomList.getAtomList());
+        return optimizedList;
     }
 
     boolean accept(TokenName tokenName) {
@@ -220,7 +220,7 @@ public class Parser {
 
         //Generate LBL for before loop atoms
         atomList.lblAtom(beforeLabel);
-        // Generate TST atom using cmp of 5 for “..” and cmp of 3 for “..=” which jumps
+        // Generate TST atom using cmp of 5 for ".." and cmp of 3 for "..=" which jumps
         // to labelAfterName (left value is identifier, right is second ARITHMETIC_EXPR
         // return)
         atomList.tstAtom(loopIdent, upperLoopVal, cmp, labelAfterName);
@@ -399,115 +399,102 @@ public class Parser {
         return "L" + lblCounter++;
     }
 
-    //Constant folding globabl optimization
-    public Queue<Token> constantFolding(Queue<Token> tokens) {
-        Queue<Token> optimizedTokens = new LinkedList<>();
-        LinkedList<Token> buffer = new LinkedList<>(); 
+   //helper to check for constants
+    private static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str); 
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 
-        while (!tokens.isEmpty()) {
-            Token token = tokens.poll();
-
-            //process numeric constants and operators
-            if (token.getName() == TokenName.NUMERIC || isOperator(token.getName())) {
-                buffer.add(token);
-
-                //check for at least two numbers and an operator in the buffer
-                if (buffer.size() >= 3) {
-                    Token leftOperand = buffer.get(buffer.size() - 3);
-                    Token operator = buffer.get(buffer.size() - 2);
-                    Token rightOperand = buffer.get(buffer.size() - 1);
-
-                    if (leftOperand.getName() == TokenName.NUMERIC &&
-                        rightOperand.getName() == TokenName.NUMERIC &&
-                        isOperator(operator.getName())) {
-
-                        //perform constant folding
-                        long leftValue = Long.parseLong(leftOperand.getValue().toString());
-                        long rightValue = Long.parseLong(rightOperand.getValue().toString());
-                        long result = 0;
-
-                        switch (operator.getName()) {
-                            case ADD_OP:
-                                result = leftValue + rightValue;
-                                break;
-                            case SUB_OP:
-                                result = leftValue - rightValue;
-                                break;
-                            case MULT_OP:
-                                result = leftValue * rightValue;
-                                break;
-                            case DIV_OP:
-                                result = rightValue != 0 ? leftValue / rightValue : 0; 
-                                break;
-                            default:
-                                //if operator is unrecognized, move on
-                                optimizedTokens.add(leftOperand);
-                                optimizedTokens.add(operator);
-                                optimizedTokens.add(rightOperand);
-                                buffer.clear();
-                                break;
-                        }
-
-                        //replace the last three tokens with the folded result
-                        buffer.removeLast();
-                        buffer.removeLast(); 
-                        buffer.removeLast(); 
-                        buffer.add(new Token(TokenName.NUMERIC, result));
-                    }
-                }
-            } else {
-                //flush buffer if theres a non-numeric/operator token
-                optimizedTokens.addAll(buffer);
-                buffer.clear();
-                optimizedTokens.add(token);
+    public static Queue<Atom> constantFolding(Queue<Atom> atoms){
+        Queue<Atom> optimizedAtoms = new LinkedList<>();
+        HashMap<String, Double> tRegMap = new HashMap<>();
+        HashMap<String, Atom> movAtoms = new HashMap<>();
+        while (!atoms.isEmpty()){
+            Atom a = atoms.remove();
+            if (a.name.equals("MOV") && isNumeric(a.left)) {
+                tRegMap.put(a.dest, Double.parseDouble(a.left));
+                movAtoms.put(a.dest, a);
+                optimizedAtoms.add(a);
             }
+            else if (a.name.equals("MOV") && tRegMap.containsKey(a.left)){
+                optimizedAtoms.remove(movAtoms.remove(a.left));
+                optimizedAtoms.add(new Atom("MOV", Double.toString(tRegMap.get(a.left)), null, null, -1, a.dest));
+            }
+            else if (a.name.equals("MUL")){
+                Double left = tRegMap.get(a.left);
+                Double right = tRegMap.get(a.right);
+                if (left != null && right != null){
+                    Atom n = new Atom("MOV", Double.toString(left * right), null, null, -1, a.result);
+                    optimizedAtoms.add(n);
+                    optimizedAtoms.remove(movAtoms.remove(a.left));
+                    optimizedAtoms.remove(movAtoms.remove(a.right));
+                    tRegMap.put(a.result, left * right);
+                    movAtoms.put(a.result, n);
+                }
+                else {
+                    if (atoms.peek() != null && atoms.peek().name.equals("MOV") && atoms.peek().left.equals(a.result))
+                            a.result = atoms.remove().dest;
+                    optimizedAtoms.add(a);
+                }
+            }
+            else if (a.name.equals("DIV")){
+                Double left = tRegMap.get(a.left);
+                Double right = tRegMap.get(a.right);
+                if (left != null && right != null){
+                    Atom n = new Atom("MOV", Double.toString(left / right), null, null, -1, a.result);
+                    optimizedAtoms.add(n);
+                    optimizedAtoms.remove(movAtoms.remove(a.left));
+                    optimizedAtoms.remove(movAtoms.remove(a.right));
+                    tRegMap.put(a.result, left / right);
+                    movAtoms.put(a.result, n);
+                }
+                else {
+                    if (atoms.peek() != null && atoms.peek().name.equals("MOV") && atoms.peek().left.equals(a.result))
+                        a.result = atoms.remove().dest;
+                    optimizedAtoms.add(a);
+                }
+            }
+            else if (a.name.equals("ADD")){
+                Double left = tRegMap.get(a.left);
+                Double right = tRegMap.get(a.right);
+                if (left != null && right != null){
+                    Atom n = new Atom("MOV", Double.toString(left + right), null, null, -1, a.result);
+                    optimizedAtoms.add(n);
+                    optimizedAtoms.remove(movAtoms.remove(a.left));
+                    optimizedAtoms.remove(movAtoms.remove(a.right));
+                    tRegMap.put(a.result, left + right);
+                    movAtoms.put(a.result, n);
+                }
+                else {
+                    if (atoms.peek() != null && atoms.peek().name.equals("MOV") && atoms.peek().left.equals(a.result))
+                        a.result = atoms.remove().dest;
+                    optimizedAtoms.add(a);
+                }
+            }
+            else if (a.name.equals("SUB")){
+                Double left = tRegMap.get(a.left);
+                Double right = tRegMap.get(a.right);
+                if (left != null && right != null){
+                    Atom n = new Atom("MOV", Double.toString(left - right), null, null, -1, a.result);
+                    optimizedAtoms.add(n);
+                    optimizedAtoms.remove(movAtoms.remove(a.left));
+                    optimizedAtoms.remove(movAtoms.remove(a.right));
+                    tRegMap.put(a.result, left - right);
+                    movAtoms.put(a.result, n);
+                }
+                else {
+                    if (atoms.peek() != null && atoms.peek().name.equals("MOV") && atoms.peek().left.equals(a.result))
+                        a.result = atoms.remove().dest;
+                    optimizedAtoms.add(a);
+                }
+            }
+            else
+                optimizedAtoms.add(a);
         }
-
-        // add any remaining buffered tokens to the optimized tokens
-        optimizedTokens.addAll(buffer);
-
-        return optimizedTokens;
+        return optimizedAtoms;
     }
-    
-    private boolean isOperator(TokenName tokenName) {
-        return tokenName == TokenName.ADD_OP || tokenName == TokenName.SUB_OP || tokenName == TokenName.MULT_OP || tokenName == TokenName.DIV_OP;
-    }
-
-    //TODO: Implement flag option
-
-    //This is just here to test the constant folding, will remove once complete
-    public static void main(String[] args) {
-        Queue<Token> tokens = new LinkedList<>();
-        tokens.add(new Token(TokenName.NUMERIC, "10"));
-        tokens.add(new Token(TokenName.ADD_OP, "+"));
-        tokens.add(new Token(TokenName.NUMERIC, "20"));
-        tokens.add(new Token(TokenName.MULT_OP, "*"));
-        tokens.add(new Token(TokenName.NUMERIC, "2"));
-        tokens.add(new Token(TokenName.SUB_OP, "-"));
-        tokens.add(new Token(TokenName.NUMERIC, "5"));
-    
-        
-        System.out.println("Original Expression:");
-        printExpression(tokens);
-    
-   
-        Parser parser = new Parser();
-        Queue<Token> optimizedTokens = parser.constantFolding(new LinkedList<>(tokens));
-    
-      
-        System.out.println("Optimized Expression:");
-        printExpression(optimizedTokens);
-    }
-    
-    // Helper method to print tokens as an expression for testing, will remove once complete
-    private static void printExpression(Queue<Token> tokens) {
-        StringBuilder expression = new StringBuilder();
-        for (Token token : tokens) {
-            expression.append(token.getValue()).append(" ");
-        }
-        System.out.println(expression.toString().trim());
-    }
-    
-
-    
 }

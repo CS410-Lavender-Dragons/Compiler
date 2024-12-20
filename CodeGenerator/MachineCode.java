@@ -1,11 +1,11 @@
-package phase3;
+package codeGenerator;
 
-public class machineCode {
+public class MachineCode {
 
     Integer opcode, cmp, r, a;
 
     //constructor
-    public machineCode(int opcode, int cmp, int r, int a) {
+    public MachineCode(int opcode, int cmp, int r, int a) {
         this.opcode = opcode;
         this.cmp = cmp;
         this.r = r;
