@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 public class CodeGenerator {
 
     // machineCode queue for our functions to populate with machineCode
-    //private Queue<String> machineQueue;
     private Queue<MachineCode> instructionQueue;
     // labelTable to store labels' associated address (pc value)
     private Hashtable<String, Integer> labelTable;

@@ -32,7 +32,7 @@ public class Parser {
         expect(TokenName.EOI);
         if(!optimizedFlag)
             return atomList.getAtomList();
-        Queue<Atom> optimizedList = constantFolding2(atomList.getAtomList());
+        Queue<Atom> optimizedList = constantFolding(atomList.getAtomList());
         return optimizedList;
     }
 
@@ -399,63 +399,6 @@ public class Parser {
         return "L" + lblCounter++;
     }
 
-    //constant folding optimization
-    public static Queue<Atom> constantFolding(Queue<Atom> atoms) {
-        Queue<Atom> optimizedAtoms = new LinkedList<>();
-
-        while (!atoms.isEmpty()) {
-            Atom currentAtom = atoms.poll();
-
-            //check for operators
-            if (currentAtom.name.equals("ADD") || currentAtom.name.equals("SUB") ||  currentAtom.name.equals("MUL") || currentAtom.name.equals("DIV")) {
-                
-                //check if both left and right operands are constants
-                if (isNumeric(currentAtom.left) && isNumeric(currentAtom.right)) {
-                    //preform the constant folding
-                    int leftValue = Integer.parseInt(currentAtom.left);
-                    int rightValue = Integer.parseInt(currentAtom.right);
-                    int resultValue = 0;
-
-                   //does the  actual operation
-                   //probably will have to  calculate div as floats??
-                    switch (currentAtom.name) {
-                        case "ADD":
-                            resultValue = leftValue + rightValue;
-                            break;
-                        case "SUB":
-                            resultValue = leftValue - rightValue;
-                            break;
-                        case "MUL":
-                            resultValue = leftValue * rightValue;
-                            break;
-                        case "DIV":
-                        //make sure we dont divide by 0
-                            if (rightValue != 0) {
-                                resultValue = leftValue / rightValue;
-                            } else {
-                                System.err.println("Division by zero detected.");
-                                resultValue = 0; 
-                            }
-                            break;
-                    }
-
-                    //replace with MOV atom with the result
-                    Atom movedAtom = new Atom("MOV", String.valueOf(resultValue), "", "", 0, currentAtom.dest);
-
-                    //add the new MOV atom to the optimized atoms list
-                    optimizedAtoms.add(movedAtom);
-                } else {
-                    // if operands are not constants, add the atom as-is
-                    optimizedAtoms.add(currentAtom);
-                }
-            } else {
-                //for others, just add them to the optimized list without modification
-                optimizedAtoms.add(currentAtom);
-            }
-        }
-
-        return optimizedAtoms; 
-    }
    //helper to check for constants
     private static boolean isNumeric(String str) {
         try {
@@ -466,7 +409,7 @@ public class Parser {
         }
     }
 
-    public static Queue<Atom> constantFolding2(Queue<Atom> atoms){
+    public static Queue<Atom> constantFolding(Queue<Atom> atoms){
         Queue<Atom> optimizedAtoms = new LinkedList<>();
         HashMap<String, Double> tRegMap = new HashMap<>();
         HashMap<String, Atom> movAtoms = new HashMap<>();
@@ -554,32 +497,4 @@ public class Parser {
         }
         return optimizedAtoms;
     }
-    
-  //just a helper function to print the expressions for testing, will remove once complete 
-     public static void printExpression(Queue<Atom> atoms) {
-        for (Atom a : atoms) {
-            System.out.println(a);
-        }
-    }
-
-    //main method for testing purposes only, will remove once complete.
-    public static void main(String[] args) {
-
-        Lexer lex = new Lexer();
-        Queue<Token> lexed = lex.tokenize("let mut x:i32 = (2 * 4 + 12) / 20 - 1 + 300 - 50; let mut y : f16 = 2 * x + 36 * 2; let z:f32 = x / y - y;");
-        Parser p = new Parser();
-        Queue<Atom> atoms = p.parse(lexed, false);
-
-       
-        System.out.println("Original Expressions:");
-        printExpression(atoms);
-
-   
-        //Queue<Atom> optimizedAtoms = constantFolding(test);
-
-    
-        System.out.println("\nOptimzed Expression");
-        printExpression(p.constantFolding2(atoms));
-    }
-
 }
