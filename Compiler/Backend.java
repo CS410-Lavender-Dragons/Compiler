@@ -27,10 +27,6 @@ public class Backend {
         if(!input.exists()){
             throw new RuntimeException("Error: input file " + args[0] + " does not exist");
         }
-        File output = new File(args[1]);
-        if(!output.exists()){
-            throw new RuntimeException("Error: output file " + args[1] + " does not exist");
-        }
 
         try {
             if(args[2].toLowerCase().trim().equals("-o")){
